@@ -65,10 +65,16 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1
+        if: steps.market.outputs.ready == 'true'
+        with:
+          version: v1.7.1
       - if: steps.market.outputs.ready == 'true'
         run: pnpm install --frozen-lockfile
       - if: steps.market.outputs.ready == 'true'
         run: pnpm --filter @qtimeline/resolver test
+      - if: steps.market.outputs.ready == 'true'
+        run: pnpm contracts:build
       - name: Verify testnet secrets and active BEA market
         if: steps.market.outputs.ready == 'true'
         env:
