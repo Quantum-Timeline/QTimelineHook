@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { robinhoodChain } from "@qtimeline/chain";
 import { WalletButton } from "@/components/WalletButton";
-import { ForkHero } from "@/components/ForkHero";
 
 const links = [
   ["Market", "/market/"],
@@ -103,28 +102,27 @@ export function Frame({ children }: { children: React.ReactNode; wide?: boolean 
 
 export type HeadingFact = { label: string; value: React.ReactNode; sub?: string; wide?: boolean };
 
-/** Page hero: title and intro with fact chips on the left, the forking-timeline graphic on the right. */
+/** Page hero: title and intro on the left, the page's key facts on the right. */
 export function PageHeading({ tag, title, body, facts, note }: { tag: string; title: string; body: string; facts?: HeadingFact[]; note?: React.ReactNode }) {
   return (
-    <section className="phero">
+    <section className={`phero${facts ? "" : " phero--solo"}`}>
       <div className="phero__copy">
         <p className="phero__tag"><i aria-hidden="true" />{tag}</p>
         <h1>{title}</h1>
         <p className="phero__intro">{body}</p>
         {note && <p className="phero__note">{note}</p>}
-        {facts && (
-          <ul className="fchips" aria-label="At a glance">
-            {facts.map((fact) => (
-              <li key={fact.label} className={`fchip${fact.wide ? " fchip--lead" : ""}`}>
-                <span className="fchip__label">{fact.label}</span>
-                <div className="fchip__value">{fact.value}</div>
-                {fact.sub && <small>{fact.sub}</small>}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
-      <ForkHero />
+      {facts && (
+        <ul className="fchips" aria-label="At a glance">
+          {facts.map((fact) => (
+            <li key={fact.label} className={`fchip${fact.wide ? " fchip--lead" : ""}`}>
+              <span className="fchip__label">{fact.label}</span>
+              <div className="fchip__value">{fact.value}</div>
+              {fact.sub && <small>{fact.sub}</small>}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

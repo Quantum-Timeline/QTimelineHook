@@ -1,5 +1,4 @@
-/* QTimeline product identity: "two timelines".
-   Soft glass surfaces, rounded shapes, sentence-case labels, and a forking line as the one recurring graphic.
+/* QTimeline product identity: soft glass surfaces, rounded shapes and sentence-case labels.
    Loaded after brand-theme / motion / market so it wins on equal specificity. Lime is reserved for YES, coral for NO. */
 
 .product-shell {
@@ -49,7 +48,7 @@
 .product-shell .guide__kicker, .product-shell .panel-head small, .product-shell .trade-title small { color: var(--paper); opacity: 0.6; }
 
 /* ── Hero ── */
-.phero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(24px, 4vw, 64px); align-items: center; padding: clamp(34px, 4.6vw, 64px) 0 clamp(20px, 2.6vw, 36px); }
+.phero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(24px, 4vw, 64px); align-items: end; padding: clamp(34px, 4.6vw, 64px) 0 clamp(20px, 2.6vw, 36px); }
 .phero__tag { margin: 0; display: inline-flex; align-items: center; gap: 9px; padding: 7px 14px 7px 12px; border-radius: 999px; background: rgba(243, 242, 236, 0.06); border: 1px solid var(--glass-line); font-size: 0.82rem; font-weight: 500; color: var(--paper); animation: lift-in 0.6s var(--ease-out) 0.05s both; }
 .phero__tag i { width: 7px; height: 7px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 12px var(--lime); animation: live-dot 2.4s ease-in-out infinite; }
 .phero h1 { margin: 22px 0 18px; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; font-variation-settings: "wdth" 108; font-weight: 600; font-size: clamp(2.7rem, 5.6vw, 5.3rem); line-height: 0.97; letter-spacing: -0.04em; background: linear-gradient(180deg, #ffffff 30%, #aeb8a8); -webkit-background-clip: text; background-clip: text; color: transparent; animation: lift-in 0.7s var(--ease-out) 0.12s both; }
@@ -57,33 +56,17 @@
 .phero__note { margin: 16px 0 0; padding: 12px 16px; border-radius: var(--r-md); background: rgba(207, 239, 140, 0.07); border: 1px solid rgba(207, 239, 140, 0.2); font-size: 0.86rem; line-height: 1.55; max-width: 60ch; animation: lift-in 0.7s var(--ease-out) 0.26s both; }
 .phero__note .proof-link { color: var(--lime); }
 
-.fchips { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.fchip { padding: 12px 16px; border-radius: var(--r-md); background: var(--glass); border: 1px solid var(--glass-line); display: grid; gap: 3px; animation: lift-in 0.7s var(--ease-out) both; transition: border-color 0.3s var(--ease), transform 0.35s var(--ease-out); }
+.phero--solo { grid-template-columns: minmax(0, 1fr); }
+.fchips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fchip { padding: 16px 20px; border-radius: var(--r-md); background: var(--glass); border: 1px solid var(--glass-line); display: grid; gap: 3px; animation: lift-in 0.7s var(--ease-out) both; transition: border-color 0.3s var(--ease), transform 0.35s var(--ease-out); }
 .fchip:hover { border-color: var(--glass-line-hi); transform: translateY(-2px); }
 .fchip:nth-child(1) { animation-delay: 0.3s; } .fchip:nth-child(2) { animation-delay: 0.36s; } .fchip:nth-child(3) { animation-delay: 0.42s; } .fchip:nth-child(4) { animation-delay: 0.48s; }
 .fchip__value { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
 .fchip small { color: var(--muted); font-size: 0.76rem; }
+.fchip--lead { grid-column: 1 / -1; }
 .fchip--lead .fchip__value { display: flex; align-items: center; gap: 12px; }
 .fchip--lead .fchip__value span { display: inline-flex; align-items: center; gap: 8px; }
 .fchip--lead .fchip__value i { color: var(--muted); font-style: normal; }
-
-/* ── The fork ── */
-.fork { position: relative; margin: 0; aspect-ratio: 560 / 360; width: 100%; max-width: 640px; justify-self: end; animation: lift-in 0.9s var(--ease-out) 0.2s both; }
-.fork svg { width: 100%; height: 100%; overflow: visible; }
-.fork__trunk, .fork__branch { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 700; stroke-dashoffset: 700; animation: fork-draw 1.6s var(--ease-out) 0.35s forwards; }
-.fork__branch { animation-delay: 0.9s; }
-@keyframes fork-draw { to { stroke-dashoffset: 0; } }
-.fork__ghost { fill: none; stroke: rgba(243, 242, 236, 0.14); stroke-width: 1.5; stroke-dasharray: 3 8; }
-.fork__node { fill: var(--paper); filter: drop-shadow(0 0 10px rgba(243, 242, 236, 0.6)); }
-.fork__node-ring { fill: none; stroke: var(--paper); stroke-width: 1.5; transform-origin: 190px 180px; animation: ring-out 2.6s ease-out infinite; }
-@keyframes ring-out { from { transform: scale(1); opacity: 0.7; } to { transform: scale(3.2); opacity: 0; } }
-.fork__end--yes { fill: var(--lime); filter: drop-shadow(0 0 12px var(--lime)); } .fork__end--no { fill: var(--no); filter: drop-shadow(0 0 12px var(--no)); }
-.fork__pulse { fill: var(--paper); } .fork__pulse--yes { fill: var(--lime); filter: drop-shadow(0 0 7px var(--lime)); } .fork__pulse--no { fill: var(--no); filter: drop-shadow(0 0 7px var(--no)); }
-.fork__tag { position: absolute; right: 0; display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px; border-radius: 999px; background: rgba(14, 18, 16, 0.82); border: 1px solid var(--glass-line); backdrop-filter: blur(10px); animation: lift-in 0.8s var(--ease-out) 1.5s both; }
-.fork__tag--yes { top: calc(22.2% - 30px); border-color: rgba(207, 239, 140, 0.4); } .fork__tag--no { top: calc(77.8% - 30px); border-color: rgba(240, 165, 143, 0.4); }
-.fork__tag strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; } .fork__tag small { color: var(--muted); font-size: 0.74rem; }
-.fork__tag--yes strong { color: var(--lime); } .fork__tag--no strong { color: var(--no); }
-.fork__now { position: absolute; left: calc(33.9% - 22px); top: calc(50% + 22px); font-size: 0.78rem; color: var(--muted); width: 44px; text-align: center; }
 
 /* ── The question ── */
 .question { position: relative; margin: 8px 0 20px; padding: clamp(26px, 3.4vw, 48px); border-radius: var(--r-xl); border: 1px solid var(--glass-line); overflow: hidden; background:
@@ -149,10 +132,8 @@
 .tprog__label { font-family: Archivo, sans-serif; letter-spacing: 0; text-transform: none; font-size: 0.74rem; }
 
 /* ── Timeline spine: the lifecycle section ── */
-.spine { position: relative; margin-top: clamp(28px, 3.4vw, 48px); padding-left: clamp(22px, 2.6vw, 38px); }
-.spine::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 6px; width: 2px; background: linear-gradient(180deg, var(--paper), rgba(243, 242, 236, 0.04)); border-radius: 2px; }
+.spine { position: relative; margin-top: clamp(28px, 3.4vw, 48px); }
 .spine__title { position: relative; margin: 0 0 16px; font-family: Archivo, sans-serif; font-variation-settings: "wdth" 108; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
-.spine__title::before { content: ""; position: absolute; left: calc(-1 * clamp(22px, 2.6vw, 38px) + 0px); top: 0.5em; width: 14px; height: 14px; margin-left: -1px; border-radius: 999px; background: var(--paper); box-shadow: 0 0 0 5px rgba(243, 242, 236, 0.12), 0 0 18px rgba(243, 242, 236, 0.5); }
 .mtl { border: 1px solid var(--glass-line); border-radius: var(--r-xl); background: var(--glass); padding: clamp(20px, 2.4vw, 32px); margin-top: 0; }
 .mtl__clock { font-size: clamp(1.6rem, 3vw, 2.4rem); font-family: Archivo, sans-serif; font-variation-settings: "wdth" 108; letter-spacing: -0.03em; font-weight: 600; color: var(--paper); }
 .mtl__count small, .mtl__legend span { font-family: Archivo, sans-serif; letter-spacing: 0; text-transform: none; font-size: 0.8rem; }
@@ -191,7 +172,6 @@
 .product-shell .guide { padding: clamp(22px, 2.4vw, 34px); top: 96px; }
 .product-shell .guide h2 { font-size: 1.6rem; }
 .product-shell .guide ol { position: relative; }
-.product-shell .guide ol::before { content: ""; position: absolute; left: 19px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(180deg, rgba(207, 239, 140, 0.5), rgba(240, 165, 143, 0.5)); opacity: 0.5; }
 .product-shell .guide li { border-top: 0; padding: 14px 0; }
 .product-shell .guide__icon { position: relative; z-index: 1; }
 
@@ -211,7 +191,6 @@
 /* ── Responsive ── */
 @media (max-width: 1100px) {
   .phero { grid-template-columns: 1fr; }
-  .fork { justify-self: center; max-width: 560px; }
   .worlds { grid-template-columns: 1fr 1fr; }
   .worlds .trade-panel { grid-column: 1 / -1; grid-row: 1; }
   .product-shell .guide { position: static; }
@@ -221,13 +200,10 @@
 }
 @media (max-width: 640px) {
   .worlds { grid-template-columns: 1fr; }
-  .fork__tag { padding: 8px 12px 8px 8px; } .fork__tag small { display: none; }
   .product-shell .amount-label input { font-size: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .qt-erestyra.product-shell::before, .phero__tag, .phero__tag i, .phero h1, .phero__intro, .phero__note, .fchip, .fork, .fork__tag, .world, .fork__node-ring { animation: none !important; }
-  .fork__trunk, .fork__branch { animation: none !important; stroke-dashoffset: 0; }
-  .fork__pulse { display: none; }
+  .qt-erestyra.product-shell::before, .phero__tag, .phero__tag i, .phero h1, .phero__intro, .phero__note, .fchip, .world { animation: none !important; }
 }
 
 .world__odds--na b { font-size: clamp(1.8rem, 2.6vw, 2.6rem); letter-spacing: -0.03em; opacity: 0.55; }
@@ -237,3 +213,4 @@
 
 .product-shell .world__note, .product-shell .panel-message, .product-shell .trade-message { font-family: Archivo, sans-serif; letter-spacing: 0; }
 .product-shell .fchip small, .product-shell .fchip__value, .product-shell .world__facts, .product-shell .tally__legend { font-family: Archivo, sans-serif; }
+.fchip:last-child:nth-child(even) { grid-column: 1 / -1; }
