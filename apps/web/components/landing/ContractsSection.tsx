@@ -14,37 +14,37 @@ const EXPLORER_BASE = "https://robinhoodchain.blockscout.com/address";
 const MAINNET_CONTRACTS: ContractEntry[] = [
   {
     name: "IpoMarketRegistry",
-    kind: "PROXY",
+    kind: "CORE",
     role: "Market state, cutoff & pool registry",
     address: "0x5444CF6E91462938C975668266c9E24b6233BD37",
   },
   {
     name: "IpoMarketFactory",
-    kind: "PROXY",
+    kind: "CORE",
     role: "Deploys vault, outcome tokens, hook & 3 pools",
     address: "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
   },
   {
     name: "TimelineRouter",
-    kind: "PROXY",
+    kind: "ROUTER",
     role: "Atomic split, merge & conditional swap router",
     address: "0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45",
   },
   {
     name: "IpoResolutionAdapter",
-    kind: "PROXY",
+    kind: "ORACLE",
     role: "SEC Form 424B4 hybrid oracle adapter",
     address: "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
   },
   {
     name: "IpoTimelineHook",
-    kind: "BEACON",
+    kind: "HOOK",
     role: "beforeSwap cutoff guard on Uniswap v4 pools",
     address: "0xc79062f4a0A67142c84F042b4aE85952A4A0A880",
   },
   {
     name: "IpoConditionalVault",
-    kind: "BEACON",
+    kind: "VAULT",
     role: "1:1 USDG-backed YES/NO vault & redemption",
     address: "0x6B690Cc6e05de26A617ea530bA068B556489E889",
   },
@@ -56,7 +56,7 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
   },
   {
     name: "PQKeyRegistry",
-    kind: "PROXY",
+    kind: "PQ CRYPTO",
     role: "Post-quantum resolver public-key commitments",
     address: "0x78F42d96AD69Ed3D696875CF59eFF8A447Cd80A8",
   },

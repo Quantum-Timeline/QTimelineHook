@@ -580,7 +580,7 @@ export default function HomePage() {
       <ContractsSection />
 
       {/* 13 · 3D PORTAL */}
-      <section className="section" data-dim="0.5">
+      <section className="section section--portal" data-dim="0.5">
         <div className="wrap">
           <Link href="/market/" className="portal__link" data-cursor data-reveal>
             <span className="portal__ring" aria-hidden="true">

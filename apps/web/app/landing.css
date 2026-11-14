@@ -2169,13 +2169,25 @@ html.is-warping {
 }
 
 /* Mainnet Contracts Registry */
+ .qt-erestyra .contracts {
+  padding-block: clamp(72px, 8vw, 116px);
+}
+
+ .qt-erestyra .section--portal {
+  padding-block: clamp(32px, 4vw, 64px);
+}
+
+ .qt-erestyra .section--portal .portal__link {
+  padding: clamp(72px, 9vw, 120px) 0;
+}
+
  .qt-erestyra .contracts__head {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 24px 40px;
-  margin-bottom: clamp(32px, 5vw, 56px);
+  gap: 20px 36px;
+  margin-bottom: clamp(28px, 3.6vw, 44px);
 }
 
  .qt-erestyra .contracts__meta {
