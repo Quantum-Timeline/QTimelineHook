@@ -42,6 +42,13 @@ export default function MarketPage() {
         <p><b>Resolves from</b> {source}</p>
       </section>
 
+      {!testnet && !process.env.NEXT_PUBLIC_MARKET_ID?.replace(/^0x0+$/, "") && (
+        <div className="soon" role="status">
+          <b>Trading opens soon</b>
+          <span>The market is being set up on Robinhood Chain. Odds, quotes and trading unlock here the moment it goes live.</span>
+        </div>
+      )}
+
       <div className="worlds">
         <WorldLane yes label="YES world" />
         <MarketTradePanel />

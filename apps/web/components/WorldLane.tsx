@@ -21,7 +21,7 @@ export function WorldLane({ yes, label }: { yes: boolean; label: string }) {
         <span className="world__name">{label}</span>
       </div>
       <div className={`world__odds${pct === undefined ? " world__odds--na" : ""}`}>
-        <b>{pct === undefined ? (note.startsWith("Reading") ? "…" : "No quote") : <AnimatedNumber value={pct.toFixed(0)} />}</b>
+        <b>{pct === undefined ? (note.startsWith("Reading") ? "…" : "Soon") : <AnimatedNumber value={pct.toFixed(0)} />}</b>
         <span>{pct === undefined ? "" : "%"}</span>
       </div>
       <p className="world__caption">{yes ? "chance the market assigns to YES" : "chance the market assigns to NO"}</p>

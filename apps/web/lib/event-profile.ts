@@ -110,4 +110,4 @@ const ipo: EventProfile = {
   formatValue: dollars,
 };
 
-export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "ipo" ? ipo : pce;
+export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "pce" ? pce : ipo;

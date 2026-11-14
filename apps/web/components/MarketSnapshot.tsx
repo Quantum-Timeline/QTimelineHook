@@ -9,7 +9,7 @@ import { MarketTimeline } from "@/components/MarketTimeline";
 
 type Snapshot = { status: number; opensAt: bigint; cutoffAt: bigint; releaseAt: bigint; deadline: bigint; thresholdBps: number; activated: boolean; chainTimestamp: bigint; reportedValueBps?: number; evidenceHash?: Hex };
 const labels = ["Draft", "Scheduled", "Open", "Awaiting result", "Final YES", "Final NO", "Cancelled", "Discarded"];
-const INITIAL_MESSAGE = "No verified deployment manifest configured.";
+const INITIAL_MESSAGE = "The timeline appears here once the market is live.";
 const resolutionAbi = parseAbi(["function reportedValueBps(bytes32) view returns (int32)", "function evidenceHash(bytes32) view returns (bytes32)"]);
 
 export function MarketSnapshot({ registryOverride, marketIdOverride, fixtureEvidence = false }: { registryOverride?: Address; marketIdOverride?: Hex; fixtureEvidence?: boolean } = {}) {

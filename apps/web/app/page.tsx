@@ -59,7 +59,7 @@ const ARCHITECTURE_ITEMS = [
     index: "HOOK",
     kindLabel: "Cutoff",
     icon: "soluciones-blockchain",
-    name: "TimelineHook",
+    name: eventProfile.id === "ipo" ? "IpoTimelineHook" : "TimelineHook",
     label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC—five minutes before release.",
     href: "/rules/",
   },

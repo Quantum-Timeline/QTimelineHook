@@ -99,3 +99,11 @@
   .wmodal__list img, .wmodal__fallback { width: 34px; height: 34px; }
   .wmodal__name { font-size: 0.84rem; }
 }
+
+/* Shown until a market exists: one clear status instead of several empty states. */
+.soon { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0 0 18px; padding: 14px 20px; border-radius: var(--r-lg, 18px); border: 1px solid var(--glass-line); background: rgba(243, 242, 236, 0.05); }
+.soon b { font-family: Archivo, sans-serif; font-weight: 600; letter-spacing: -0.01em; }
+.soon span { opacity: 0.72; font-size: 0.95rem; }
+
+/* A legacy rule hid the wallet button on phones, leaving no way to connect. */
+@media (max-width: 700px) { .product-shell .wallet { display: inline-flex; align-items: center; padding: 9px 16px; font-size: 0.82rem; } }

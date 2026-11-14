@@ -86,7 +86,7 @@ export function MarketTradePanel() {
   const refreshQuote = useCallback(async (preserveMessage = false) => {
     setQuote(undefined);
     if (!validConfig || !marketId || !registry || !factory || !quoter || !router) {
-      setMessage("Set the deployment manifest to enable a live quote.");
+      setMessage("Quotes appear here once the market is live.");
       return;
     }
     if (!/^(?:\d+)(?:\.\d{1,18})?$/.test(amount)) return;
@@ -319,7 +319,7 @@ export function MarketTradePanel() {
       {(() => {
         const closed = !validConfig || (info ? !info.open : false);
         const ready = !!account && !wrongChain;
-        const label = !validConfig ? "Market not configured"
+        const label = !validConfig ? "Trading opens soon"
           : info && !info.open ? "Trading is closed"
           : !account ? "Connect wallet to trade"
           : wrongChain ? "Switch network"

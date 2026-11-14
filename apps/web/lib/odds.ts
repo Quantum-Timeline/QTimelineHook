@@ -28,7 +28,7 @@ export function useOdds(): Odds {
     && [registry, factory, quoter].every((a) => !!a && isAddress(a));
 
   useEffect(() => {
-    if (!ready || !registry || !factory || !quoter || !marketId) { setOdds({ note: "Odds appear once a market is configured." }); return; }
+    if (!ready || !registry || !factory || !quoter || !marketId) { setOdds({ note: "Odds appear once trading opens." }); return; }
     let active = true;
     async function read() {
       try {
