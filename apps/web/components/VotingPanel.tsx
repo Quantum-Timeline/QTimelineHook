@@ -115,7 +115,7 @@ export function VotingPanel() {
         const phase = election.finalized ? "Finalized" : now < election.depositStart ? "Not started" : now < election.voteStart ? "Deposits open" : now < election.voteEnd ? "Voting live" : "Awaiting finalize";
         const nextAt = election.finalized ? undefined : now < election.depositStart ? election.depositStart : now < election.voteStart ? election.voteStart : now < election.voteEnd ? election.voteEnd : undefined;
         return <div className="tally" data-phase={phase.toLowerCase().replace(/\s+/g, "-")}>
-          <div className="tally__head"><span className="tally__phase"><i />{phase}</span>{nextAt !== undefined && <span className="tally__clock">{formatCountdown(nextAt - now)}</span>}</div>
+          <div className="tally__head"><span className="tally__phase">{phase}</span>{nextAt !== undefined && <span className="tally__clock">{formatCountdown(nextAt - now)}</span>}</div>
           <div className="tally__bar" role="img" aria-label={`Candidate A ${shareA.toFixed(1)} percent of votes`}><div className="tally__a" style={{ width: `${shareA}%` }} /><div className="tally__b" /></div>
           <div className="tally__legend"><span>A · <AnimatedNumber value={shareA.toFixed(1)} />%</span><span>{total === 0n ? "no votes yet" : "share of escrowed weight"}</span><span>B · <AnimatedNumber value={(100 - shareA).toFixed(1)} />%</span></div>
         </div>;

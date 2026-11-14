@@ -4,7 +4,6 @@
 .wallet-menu { position: relative; }
 .product-shell .wallet--on { display: inline-flex; align-items: center; gap: 9px; background: rgba(243, 242, 236, 0.1); color: var(--paper); box-shadow: inset 0 0 0 1px var(--glass-line-hi); }
 .product-shell .wallet--on:hover:not(:disabled) { background: rgba(243, 242, 236, 0.16); color: var(--paper); }
-.wallet--on i { width: 8px; height: 8px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 10px var(--lime); }
 .product-shell .wallet--warn { background: var(--no); color: #0b0e0c; }
 .wallet-menu__panel { position: absolute; right: 0; top: calc(100% + 10px); min-width: 230px; padding: 8px; border-radius: 18px; background: rgba(16, 20, 18, 0.97); border: 1px solid var(--glass-line-hi); box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.9); display: grid; gap: 2px; z-index: 40; animation: lift-in 0.25s var(--ease-out) both; }
 .wallet-menu__panel p { margin: 0; padding: 8px 12px 10px; color: var(--muted); font-size: 0.78rem; }

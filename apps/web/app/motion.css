@@ -45,11 +45,6 @@
 }
 .product-shell .topbar__nav a.is-active { color: var(--bg); }
 
-.product-shell .net-pill i { animation: live-dot 2.4s ease-in-out infinite; }
-@keyframes live-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(207, 239, 140, 0.55); }
-  50%      { box-shadow: 0 0 0 6px rgba(207, 239, 140, 0); }
-}
 
 /* ── Cards: hover lift and a lime edge that sweeps in ── */
 .product-shell .detail-card,
@@ -172,7 +167,7 @@
 .mtl__stop { position: absolute; top: 3px; width: 12px; height: 12px; margin-left: -6px; }
 .mtl__stop i { display: block; width: 12px; height: 12px; border-radius: 999px; background: var(--bg-3); border: 1.5px solid var(--line-strong); transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease); }
 .mtl__stop.is-done i { background: var(--lime); border-color: var(--lime); }
-.mtl__stop.is-current i { animation: node-pulse 1.6s ease-in-out infinite; }
+.mtl__stop.is-current i { box-shadow: 0 0 0 4px rgba(243, 242, 236, 0.18); }
 .mtl__head-dot { position: absolute; top: 5px; width: 8px; height: 8px; margin-left: -4px; border-radius: 999px; background: var(--ink); box-shadow: 0 0 0 3px rgba(243, 242, 236, 0.12); transition: left 1s var(--ease-out); }
 .mtl[data-state="terminal"] .mtl__head-dot { display: none; }
 .mtl__legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -235,7 +230,7 @@
 /* ── Reduced motion: keep every state visible, drop the movement ── */
 @media (prefers-reduced-motion: reduce) {
   .qt-erestyra.product-shell::before, .product-shell .product-body, .product-shell .hero.subhero *, .market-workspace > *, .product-shell .claim-card,
-  .product-shell .net-pill i, .flow__wire, .shimmer-text, .snapshot-skeleton span, .tprog, .tprog__step.is-active .tprog__node, .mtl__stop.is-current i, .odds[data-ready="false"] .odds__yes-fill { animation: none !important; }
+  .product-shell .net-pill-removed, .flow__wire, .shimmer-text, .snapshot-skeleton span, .tprog, .tprog__step.is-active .tprog__node, .mtl__stop.is-current i, .odds[data-ready="false"] .odds__yes-fill { animation: none !important; }
   .reveal--armed { opacity: 1; transform: none; }
   .product-shell .topbar__pill, .mtl__fill, .mtl__head-dot, .odds__yes-fill, .odds__marker, .product-shell .segmented::before { transition: none; }
   .flow__pulse { display: none; }
@@ -245,8 +240,6 @@
 .tally { margin: 18px 0 4px; padding: 16px; border: 1px solid var(--line); background: var(--bg-3); display: grid; gap: 12px; }
 .tally__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .tally__phase { display: inline-flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
-.tally__phase i { width: 7px; height: 7px; border-radius: 999px; background: var(--muted); }
-.tally[data-phase="voting-live"] .tally__phase i, .tally[data-phase="deposits-open"] .tally__phase i { background: var(--lime); animation: live-dot 2s ease-in-out infinite; }
 .tally__clock { color: var(--lime); font-family: "JetBrains Mono", monospace; font-size: 1rem; font-variant-numeric: tabular-nums; }
 .tally__bar { position: relative; height: 10px; display: flex; background: var(--no-soft); border: 1px solid var(--line); overflow: hidden; }
 .tally__a { height: 100%; background: linear-gradient(90deg, var(--forest), var(--lime)); transition: width 0.9s var(--ease-out); }
@@ -265,6 +258,5 @@
 .empty-claims circle { fill: var(--ink); } .empty-claims .ec__yes { fill: var(--lime); } .empty-claims .ec__no { fill: var(--no); }
 
 @media (prefers-reduced-motion: reduce) {
-  .ec__wire, .product-shell .candidate-card, .tally[data-phase] .tally__phase i { animation: none !important; }
-  .tally__a { transition: none; }
+  .ec__wire, .product-shell .candidate-card, .tally[data-phase]   .tally__a { transition: none; }
 }

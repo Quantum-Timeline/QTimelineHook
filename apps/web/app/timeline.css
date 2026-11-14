@@ -50,7 +50,6 @@
 /* ── Hero ── */
 .phero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(24px, 4vw, 64px); align-items: end; padding: clamp(22px, 2.8vw, 40px) 0 clamp(16px, 2vw, 28px); }
 .phero__tag { margin: 0; display: inline-flex; align-items: center; gap: 9px; padding: 7px 14px 7px 12px; border-radius: 999px; background: rgba(243, 242, 236, 0.06); border: 1px solid var(--glass-line); font-size: 0.82rem; font-weight: 500; color: var(--paper); animation: lift-in 0.6s var(--ease-out) 0.05s both; }
-.phero__tag i { width: 7px; height: 7px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 12px var(--lime); animation: live-dot 2.4s ease-in-out infinite; }
 .phero h1 { margin: 16px 0 14px; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; font-variation-settings: "wdth" 108; font-weight: 600; font-size: clamp(2.7rem, 5.6vw, 5.3rem); line-height: 0.97; letter-spacing: -0.04em; background: linear-gradient(180deg, #ffffff 30%, #aeb8a8); -webkit-background-clip: text; background-clip: text; color: transparent; animation: lift-in 0.7s var(--ease-out) 0.12s both; }
 .phero__intro { margin: 0; max-width: 56ch; color: #a3ad9f; font-size: 1.06rem; line-height: 1.65; animation: lift-in 0.7s var(--ease-out) 0.2s both; }
 .phero__note { margin: 16px 0 0; padding: 12px 16px; border-radius: var(--r-md); background: rgba(207, 239, 140, 0.07); border: 1px solid rgba(207, 239, 140, 0.2); font-size: 0.86rem; line-height: 1.55; max-width: 60ch; animation: lift-in 0.7s var(--ease-out) 0.26s both; }
@@ -203,7 +202,7 @@
   .product-shell .amount-label input { font-size: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .qt-erestyra.product-shell::before, .phero__tag, .phero__tag i, .phero h1, .phero__intro, .phero__note, .fchip, .world { animation: none !important; }
+  .qt-erestyra.product-shell::before, .phero__tag, .phero h1, .phero__intro, .phero__note, .fchip, .world { animation: none !important; }
 }
 
 .world__odds--na b { font-size: clamp(1.8rem, 2.6vw, 2.6rem); letter-spacing: -0.03em; opacity: 0.55; }

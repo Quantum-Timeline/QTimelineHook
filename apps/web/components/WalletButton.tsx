@@ -28,7 +28,7 @@ export function WalletButton() {
   return (
     <div className="wallet-menu" ref={box}>
       <button className="wallet wallet--on" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        {activeWallet?.icon ? <img src={activeWallet.icon} alt="" width={18} height={18} /> : <i aria-hidden="true" />}{shortAddress(account)}
+        {activeWallet?.icon && <img src={activeWallet.icon} alt="" width={18} height={18} />}{shortAddress(account)}
       </button>
       {open && (
         <div className="wallet-menu__panel" role="menu">

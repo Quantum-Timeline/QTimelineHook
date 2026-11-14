@@ -142,6 +142,24 @@ body {
   gap: 10px;
 }
 
+.product-shell .topbar__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.product-shell .topbar__x:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--surface-alt);
+}
+
 .product-shell .net-pill {
   display: inline-flex;
   align-items: center;
@@ -154,13 +172,6 @@ body {
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.product-shell .net-pill i {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--lime);
 }
 
 .product-shell .wallet {
