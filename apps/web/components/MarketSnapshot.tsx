@@ -58,11 +58,11 @@ export function MarketSnapshot({ registryOverride, marketIdOverride, fixtureEvid
   const syntheticTest = !fixtureEvidence && Boolean(process.env.NEXT_PUBLIC_TEST_EVENT_LABEL);
   return <>
     <MarketTimeline status={snapshot.status} activated={snapshot.activated} opensAt={snapshot.opensAt} cutoffAt={snapshot.cutoffAt} releaseAt={snapshot.releaseAt} deadline={snapshot.deadline} chainTimestamp={snapshot.chainTimestamp} />
-    <div className="chain-snapshot"><div><small>ON-CHAIN / TIME STATUS</small><strong>{labels[liveStatus] ?? "Unknown"}</strong></div><div><small>{syntheticTest ? "TEST MARKET" : "THRESHOLD"}</small><strong>{syntheticTest ? "Synthetic YES / NO event" : `${(snapshot.thresholdBps / 100).toFixed(2)}%`}</strong></div><div><small>CUTOFF</small><strong>{new Date(Number(snapshot.cutoffAt) * 1000).toLocaleString()}</strong></div><div><small>RESULT DEADLINE</small><strong>{new Date(Number(snapshot.deadline) * 1000).toLocaleString()}</strong></div><p>{tradeable ? "Market is inside its on-chain trading window." : "Market configuration and time are read from Robinhood Chain."}</p></div>
+    <div className="chain-snapshot"><div><small>On-chain status</small><strong>{labels[liveStatus] ?? "Unknown"}</strong></div><div><small>{syntheticTest ? "Test market" : "Threshold"}</small><strong>{syntheticTest ? "Synthetic YES / NO event" : `${(snapshot.thresholdBps / 100).toFixed(2)}%`}</strong></div><div><small>Cutoff</small><strong>{new Date(Number(snapshot.cutoffAt) * 1000).toLocaleString()}</strong></div><div><small>Result deadline</small><strong>{new Date(Number(snapshot.deadline) * 1000).toLocaleString()}</strong></div><p>{tradeable ? "Market is inside its on-chain trading window." : "Market configuration and time are read from Robinhood Chain."}</p></div>
     {(snapshot.status === 4 || snapshot.status === 5) && snapshot.reportedValueBps !== undefined && snapshot.evidenceHash && <div className="resolution-proof" data-testid="resolution-proof">
-      <div><small>REPORTED VALUE</small><strong>{(snapshot.reportedValueBps / 100).toFixed(2)}%</strong></div>
-      <div><small>ON-CHAIN RESULT</small><strong>{labels[snapshot.status]}</strong></div>
-      <div className="resolution-proof__hash"><small>EVIDENCE HASH</small><code>{snapshot.evidenceHash}</code></div>
+      <div><small>Reported value</small><strong>{(snapshot.reportedValueBps / 100).toFixed(2)}%</strong></div>
+      <div><small>On-chain result</small><strong>{labels[snapshot.status]}</strong></div>
+      <div className="resolution-proof__hash"><small>Evidence hash</small><code>{snapshot.evidenceHash}</code></div>
       {(syntheticTest || fixtureEvidence) && <p>Fixture evidence · testnet only</p>}
     </div>}
   </>;

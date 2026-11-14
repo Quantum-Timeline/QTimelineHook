@@ -99,6 +99,12 @@ export function MarketTradePanel() {
   }, [amount, client, direction, factory, instrument, marketId, outcomeYes, quoter, registry, router, validConfig]);
 
   useEffect(() => { const timer = window.setTimeout(() => { void refreshQuote(); }, 250); return () => window.clearTimeout(timer); }, [refreshQuote]);
+  // The two world lanes beside the ticket can switch the side being traded.
+  useEffect(() => {
+    const onOutcome = (event: Event) => { const side = (event as CustomEvent<string>).detail; if (side === "yes" || side === "no") setOutcomeYes(side === "yes"); };
+    window.addEventListener("qt:outcome", onOutcome);
+    return () => window.removeEventListener("qt:outcome", onOutcome);
+  }, []);
 
   async function trade() {
     if (!marketId || !registry || !factory || !router || !quoter || !account) return;
@@ -226,9 +232,9 @@ export function MarketTradePanel() {
   const quoteLoading = validConfig && quote === undefined && /^(?:\d+)(?:\.\d{1,18})?$/.test(amount) && !message;
 
   return (
-    <section className="trade-panel" data-outcome={outcomeYes ? "yes" : "no"}>
+    <section className="trade-panel" id="trade-ticket" data-outcome={outcomeYes ? "yes" : "no"}>
       <div className="trade-title">
-        <div><small>TRADE CONDITIONAL ETH</small><h2>Choose a timeline</h2></div>
+        <div><small>Trade conditional ETH</small><h2>Choose a timeline</h2></div>
         <span className="fee-label">0.30% LP fee</span>
       </div>
       <div className="segmented" style={{ ["--i" as string]: instrument === "eth" ? 0 : 1 }}>

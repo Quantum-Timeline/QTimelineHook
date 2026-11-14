@@ -7,20 +7,20 @@ export default function VotePage() {
   return (
     <Frame>
       <PageHeading
-        tag="QTL GOVERNANCE"
+        tag="QTL governance"
         title="The next market."
         body="Deposit QTL before the vote begins. Your escrowed balance sets voting weight, one vote per wallet, and you can withdraw when the election window permits."
         facts={[
-          { label: "TOKEN", wide: true, value: <span><QtlMark size={30} /> QTL</span>, sub: "Escrowed in the voting contract while the vote runs" },
-          { label: "WEIGHT", value: "1 QTL = 1 vote", sub: "Fixed when voting starts" },
-          { label: "WINDOWS", value: "24h + 24h", sub: "Deposit, then vote" },
-          { label: "ON A TIE", value: "Candidate B", sub: "The announced default" },
+          { label: "Token", wide: true, value: <span><QtlMark size={30} /> QTL</span>, sub: "Escrowed in the voting contract while the vote runs" },
+          { label: "Weight", value: "1 QTL = 1 vote", sub: "Fixed when voting starts" },
+          { label: "Windows", value: "24h + 24h", sub: "Deposit, then vote" },
+          { label: "On a tie", value: "Candidate B", sub: "The announced default" },
         ]}
       />
       <div className="split-layout">
         <VotingPanel />
         <GuideCard
-          kicker="HOW VOTING WORKS"
+          kicker="How voting works"
           title="From deposit to the next market"
           steps={[
             { icon: <QtlMark size={34} />, title: "Deposit QTL", body: "Escrow the amount you want counted before voting opens. Moving tokens between wallets later adds no weight." },

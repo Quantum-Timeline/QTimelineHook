@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { robinhoodChain } from "@qtimeline/chain";
 import { WalletButton } from "@/components/WalletButton";
+import { ForkHero } from "@/components/ForkHero";
 
 const links = [
   ["Market", "/market/"],
@@ -102,26 +103,28 @@ export function Frame({ children }: { children: React.ReactNode; wide?: boolean 
 
 export type HeadingFact = { label: string; value: React.ReactNode; sub?: string; wide?: boolean };
 
-/** Page hero: tag, title and intro on the left, an at-a-glance fact grid on the right (when given). */
-export function PageHeading({ tag, title, body, facts }: { tag: string; title: string; body: string; facts?: HeadingFact[] }) {
+/** Page hero: title and intro with fact chips on the left, the forking-timeline graphic on the right. */
+export function PageHeading({ tag, title, body, facts, note }: { tag: string; title: string; body: string; facts?: HeadingFact[]; note?: React.ReactNode }) {
   return (
-    <section className={`market-hero${facts ? "" : " market-hero--solo"}`}>
-      <div className="market-hero__copy">
-        <p className="market-hero__tag">{tag}</p>
+    <section className="phero">
+      <div className="phero__copy">
+        <p className="phero__tag"><i aria-hidden="true" />{tag}</p>
         <h1>{title}</h1>
-        <p className="market-hero__intro">{body}</p>
+        <p className="phero__intro">{body}</p>
+        {note && <p className="phero__note">{note}</p>}
+        {facts && (
+          <ul className="fchips" aria-label="At a glance">
+            {facts.map((fact) => (
+              <li key={fact.label} className={`fchip${fact.wide ? " fchip--lead" : ""}`}>
+                <span className="fchip__label">{fact.label}</span>
+                <div className="fchip__value">{fact.value}</div>
+                {fact.sub && <small>{fact.sub}</small>}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {facts && (
-        <aside className="market-hero__facts" aria-label="At a glance">
-          {facts.map((fact) => (
-            <div key={fact.label} className={`fact${fact.wide ? " fact--assets" : ""}`}>
-              <span className="fact__label">{fact.label}</span>
-              {fact.wide ? <div className="fact__assets">{fact.value}</div> : <strong>{fact.value}</strong>}
-              {fact.sub && <small>{fact.sub}</small>}
-            </div>
-          ))}
-        </aside>
-      )}
+      <ForkHero />
     </section>
   );
 }

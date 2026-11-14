@@ -37,7 +37,7 @@ export function MarketTimeline({ status, activated, opensAt, cutoffAt, releaseAt
   return (
     <div className="mtl" data-state={terminal ? "terminal" : stageIndex < 0 ? "scheduled" : "live"}>
       <div className="mtl__head">
-        <span className="mtl__label">LIFECYCLE</span>
+        <span className="mtl__label">Lifecycle</span>
         <span className="mtl__count">
           <small>{headline}</small>
           {target !== undefined && <b className="mtl__clock">{formatCountdown(target - now)}</b>}

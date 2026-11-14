@@ -2,9 +2,9 @@ import { PoolPair } from "@/components/TokenLogo";
 import { Reveal } from "@/lib/motion";
 
 const pools = [
-  { key: "yes", title: "ETH timeline · YES", pair: ["ETH", "USDG"] as const, sides: [true, true] as const, line: "Price of ETH if the threshold is met.", tag: "POOL 1" },
-  { key: "no", title: "ETH timeline · NO", pair: ["ETH", "USDG"] as const, sides: [false, false] as const, line: "Price of ETH if it is not.", tag: "POOL 2" },
-  { key: "odds", title: "YES / NO odds", pair: ["USDG", "USDG"] as const, sides: [true, false] as const, line: "The ratio between the two claims is the market's implied odds.", tag: "POOL 3" },
+  { key: "yes", title: "ETH timeline · YES", pair: ["ETH", "USDG"] as const, sides: [true, true] as const, line: "Price of ETH if the threshold is met.", tag: "Pool 1" },
+  { key: "no", title: "ETH timeline · NO", pair: ["ETH", "USDG"] as const, sides: [false, false] as const, line: "Price of ETH if it is not.", tag: "Pool 2" },
+  { key: "odds", title: "YES / NO odds", pair: ["USDG", "USDG"] as const, sides: [true, false] as const, line: "The ratio between the two claims is the market's implied odds.", tag: "Pool 3" },
 ];
 
 /** Three Uniswap v4 pools behind every market, shown with the claim tokens that make each one up. */
@@ -20,9 +20,9 @@ export function PoolStrip() {
           <h3>{pool.title}</h3>
           <p>{pool.line}</p>
           <dl>
-            <div><dt>LP FEE</dt><dd>0.30%</dd></div>
-            <div><dt>ROUTE</dt><dd>Uniswap v4</dd></div>
-            <div><dt>PROTOCOL FEE</dt><dd>None</dd></div>
+            <div><dt>LP fee</dt><dd>0.30%</dd></div>
+            <div><dt>Route</dt><dd>Uniswap v4</dd></div>
+            <div><dt>Protocol fee</dt><dd>None</dd></div>
           </dl>
         </Reveal>
       ))}

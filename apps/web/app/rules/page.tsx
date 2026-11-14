@@ -4,10 +4,10 @@ import { ClaimIcon, TokenLogo } from "@/components/TokenLogo";
 import { Reveal } from "@/lib/motion";
 
 const rules = [
-  ["VAULT // SPLIT", "One deposit, two claims", "Deposit ETH or USDG into a market vault to mint equal YES and NO outcome tokens for that collateral.", "ETH", true],
-  ["POOL // TRADE", "Three independent pools", "ETH-YES and ETH-NO expose conditional asset prices. YES-NO provides an implied outcome price. LP fee is 0.30%; QTimeline adds no protocol fee.", "USDG", false],
-  ["ORACLE // RESOLVE", "BEA data, hybrid authorization", "A project bot reads the first official BEA release. The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the BEA number.", "ETH", false],
-  ["CLAIM // REDEEM", "Winning side pays 1:1", "After a valid result, winning claims redeem for their collateral. If unresolved 48 hours after scheduled release, anyone can trigger cancellation; each individual claim redeems for half, while a matched YES/NO pair merges for full collateral.", "USDG", true],
+  ["Vault · split", "One deposit, two claims", "Deposit ETH or USDG into a market vault to mint equal YES and NO outcome tokens for that collateral.", "ETH", true],
+  ["Pool · trade", "Three independent pools", "ETH-YES and ETH-NO expose conditional asset prices. YES-NO provides an implied outcome price. LP fee is 0.30%; QTimeline adds no protocol fee.", "USDG", false],
+  ["Oracle · resolve", "BEA data, hybrid authorization", "A project bot reads the first official BEA release. The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the BEA number.", "ETH", false],
+  ["Claim · redeem", "Winning side pays 1:1", "After a valid result, winning claims redeem for their collateral. If unresolved 48 hours after scheduled release, anyone can trigger cancellation; each individual claim redeems for half, while a matched YES/NO pair merges for full collateral.", "USDG", true],
 ] as const;
 
 const numbers = [
@@ -21,14 +21,14 @@ export default function RulesPage() {
   return (
     <Frame>
       <PageHeading
-        tag="PROTOCOL RULES"
+        tag="Protocol rules"
         title="Know the mechanics."
         body="QTimeline prices how an asset might trade under two outcomes. Pool prices are market estimates, not probability guarantees."
         facts={[
-          { label: "ASSETS", wide: true, value: <><span><TokenLogo asset="ETH" size={30} /> ETH</span><i aria-hidden="true">⇄</i><span><TokenLogo asset="USDG" size={30} /> USDG</span></>, sub: "ETH native and USDG; pair fixed per market" },
-          { label: "VENUE", value: "Uniswap v4", sub: "Hook-gated by lifecycle" },
-          { label: "SIGNATURES", value: "ECDSA + ML-DSA-44", sub: "Both must verify on-chain" },
-          { label: "CUSTODY", value: "No admin exit", sub: "Deployer cannot move collateral" },
+          { label: "Assets", wide: true, value: <><span><TokenLogo asset="ETH" size={30} /> ETH</span><i aria-hidden="true">⇄</i><span><TokenLogo asset="USDG" size={30} /> USDG</span></>, sub: "ETH native and USDG; pair fixed per market" },
+          { label: "Venue", value: "Uniswap v4", sub: "Hook-gated by lifecycle" },
+          { label: "Signatures", value: "ECDSA + ML-DSA-44", sub: "Both must verify on-chain" },
+          { label: "Custody", value: "No admin exit", sub: "Deployer cannot move collateral" },
         ]}
       />
       <Reveal><FlowDiagram /></Reveal>

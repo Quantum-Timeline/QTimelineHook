@@ -7,20 +7,20 @@ export default function PositionsPage() {
   return (
     <Frame>
       <PageHeading
-        tag="YOUR CLAIMS"
+        tag="Your claims"
         title="Positions."
         body="Read your four conditional token balances directly from the market vault. Merge paired claims before resolution or redeem eligible claims after the result is final."
         facts={[
-          { label: "ASSETS", wide: true, value: <><span><TokenLogo asset="ETH" size={30} /> ETH</span><i aria-hidden="true">⇄</i><span><TokenLogo asset="USDG" size={30} /> USDG</span></>, sub: "Each asset has its own YES and NO claim" },
-          { label: "CLAIM TOKENS", value: "4 per market", sub: "ETH YES · ETH NO · USDG YES · USDG NO" },
-          { label: "BEFORE RESULT", value: "Merge pairs", sub: "YES + NO returns full collateral" },
-          { label: "AFTER RESULT", value: "Redeem", sub: "Winner 1 : 1 · cancelled pays 50%" },
+          { label: "Assets", wide: true, value: <><span><TokenLogo asset="ETH" size={30} /> ETH</span><i aria-hidden="true">⇄</i><span><TokenLogo asset="USDG" size={30} /> USDG</span></>, sub: "Each asset has its own YES and NO claim" },
+          { label: "Claim tokens", value: "4 per market", sub: "ETH YES · ETH NO · USDG YES · USDG NO" },
+          { label: "Before the result", value: "Merge pairs", sub: "YES + NO returns full collateral" },
+          { label: "After the result", value: "Redeem", sub: "Winner 1 : 1 · cancelled pays 50%" },
         ]}
       />
       <div className="split-layout">
         <PositionsPanel />
         <GuideCard
-          kicker="HOW CLAIMS WORK"
+          kicker="How claims work"
           title="What you can do with a claim"
           steps={[
             { icon: <ClaimIcon asset="ETH" yes size={36} />, title: "Hold the position you traded", body: "A buy leaves you with the claim you chose plus the paired claim on your input collateral." },
