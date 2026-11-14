@@ -78,7 +78,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Governance",
     icon: "tokenizacion-de-activos",
     name: "$QTL Voting",
-    label: "Hold $QTL to nominate macro triggers and vote on the next market across 24h cycles.",
+    label: eventProfile.id === "ipo" ? "Hold $QTL to nominate the next event and vote on which market launches across 24h cycles." : "Hold $QTL to nominate macro triggers and vote on the next market across 24h cycles.",
     href: "/vote/",
   },
 ];
@@ -136,7 +136,7 @@ const LIFECYCLE_ROWS = [
     n: "SWAP",
     kicker: "Discovery",
     title: "Trade parallel worlds",
-    text: "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to express correlated macro and ETH directional views.",
+    text: eventProfile.id === "ipo" ? "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to trade your view on the IPO price together with ETH." : "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to express correlated macro and ETH directional views.",
   },
   {
     n: "LOCK",
@@ -163,7 +163,7 @@ const OPERATOR_CARDS = [
     index: "TRD",
     kind: "Traders",
     icon: "tokenizacion-de-activos",
-    name: "Macro Traders",
+    name: eventProfile.id === "ipo" ? "IPO Traders" : "Macro Traders",
     label: eventProfile.copy.traderCard,
   },
   {
@@ -178,7 +178,7 @@ const OPERATOR_CARDS = [
     kind: "Governors",
     icon: "redes-blockchain",
     name: "$QTL Holders",
-    label: "Nominate upcoming macro catalysts in 24h windows and vote on the next live timeline.",
+    label: eventProfile.id === "ipo" ? "Nominate upcoming events in 24h windows and vote on the next live market." : "Nominate upcoming macro catalysts in 24h windows and vote on the next live timeline.",
   },
 ];
 
@@ -197,7 +197,7 @@ const TRANSPARENCY_ROWS = [
   },
   {
     n: eventProfile.copy.sourceKey,
-    kicker: "First Release",
+    kicker: eventProfile.id === "ipo" ? "First Filing" : "First Release",
     title: eventProfile.copy.sourceTitle,
     text: eventProfile.copy.sourceText,
   },
@@ -417,7 +417,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="How it works" className="split display-md" />
             <p className="lead" data-reveal>
-              Five immutable phases from USDG collateral split to post-quantum settlement on Robinhood
+              Five on-chain phases from USDG collateral split to post-quantum settlement on Robinhood
               Chain.
             </p>
           </div>
@@ -445,7 +445,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="Built for every participant" className="split display-md" />
             <p className="lead" data-reveal>
-              Non-custodial conditional infrastructure for macro traders, Uniswap v4 LPs, and $QTL
+              {eventProfile.id === "ipo" ? "Conditional markets for IPO traders" : "Non-custodial conditional infrastructure for macro traders"}, Uniswap v4 LPs, and $QTL
               voters.
             </p>
           </div>
@@ -597,7 +597,7 @@ export default function HomePage() {
       <section className="cta" id="genesis">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">LAUNCH</span>Genesis Market
+            <span className="eyebrow__n">LAUNCH</span>{eventProfile.id === "ipo" ? "Live market" : "Genesis Market"}
           </p>
           <SplitHeading text="Ready to trade parallel timelines?" className="split display" />
           <Link href="/market/" className="cta__btn" data-cursor data-reveal>

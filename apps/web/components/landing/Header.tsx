@@ -171,7 +171,7 @@ export default function Header() {
             </ul>
 
             <div className="menu__genesis">
-              <p className="eyebrow">Genesis Event</p>
+              <p className="eyebrow">{eventProfile.id === "ipo" ? "Current event" : "Genesis Event"}</p>
               <p className="menu__genesis-copy">
                 {eventProfile.copy.genesis}
               </p>

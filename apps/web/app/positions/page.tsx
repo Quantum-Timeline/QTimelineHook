@@ -26,7 +26,7 @@ export default function PositionsPage() {
             { icon: <ClaimIcon asset="ETH" yes size={36} />, title: "Hold the position you traded", body: "A buy leaves you with the claim you chose plus the paired claim on your input collateral." },
             { icon: <ClaimIcon asset="USDG" yes={false} size={36} />, title: "Merge before the result", body: "One YES and one NO of the same asset merge back into that asset, any time before resolution." },
             { icon: <ClaimIcon asset="ETH" yes size={36} />, title: "Redeem a winner 1 : 1", body: "After a valid result, the winning claim redeems for its collateral. The losing claim is worth zero." },
-            { icon: <ClaimIcon asset="USDG" yes={false} size={36} />, title: "Cancelled pays half", body: "If no result arrives within 48 hours of the release, anyone can cancel; every claim redeems for 50%." },
+            { icon: <ClaimIcon asset="USDG" yes={false} size={36} />, title: "Cancelled pays half", body: "If no result arrives within 48 hours of the scheduled report time, anyone can cancel; every claim redeems for 50%." },
           ]}
         />
       </div>
