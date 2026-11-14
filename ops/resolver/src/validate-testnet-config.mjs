@@ -9,7 +9,10 @@ const root = resolve(import.meta.dirname, '../../..');
 const manifestPath = resolve(root, process.env.QTIMELINE_TESTNET_MANIFEST || 'deployments/robinhood-testnet-current-vault.json');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 assertTestnetManifest(manifest);
-const envText = await readFile(resolve(root, 'contracts/.env'), 'utf8');
+let envText = '';
+try { envText = await readFile(resolve(root, 'contracts/.env'), 'utf8'); } catch (error) {
+  if (error?.code !== 'ENOENT') throw error;
+}
 const env = Object.fromEntries(envText.split(/\r?\n/).flatMap((line) => {
   const i = line.indexOf('=');
   return i < 1 || line.trim().startsWith('#') ? [] : [[line.slice(0, i).trim(), line.slice(i + 1).trim().replace(/^['"](.*)['"]$/, '$1')]];
