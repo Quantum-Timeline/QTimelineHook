@@ -37,7 +37,10 @@
     "withdraw:testnet": "node contracts/scripts/withdraw-testnet-liquidity.mjs",
     "cutoff:testnet": "node contracts/scripts/cutoff-testnet-smoke.mjs",
     "resolve-negative:testnet": "node contracts/scripts/resolver-negative-testnet-smoke.mjs",
-    "split-cutoff:testnet": "node contracts/scripts/split-cutoff-testnet-smoke.mjs"
+    "split-cutoff:testnet": "node contracts/scripts/split-cutoff-testnet-smoke.mjs",
+    "market:mainnet:plan": "node contracts/scripts/create-mainnet-market.mjs --plan",
+    "market:mainnet:create": "node contracts/scripts/create-mainnet-market.mjs --broadcast",
+    "market:mainnet:quote": "node contracts/scripts/create-mainnet-market.mjs --quote"
   },
   "devDependencies": {
     "@foundry-rs/forge-win32-amd64": "1.7.1",
