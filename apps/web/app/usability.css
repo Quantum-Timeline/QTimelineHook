@@ -108,11 +108,8 @@
 /* A legacy rule hid the wallet button on phones, leaving no way to connect. */
 @media (max-width: 700px) { .product-shell .wallet { display: inline-flex; align-items: center; padding: 9px 16px; font-size: 0.82rem; } }
 
-/* Side lanes match the height of the trade ticket: explanation grows to fill, the shortcut sits at the bottom. */
-.worlds > .world { display: flex; flex-direction: column; gap: 14px; }
-.world__example { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; margin-top: 4px; padding: 16px 18px; border-radius: 16px; background: rgba(243, 242, 236, 0.04); border: 1px solid var(--glass-line); }
-.world__example p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
-.world__example-title { font-weight: 600; font-size: 0.92rem; }
-.worlds > .world .world__cta { margin-top: auto; align-self: flex-start; }
-.worlds > .world .world__note { min-height: 1.2em; }
-@media (max-width: 1100px) { .world__example { flex: none; } }
+/* Side lanes keep their natural height and stay in view while the long trade ticket scrolls. */
+@media (min-width: 1101px) {
+  .worlds { align-items: start; }
+  .worlds > .world { position: sticky; top: 96px; }
+}
