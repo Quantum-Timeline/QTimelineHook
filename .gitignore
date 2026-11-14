@@ -3,6 +3,7 @@ node_modules/
 apps/web/.next-build/
 .build-isolated/
 out/
+apps/web/out-ipo/
 coverage/
 contracts/out/
 contracts/cache/

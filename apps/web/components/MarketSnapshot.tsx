@@ -4,6 +4,7 @@ import { createPublicClient, http, isHex, parseAbi, type Address, type Hex } fro
 import { registryAbi, robinhoodChain } from "@qtimeline/chain";
 import { useMarketId } from "@/lib/use-market-id";
 import { canTradeAt } from "@/lib/market-lifecycle";
+import { eventProfile } from "@/lib/event-profile";
 import { MarketTimeline } from "@/components/MarketTimeline";
 
 type Snapshot = { status: number; opensAt: bigint; cutoffAt: bigint; releaseAt: bigint; deadline: bigint; thresholdBps: number; activated: boolean; chainTimestamp: bigint; reportedValueBps?: number; evidenceHash?: Hex };
@@ -58,9 +59,9 @@ export function MarketSnapshot({ registryOverride, marketIdOverride, fixtureEvid
   const syntheticTest = !fixtureEvidence && Boolean(process.env.NEXT_PUBLIC_TEST_EVENT_LABEL);
   return <>
     <MarketTimeline status={snapshot.status} activated={snapshot.activated} opensAt={snapshot.opensAt} cutoffAt={snapshot.cutoffAt} releaseAt={snapshot.releaseAt} deadline={snapshot.deadline} chainTimestamp={snapshot.chainTimestamp} />
-    <div className="chain-snapshot"><div><small>On-chain status</small><strong>{labels[liveStatus] ?? "Unknown"}</strong></div><div><small>{syntheticTest ? "Test market" : "Threshold"}</small><strong>{syntheticTest ? "Synthetic YES / NO event" : `${(snapshot.thresholdBps / 100).toFixed(2)}%`}</strong></div><div><small>Cutoff</small><strong>{new Date(Number(snapshot.cutoffAt) * 1000).toLocaleString()}</strong></div><div><small>Result deadline</small><strong>{new Date(Number(snapshot.deadline) * 1000).toLocaleString()}</strong></div><p>{tradeable ? "Market is inside its on-chain trading window." : "Market configuration and time are read from Robinhood Chain."}</p></div>
+    <div className="chain-snapshot"><div><small>On-chain status</small><strong>{labels[liveStatus] ?? "Unknown"}</strong></div><div><small>{syntheticTest ? "Test market" : eventProfile.thresholdLabel}</small><strong>{syntheticTest ? "Synthetic YES / NO event" : eventProfile.formatThreshold(snapshot.thresholdBps)}</strong></div><div><small>Cutoff</small><strong>{new Date(Number(snapshot.cutoffAt) * 1000).toLocaleString()}</strong></div><div><small>Result deadline</small><strong>{new Date(Number(snapshot.deadline) * 1000).toLocaleString()}</strong></div><p>{tradeable ? "Market is inside its on-chain trading window." : "Market configuration and time are read from Robinhood Chain."}</p></div>
     {(snapshot.status === 4 || snapshot.status === 5) && snapshot.reportedValueBps !== undefined && snapshot.evidenceHash && <div className="resolution-proof" data-testid="resolution-proof">
-      <div><small>Reported value</small><strong>{(snapshot.reportedValueBps / 100).toFixed(2)}%</strong></div>
+      <div><small>{eventProfile.reportedLabel}</small><strong>{eventProfile.formatValue(snapshot.reportedValueBps)}</strong></div>
       <div><small>On-chain result</small><strong>{labels[snapshot.status]}</strong></div>
       <div className="resolution-proof__hash"><small>Evidence hash</small><code>{snapshot.evidenceHash}</code></div>
       {(syntheticTest || fixtureEvidence) && <p>Fixture evidence · testnet only</p>}

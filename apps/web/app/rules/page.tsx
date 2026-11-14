@@ -2,17 +2,18 @@ import { Frame, PageHeading } from "@/components/Frame";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { ClaimIcon, TokenLogo } from "@/components/TokenLogo";
 import { Reveal } from "@/lib/motion";
+import { eventProfile } from "@/lib/event-profile";
 
 const rules = [
   ["Vault · split", "One deposit, two claims", "Deposit ETH or USDG into a market vault to mint equal YES and NO outcome tokens for that collateral.", "ETH", true],
   ["Pool · trade", "Three independent pools", "ETH-YES and ETH-NO expose conditional asset prices. YES-NO provides an implied outcome price. LP fee is 0.30%; QTimeline adds no protocol fee.", "USDG", false],
-  ["Oracle · resolve", "BEA data, hybrid authorization", "A project bot reads the first official BEA release. The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the BEA number.", "ETH", false],
+  ["Oracle · resolve", eventProfile.id === "ipo" ? "SEC filing, hybrid authorization" : "BEA data, hybrid authorization", eventProfile.oracleRule, "ETH", false],
   ["Claim · redeem", "Winning side pays 1:1", "After a valid result, winning claims redeem for their collateral. If unresolved 48 hours after scheduled release, anyone can trigger cancellation; each individual claim redeems for half, while a matched YES/NO pair merges for full collateral.", "USDG", true],
 ] as const;
 
 const numbers = [
   ["0.30%", "LP fee per swap", "No QTimeline fee on top"],
-  ["5 min", "Cutoff before release", "Swaps close on-chain"],
+  eventProfile.cutoffNumber,
   ["48 h", "Report deadline", "Then anyone can cancel"],
   ["50%", "Payout if cancelled", "Per claim; pairs merge to 100%"],
 ] as const;

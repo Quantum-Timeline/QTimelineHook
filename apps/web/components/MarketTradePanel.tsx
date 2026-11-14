@@ -8,6 +8,7 @@ import { canTradeAt } from "@/lib/market-lifecycle";
 import { findBestProbabilitySell } from "@/lib/probability-sell.mjs";
 import { AnimatedNumber } from "@/lib/motion";
 import { getActiveProvider, useWallet } from "@/lib/wallet";
+import { eventProfile } from "@/lib/event-profile";
 import { friendlyError } from "@/lib/errors";
 import { TradeProgress, type TradeStep } from "@/components/TradeProgress";
 import { ClaimIcon } from "@/components/TokenLogo";
@@ -22,8 +23,8 @@ const routerAbi = parseAbi(["function tradeAsset((bytes32 marketId,address vault
 const probabilityRouterAbi = parseAbi(["function buyProbability((bytes32 marketId,address vault,(address currency0,address currency1,uint24 fee,int24 tickSpacing,address hooks) key,address asset,address recipient,bool yes,bool zeroForOne,uint128 amountIn,uint128 minAmountOut,uint160 sqrtPriceLimitX96,uint64 deadline,uint64 nonce,bytes32 expectedConfigHash) r) returns (uint128 totalOutcome)","function sellProbability((bytes32 marketId,address vault,(address currency0,address currency1,uint24 fee,int24 tickSpacing,address hooks) key,address asset,address recipient,bool yes,bool zeroForOne,uint128 amountIn,uint128 swapAmount,uint128 minAmountOut,uint160 sqrtPriceLimitX96,uint64 deadline,uint64 nonce,bytes32 expectedConfigHash) r) returns (uint128 collateralOut)"]);
 const MIN_SQRT = 4295128740n;
 const MAX_SQRT = 1461446703485210103287273970341n;
-const YES_LABEL = process.env.NEXT_PUBLIC_TEST_YES_LABEL || "YES · PCE ≥ 0.30%";
-const NO_LABEL = process.env.NEXT_PUBLIC_TEST_NO_LABEL || "NO · PCE < 0.30%";
+const YES_LABEL = process.env.NEXT_PUBLIC_TEST_YES_LABEL || eventProfile.yesLabel;
+const NO_LABEL = process.env.NEXT_PUBLIC_TEST_NO_LABEL || eventProfile.noLabel;
 const TRADE_STEPS: TradeStep[] = [{ key: "prepare", label: "Prepare" }, { key: "approve", label: "Approve" }, { key: "trade", label: "Trade" }, { key: "confirm", label: "Confirm" }];
 type PoolKey = { currency0: Address; currency1: Address; fee: number; tickSpacing: number; hooks: Address };
 

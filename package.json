@@ -46,7 +46,9 @@
     "deploy:ipo": "node contracts/scripts/deploy-mainnet-ipo.mjs",
     "market:ipo:plan": "node contracts/scripts/create-mainnet-ipo-market.mjs --plan",
     "market:ipo:create": "node contracts/scripts/create-mainnet-ipo-market.mjs --broadcast",
-    "market:ipo:quote": "node contracts/scripts/create-mainnet-ipo-market.mjs --quote"
+    "market:ipo:quote": "node contracts/scripts/create-mainnet-ipo-market.mjs --quote",
+    "web:ipo:configure": "node contracts/scripts/configure-mainnet-ipo-web.mjs",
+    "web:ipo:build": "node apps/web/scripts/build-ipo.mjs"
   },
   "devDependencies": {
     "@foundry-rs/forge-win32-amd64": "1.7.1",

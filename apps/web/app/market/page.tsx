@@ -6,20 +6,21 @@ import { PoolStrip } from "@/components/PoolStrip";
 import { TokenLogo } from "@/components/TokenLogo";
 import { WorldLane } from "@/components/WorldLane";
 import { robinhoodChain } from "@qtimeline/chain";
+import { eventProfile } from "@/lib/event-profile";
 
 export default function MarketPage() {
   const testnet = robinhoodChain.id === 46630;
   const testEvent = process.env.NEXT_PUBLIC_TEST_EVENT_LABEL;
   const testSource = process.env.NEXT_PUBLIC_TEST_SOURCE_LABEL;
-  const question = testnet ? testEvent ?? "QTimeline test market" : "Did US Core PCE rise at least 0.3% month over month?";
+  const question = testnet ? testEvent ?? "QTimeline test market" : eventProfile.question;
   const source = testnet
     ? testSource ?? "Synthetic test evidence only; no real-world event"
-    : "First BEA Personal Income and Outlays release for October 2026";
+    : eventProfile.source;
 
   return (
     <Frame>
       <PageHeading
-        tag={testnet ? "Testnet · lifecycle smoke test" : "Core PCE · October 2026"}
+        tag={testnet ? "Testnet · lifecycle smoke test" : eventProfile.tag}
         title={testnet ? "Test the market lifecycle." : "Two paths for ETH."}
         body={testnet
           ? "A short-window test market on Robinhood Chain Testnet exercises trading, resolution, cancellation, and redemption with synthetic evidence."

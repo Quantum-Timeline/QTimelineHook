@@ -22,10 +22,15 @@ try {
   for (const name of ["NEXT_PUBLIC_REGISTRY", "NEXT_PUBLIC_FACTORY", "NEXT_PUBLIC_ROUTER", "NEXT_PUBLIC_VOTING", "NEXT_PUBLIC_V4_QUOTER"]) {
     if (!/^0x[0-9a-fA-F]{40}$/.test(mainnetEnv[name] || "")) throw new Error(`Mainnet web config is missing a valid ${name}`);
   }
-  const nextCli = resolve(repoRoot, "node_modules/next/dist/bin/next");
+  const nextCli = resolve(webRoot, "node_modules/next/dist/bin/next");
   const result = spawnSync(process.execPath, [nextCli, "build"], {
     cwd: webRoot,
-    env: { ...process.env, ...mainnetEnv },
+    env: {
+      ...process.env,
+      // Testnet-only variables in apps/web/.env.local must never reach a Mainnet build; an empty value wins over the env file.
+      ...Object.fromEntries(["NEXT_PUBLIC_TEST_EVENT_LABEL", "NEXT_PUBLIC_TEST_SOURCE_LABEL", "NEXT_PUBLIC_TEST_YES_LABEL", "NEXT_PUBLIC_TEST_NO_LABEL", "NEXT_PUBLIC_ELECTION_ID", "NEXT_PUBLIC_VOTE_CANDIDATE_A_ID", "NEXT_PUBLIC_VOTE_CANDIDATE_B_ID", "NEXT_PUBLIC_BEA_TESTNET_MARKET_ID", "NEXT_PUBLIC_BEA_TESTNET_REGISTRY", "NEXT_PUBLIC_BEA_TESTNET_REPORT_TX"].map((name) => [name, ""])),
+      ...mainnetEnv,
+    },
     stdio: "inherit",
     windowsHide: true,
   });
