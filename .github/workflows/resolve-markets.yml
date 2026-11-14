@@ -40,6 +40,8 @@ jobs:
       BEA_RELEASE_URL: ${{ inputs.release_url || vars.BEA_RELEASE_URL }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
       - name: Wait until an activated market manifest is configured
         id: market
         shell: bash
