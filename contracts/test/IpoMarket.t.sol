@@ -1,0 +1,368 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.30;
+
+import {Test} from "forge-std/Test.sol";
+import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
+import {IQTimelineMarketRegistry} from "../src/interfaces/IQTimeline.sol";
+import {ConditionalVault} from "../src/ConditionalVault.sol";
+import {OutcomeToken} from "../src/OutcomeToken.sol";
+import {TimelineHookDeployer} from "../src/TimelineHookDeployer.sol";
+import {TestUSDG} from "../src/testnet/TestUSDG.sol";
+import {IpoMarketRegistry} from "../src/ipo/IpoMarketRegistry.sol";
+import {IpoMarketFactory, IIpoKeyLookup, IIpoSignatureVerifier} from "../src/ipo/IpoMarketFactory.sol";
+import {IpoResolutionAdapter, IIpoPQKeyRegistry, IIpoMLDSA44Verifier} from "../src/ipo/IpoResolutionAdapter.sol";
+
+contract IpoStubPoolManager {}
+
+contract IpoStubKeys {
+    mapping(address => address) public blobOf;
+    function setBlob(address signer, address blob) external { blobOf[signer] = blob; }
+    function publicKeyBlob(address signer) external view returns (address) { return blobOf[signer]; }
+}
+
+/// @dev Accepts exactly one agreed post-quantum signature string so tests can present a good and a bad one.
+contract IpoStubVerifier {
+    function verify(address, bytes calldata, bytes calldata signature) external pure returns (bool) { return keccak256(signature) == keccak256("pq-ok"); }
+}
+
+/// @notice Offline coverage of the Anthropic IPO pricing system: schedule rules, price report handling, and payouts.
+contract IpoMarketTest is Test {
+    uint256 private constant DEPLOYER_KEY = 0xA11CE;
+    uint256 private constant SIGNER_KEY = 0xB0B;
+    int32 private constant THRESHOLD_CENTS = 7400; // $74.00, the midpoint of the announced $70-$78 range
+    bytes32 private constant PERIOD = keccak256("ANT-IPO-PRICE-2026-11");
+    uint64 private constant RELEASE_DELAY = 18 hours;
+    uint64 private constant WINDOW = 48 hours;
+    uint64 private constant MIN_TRADING = 6 hours;
+
+    address private deployer;
+    address private signer;
+    IpoMarketRegistry private registry;
+    IpoMarketFactory private factory;
+    IpoResolutionAdapter private adapter;
+    IpoStubKeys private keys;
+    IpoStubVerifier private verifier;
+    TimelineHookDeployer private hookDeployer;
+    TestUSDG private usdg;
+    IpoStubPoolManager private manager;
+
+    bytes32 private marketId;
+    ConditionalVault private vault;
+    uint64 private opensAt;
+    uint64 private cutoffAt;
+    uint64 private releaseAt;
+    uint64 private deadline;
+
+    function setUp() public {
+        vm.warp(1_800_000_000);
+        deployer = vm.addr(DEPLOYER_KEY);
+        signer = vm.addr(SIGNER_KEY);
+        usdg = new TestUSDG();
+        registry = new IpoMarketRegistry(deployer, RELEASE_DELAY, WINDOW, MIN_TRADING);
+        verifier = new IpoStubVerifier();
+        keys = new IpoStubKeys();
+        keys.setBlob(deployer, address(0xCAFE));
+        keys.setBlob(signer, address(0xBEEF));
+        manager = new IpoStubPoolManager();
+        factory = new IpoMarketFactory(deployer, address(usdg), IPoolManager(address(manager)), registry, IIpoKeyLookup(address(keys)), IIpoSignatureVerifier(address(verifier)));
+        hookDeployer = new TimelineHookDeployer(address(factory));
+        adapter = new IpoResolutionAdapter(registry, IIpoPQKeyRegistry(address(keys)), IIpoMLDSA44Verifier(address(verifier)), signer);
+        vm.startPrank(deployer);
+        factory.setHookDeployer(hookDeployer);
+        registry.wireAndSeal(address(factory), address(adapter));
+        vm.stopPrank();
+
+        opensAt = uint64(block.timestamp + 1 hours);
+        cutoffAt = uint64(block.timestamp + 3 days);
+        releaseAt = cutoffAt + RELEASE_DELAY;
+        deadline = releaseAt + WINDOW;
+        marketId = _create(opensAt, cutoffAt, releaseAt, deadline, THRESHOLD_CENTS, 0);
+        vault = ConditionalVault(payable(factory.vaultOf(marketId)));
+    }
+
+    // ---------------------------------------------------------------- schedule and configuration
+
+    function testRegistryRejectsOutOfRangeScheduleParameters() public {
+        vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
+        new IpoMarketRegistry(deployer, 299, WINDOW, MIN_TRADING);
+        vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
+        new IpoMarketRegistry(deployer, RELEASE_DELAY, 1 hours, MIN_TRADING);
+        vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
+        new IpoMarketRegistry(deployer, RELEASE_DELAY, WINDOW, 30 minutes);
+        vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
+        new IpoMarketRegistry(address(0), RELEASE_DELAY, WINDOW, MIN_TRADING);
+    }
+
+    function testFactoryReadsTheRegistrySchedule() public view {
+        assertEq(factory.releaseDelay(), RELEASE_DELAY);
+        assertEq(factory.resolutionWindow(), WINDOW);
+    }
+
+    function testCreationRejectsTheCorePceFiveMinuteGap() public {
+        uint64 cutoff = uint64(block.timestamp + 3 days);
+        IpoMarketFactory.MarketConfig memory c = _config(opensAt, cutoff, cutoff + 300, cutoff + 300 + WINDOW, THRESHOLD_CENTS, 1);
+        (bytes memory ecdsaSig, bytes32 salt) = _sign(c);
+        vm.prank(deployer);
+        vm.expectRevert(IpoMarketFactory.InvalidConfig.selector);
+        factory.createMarket(c, ecdsaSig, "pq-ok", salt);
+    }
+
+    function testCreationRejectsZeroAndNegativeThresholds() public {
+        for (int32 bad = -1; bad <= 0; ++bad) {
+            IpoMarketFactory.MarketConfig memory c = _config(opensAt, cutoffAt, releaseAt, deadline, bad, 1);
+            (bytes memory ecdsaSig, bytes32 salt) = _sign(c);
+            vm.prank(deployer);
+            vm.expectRevert(IpoMarketFactory.InvalidConfig.selector);
+            factory.createMarket(c, ecdsaSig, "pq-ok", salt);
+        }
+    }
+
+    function testOnlyTheDeployerCanCreateAndTheSignatureMustMatch() public {
+        IpoMarketFactory.MarketConfig memory c = _config(opensAt, cutoffAt, releaseAt, deadline, THRESHOLD_CENTS, 1);
+        (bytes memory ecdsaSig, bytes32 salt) = _sign(c);
+        vm.expectRevert(IpoMarketFactory.Unauthorized.selector);
+        factory.createMarket(c, ecdsaSig, "pq-ok", salt);
+        vm.prank(deployer);
+        vm.expectRevert(IpoMarketFactory.InvalidSignature.selector);
+        factory.createMarket(c, ecdsaSig, "pq-bad", salt);
+    }
+
+    function testActivationNeedsTheConfiguredMinimumTradingWindow() public {
+        vm.warp(cutoffAt - MIN_TRADING + 1);
+        vm.prank(address(factory));
+        vm.expectRevert(IpoMarketRegistry.InvalidTransition.selector);
+        registry.activate(marketId);
+        vm.warp(cutoffAt - MIN_TRADING);
+        vm.prank(address(factory));
+        registry.activate(marketId);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.Open));
+    }
+
+    // ---------------------------------------------------------------- price reports
+
+    function testPriceAtOrAboveTheThresholdIsYesAndBelowIsNo() public {
+        _activate();
+        uint256 snap = vm.snapshotState();
+        _report(7800, PERIOD);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.FinalYes));
+        assertEq(registry.reportedValueBps(marketId), 7800);
+        vm.revertToState(snap);
+        _report(7400, PERIOD);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.FinalYes), "boundary must be YES");
+        vm.revertToState(snap);
+        _report(7399, PERIOD);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.FinalNo), "one cent below must be NO");
+    }
+
+    function testRejectsAReportBeforeTheEarliestReleaseAndAtTheDeadline() public {
+        _activate();
+        vm.warp(releaseAt - 1);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "x");
+        (bytes memory e, bytes memory p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.Expired.selector);
+        adapter.reportValue(r, "x", e, p);
+        vm.warp(deadline);
+        r = _makeReport(7800, PERIOD, "x");
+        r.signatureExpiry = deadline;
+        (e, p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.Expired.selector);
+        adapter.reportValue(r, "x", e, p);
+    }
+
+    function testRejectsWrongSourceWrongPeriodAndNonPositivePrices() public {
+        _activate();
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "evidence");
+        r.sourceId = keccak256("bea:core-pce:mom:first-release"); // the Core PCE source must not resolve this market
+        (bytes memory e, bytes memory p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.reportValue(r, "evidence", e, p);
+
+        r = _makeReport(7800, keccak256("2026-10"), "evidence");
+        (e, p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.reportValue(r, "evidence", e, p);
+
+        for (int32 bad = -1; bad <= 0; ++bad) {
+            r = _makeReport(bad, PERIOD, "evidence");
+            (e, p) = _signReport(r);
+            vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+            adapter.reportValue(r, "evidence", e, p);
+        }
+    }
+
+    function testRejectsEvidenceThatDoesNotMatchTheSignedHash() public {
+        _activate();
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "evidence");
+        (bytes memory e, bytes memory p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidEvidence.selector);
+        adapter.reportValue(r, "different evidence", e, p);
+        vm.expectRevert(IpoResolutionAdapter.InvalidEvidence.selector);
+        adapter.reportValue(r, "", e, p);
+        bytes memory tooLong = new bytes(4097);
+        r = _makeReport(7800, PERIOD, tooLong);
+        (e, p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidEvidence.selector);
+        adapter.reportValue(r, tooLong, e, p);
+    }
+
+    function testRejectsAnUnauthorizedOrMismatchedSignature() public {
+        _activate();
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "evidence");
+        bytes32 digest = _reportDigest(r, address(adapter));
+        (uint8 v, bytes32 rr, bytes32 s) = vm.sign(DEPLOYER_KEY, digest); // valid signature from the wrong key
+        vm.expectRevert(IpoResolutionAdapter.InvalidSignature.selector);
+        adapter.reportValue(r, "evidence", abi.encodePacked(rr, s, v), "pq-ok");
+
+        (bytes memory e,) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidSignature.selector);
+        adapter.reportValue(r, "evidence", e, "pq-bad"); // right ECDSA, wrong post-quantum signature
+
+        keys.setBlob(signer, address(0)); // signer without a registered post-quantum key
+        vm.expectRevert(IpoResolutionAdapter.InvalidSignature.selector);
+        adapter.reportValue(r, "evidence", e, "pq-ok");
+    }
+
+    function testASignatureForAnotherAdapterAddressDoesNotVerifyHere() public {
+        _activate();
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "evidence");
+        bytes32 foreignDigest = _reportDigest(r, address(0xCE11)); // e.g. the Core PCE adapter's domain
+        (uint8 v, bytes32 rr, bytes32 s) = vm.sign(SIGNER_KEY, foreignDigest);
+        vm.expectRevert(IpoResolutionAdapter.InvalidSignature.selector);
+        adapter.reportValue(r, "evidence", abi.encodePacked(rr, s, v), "pq-ok");
+    }
+
+    function testAMarketCannotBeResolvedTwiceAndAnInactiveMarketCannotBeReported() public {
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(7800, PERIOD, "evidence");
+        (bytes memory e, bytes memory p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector); // Draft: never activated
+        adapter.reportValue(r, "evidence", e, p);
+
+        vm.warp(cutoffAt - MIN_TRADING);
+        vm.prank(address(factory));
+        registry.activate(marketId);
+        vm.warp(releaseAt);
+        r.signatureExpiry = uint64(block.timestamp + 1 hours);
+        (e, p) = _signReport(r);
+        adapter.reportValue(r, "evidence", e, p);
+        vm.expectRevert(IpoMarketRegistry.InvalidTransition.selector);
+        adapter.reportValue(r, "evidence", e, p);
+    }
+
+    // ---------------------------------------------------------------- money
+
+    function testWinningClaimsRedeemOneToOneAndLosingClaimsPayNothing() public {
+        vm.deal(deployer, 1 ether);
+        vm.prank(deployer);
+        vault.split{value: 0.01 ether}(address(0), 0.01 ether, deployer);
+        _activate();
+        _report(7800, PERIOD); // YES
+        OutcomeToken yes = OutcomeToken(vault.outcomeToken(address(0), true));
+        OutcomeToken no = OutcomeToken(vault.outcomeToken(address(0), false));
+        uint256 before = deployer.balance;
+        vm.startPrank(deployer);
+        vault.redeem(address(0), true, 0.01 ether, deployer);
+        vault.redeem(address(0), false, 0.01 ether, deployer);
+        vm.stopPrank();
+        assertEq(deployer.balance - before, 0.01 ether, "winner must pay 1:1 and loser nothing");
+        assertEq(yes.totalSupply() + no.totalSupply(), 0);
+        assertEq(vault.accountedCollateral(address(0)), 0);
+    }
+
+    function testExpiryCancelsPermissionlesslyAndEveryClaimPaysHalf() public {
+        vm.deal(deployer, 1 ether);
+        vm.prank(deployer);
+        vault.split{value: 0.01 ether}(address(0), 0.01 ether, deployer);
+        _activate();
+        vm.warp(deadline - 1);
+        vm.expectRevert(IpoResolutionAdapter.Expired.selector);
+        adapter.cancelExpired(marketId);
+        vm.warp(deadline);
+        vm.prank(address(0xBAD)); // anyone
+        adapter.cancelExpired(marketId);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.Cancelled));
+        uint256 before = deployer.balance;
+        vm.startPrank(deployer);
+        vault.redeem(address(0), true, 0.01 ether, deployer);
+        vault.redeem(address(0), false, 0.01 ether, deployer);
+        vm.stopPrank();
+        assertEq(deployer.balance - before, 0.01 ether, "a YES and a NO claim together recover the full collateral");
+    }
+
+    function testSourceIdIsSeparateFromCorePce() public view {
+        assertTrue(adapter.SOURCE_ID() != keccak256("bea:core-pce:mom:first-release"));
+    }
+
+    // ---------------------------------------------------------------- helpers
+
+    function _activate() private {
+        vm.warp(cutoffAt - MIN_TRADING);
+        vm.prank(address(factory));
+        registry.activate(marketId);
+        vm.warp(releaseAt);
+    }
+
+    function _report(int32 price, bytes32 period) private {
+        vm.warp(releaseAt);
+        IpoResolutionAdapter.Report memory r = _makeReport(price, period, "evidence");
+        (bytes memory e, bytes memory p) = _signReport(r);
+        adapter.reportValue(r, "evidence", e, p);
+    }
+
+    function _makeReport(int32 price, bytes32 period, bytes memory evidence) private view returns (IpoResolutionAdapter.Report memory r) {
+        r = IpoResolutionAdapter.Report({
+            marketId: marketId, sourceId: adapter.SOURCE_ID(), periodId: period, valueBps: price,
+            evidenceHash: keccak256(evidence), signatureExpiry: deadline
+        });
+    }
+
+    function _reportDigest(IpoResolutionAdapter.Report memory r, address verifying) private view returns (bytes32) {
+        bytes32 domain = keccak256(abi.encode(
+            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+            keccak256("QTimeline"), keccak256("1"), block.chainid, verifying
+        ));
+        bytes32 structHash = keccak256(abi.encode(adapter.REPORT_TYPEHASH(), r.marketId, r.sourceId, r.periodId, r.valueBps, r.evidenceHash, r.signatureExpiry));
+        return keccak256(abi.encodePacked("\x19\x01", domain, structHash));
+    }
+
+    function _signReport(IpoResolutionAdapter.Report memory r) private view returns (bytes memory ecdsaSig, bytes memory pqSig) {
+        (uint8 v, bytes32 rr, bytes32 s) = vm.sign(SIGNER_KEY, _reportDigest(r, address(adapter)));
+        return (abi.encodePacked(rr, s, v), bytes("pq-ok"));
+    }
+
+    function _config(uint64 o, uint64 c, uint64 r, uint64 d, int32 threshold, uint256 nonce) private view returns (IpoMarketFactory.MarketConfig memory) {
+        return IpoMarketFactory.MarketConfig({
+            opensAt: o, cutoffAt: c, releaseAt: r, deadline: d, periodId: PERIOD, thresholdBps: threshold,
+            ethCollateralCap: 0.1 ether, usdgCollateralCap: 500_000_000, nonce: nonce, signatureExpiry: uint64(block.timestamp + 30 minutes)
+        });
+    }
+
+    function _sign(IpoMarketFactory.MarketConfig memory c) private view returns (bytes memory ecdsaSig, bytes32 salt) {
+        bytes32 configHash = keccak256(abi.encode(block.chainid, address(factory), c.opensAt, c.cutoffAt, c.releaseAt, c.deadline, c.periodId, c.thresholdBps, c.ethCollateralCap, c.usdgCollateralCap));
+        bytes32 domain = keccak256(abi.encode(
+            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+            keccak256("QTimeline"), keccak256("1"), block.chainid, address(factory)
+        ));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domain, keccak256(abi.encode(factory.CREATE_TYPEHASH(), configHash, c.nonce, c.signatureExpiry))));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(DEPLOYER_KEY, digest);
+        ecdsaSig = abi.encodePacked(r, s, v);
+        bytes32 id = keccak256(abi.encode(configHash, c.nonce));
+        for (uint256 i; i < 2_000_000; ++i) {
+            salt = bytes32(i);
+            if ((uint160(hookDeployer.predict(IPoolManager(address(manager)), registry, id, salt)) & 0x3fff) == 0x2880) break;
+        }
+    }
+
+    function _create(uint64 o, uint64 c, uint64 r, uint64 d, int32 threshold, uint256 nonce) private returns (bytes32 id) {
+        IpoMarketFactory.MarketConfig memory cfg = _config(o, c, r, d, threshold, nonce);
+        (bytes memory ecdsaSig, bytes32 salt) = _sign(cfg);
+        bytes32 configHash = keccak256(abi.encode(block.chainid, address(factory), cfg.opensAt, cfg.cutoffAt, cfg.releaseAt, cfg.deadline, cfg.periodId, cfg.thresholdBps, cfg.ethCollateralCap, cfg.usdgCollateralCap));
+        id = keccak256(abi.encode(configHash, nonce));
+        vm.prank(deployer);
+        factory.createMarket(cfg, ecdsaSig, "pq-ok", salt);
+    }
+}

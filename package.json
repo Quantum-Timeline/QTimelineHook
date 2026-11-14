@@ -40,7 +40,13 @@
     "split-cutoff:testnet": "node contracts/scripts/split-cutoff-testnet-smoke.mjs",
     "market:mainnet:plan": "node contracts/scripts/create-mainnet-market.mjs --plan",
     "market:mainnet:create": "node contracts/scripts/create-mainnet-market.mjs --broadcast",
-    "market:mainnet:quote": "node contracts/scripts/create-mainnet-market.mjs --quote"
+    "market:mainnet:quote": "node contracts/scripts/create-mainnet-market.mjs --quote",
+    "keys:ipo:prepare": "node contracts/scripts/prepare-mainnet-ipo-signers.mjs",
+    "deploy:ipo:preflight": "node contracts/scripts/deploy-mainnet-ipo.mjs --preflight",
+    "deploy:ipo": "node contracts/scripts/deploy-mainnet-ipo.mjs",
+    "market:ipo:plan": "node contracts/scripts/create-mainnet-ipo-market.mjs --plan",
+    "market:ipo:create": "node contracts/scripts/create-mainnet-ipo-market.mjs --broadcast",
+    "market:ipo:quote": "node contracts/scripts/create-mainnet-ipo-market.mjs --quote"
   },
   "devDependencies": {
     "@foundry-rs/forge-win32-amd64": "1.7.1",
