@@ -61,6 +61,10 @@ if (priorOutcome) {
     publicClient.readContract({ address: manifest.addresses.MarketRegistry, abi: registryArtifact.abi, functionName: 'reportedValueBps', args: [marketId] }),
     publicClient.readContract({ address: manifest.addresses.MarketRegistry, abi: registryArtifact.abi, functionName: 'evidenceHash', args: [marketId] }),
   ]);
+  const expectedStatus = parsed.valueBps >= Number(market.thresholdBps) ? 4 : 5;
+  if (Number(market.status) !== expectedStatus || Number(reportedValueBps) !== parsed.valueBps || reportedEvidenceHash.toLowerCase() !== evidenceHash.toLowerCase()) {
+    throw new Error('Final testnet market does not match the parsed fixture report.');
+  }
   console.log(JSON.stringify({ chainId: 46630, marketId, period, alreadyFinal: true, finalStatus: priorOutcome, reportedValueBps: Number(reportedValueBps), evidenceHash: reportedEvidenceHash, newTransactionSent: false }, null, 2));
   process.exit(0);
 }
@@ -82,7 +86,8 @@ const pqAccepted = await publicClient.readContract({ address: manifest.addresses
 if (!pqAccepted) throw new Error('Testnet ML-DSA verifier rejected the fixture report signature.');
 const args = [report, stringToHex(canonicalJson), ecdsaSignature, pqSignature];
 await publicClient.simulateContract({ account: relayer, address: manifest.addresses.ResolutionAdapter, abi: adapterArtifact.abi, functionName: 'reportValue', args });
-const txHash = await walletClient.writeContract({ account: relayer, address: manifest.addresses.ResolutionAdapter, abi: adapterArtifact.abi, functionName: 'reportValue', args, gas: 25_000_000n });
+const nonce = await publicClient.getTransactionCount({ address: relayer.address, blockTag: 'pending' });
+const txHash = await walletClient.writeContract({ account: relayer, address: manifest.addresses.ResolutionAdapter, abi: adapterArtifact.abi, functionName: 'reportValue', args, gas: 25_000_000n, nonce });
 const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations: 1 });
 if (receipt.status !== 'success') throw new Error(`Testnet report transaction reverted: ${txHash}`);
 const [finalMarket, reportedValueBps, reportedEvidenceHash] = await Promise.all([

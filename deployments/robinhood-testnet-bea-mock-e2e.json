@@ -1,0 +1,218 @@
+{
+  "chainId": 46630,
+  "network": "Robinhood Chain Testnet",
+  "deployer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+  "deployments": {
+    "F1600Helper": {
+      "address": "0x163Cd6E0114A712C3523BdC901243B6A2c9482ee",
+      "transactionHash": "0xf83ecdc4a9c7c188a8305dacd12f03e95a07e56c10c8a327e7ad20b1d4c336f0",
+      "blockNumber": "152670579",
+      "runtimeCodeHash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b"
+    },
+    "TestUSDG": {
+      "address": "0xEB6B998C6dCB9E684CAe0aa14Fc7d26eFB1423d4",
+      "transactionHash": "0x482946eb14875fa35d1f87ceb2be141347a871e6642aca3d0d5e7ae52b2a0de2",
+      "blockNumber": "152670583",
+      "runtimeCodeHash": "0x811e2f35103e50d4648a0215bc227bb1c78f7ee2237381b999f4afea1d81faee"
+    },
+    "MLDSA44Verifier": {
+      "address": "0x3D3171AEa9BCc49355C3116bd00bD6588F435eB4",
+      "transactionHash": "0x536872df2b9777ef973c642fd0435f805639a7c978767f9285b320398181830e",
+      "blockNumber": "152670594",
+      "runtimeCodeHash": "0x242d24869f2687db0e81e3e7104e0ca33e5441decc6c4bf7e13ca51ce26506e7"
+    },
+    "MarketRegistry": {
+      "address": "0x3191F8E3795659E1f82e524F374D3Cd0609c969a",
+      "transactionHash": "0xe9b795970c548043d32490c457ee73a8910db79008a27d264ef04a02641f8ffc",
+      "blockNumber": "152670599",
+      "runtimeCodeHash": "0x104f09db7dca86284f81f4832e789705d0b49d1563a095d322282bfac48069d3"
+    },
+    "PQKeyRegistry": {
+      "address": "0x05bAaBF2Fa9FB75bef9D983ec2608b6600271965",
+      "transactionHash": "0xbd81b65425fbd343936ceb88f9c2ec5f578b9b66f3dacc9a4d83ae1eb9cca230",
+      "blockNumber": "152670604",
+      "runtimeCodeHash": "0x7d6bfd384c664f2433b1a6a9d3dc6b79ddec1bb4c9ac56d77936f50af3ae949a"
+    },
+    "MarketFactory": {
+      "address": "0xd642C8a275f1C34f92709c6099129ED9dC86c056",
+      "transactionHash": "0x21cc491c3d5e3c4b886a40d19fda591d47f2c17d418c8133ce2290d5e9192bb0",
+      "blockNumber": "152670609",
+      "runtimeCodeHash": "0x74149fd9634632ad63bc0c732286260bbdc1d0d0c266eed677a2cb0e99a0afec"
+    },
+    "ResolutionAdapter": {
+      "address": "0xeA46ACEEA1083A898656F1BdA3DC761DA33D3a71",
+      "transactionHash": "0x5ccbda3c971e990698ae82d2b63bb8458fb0fe92b9843eb796d6678bb83ab740",
+      "blockNumber": "152670617",
+      "runtimeCodeHash": "0xbd0cb4a2492ae649af696ed90fc6341eb1754acd17bef4da7e10103409b84b36"
+    },
+    "TimelineHookDeployer": {
+      "address": "0x51941B089Df462df0c3B926B97B42D3a81bF5157",
+      "transactionHash": "0xa8b88529da6e5b34710fa1eaf68dd91196270a438be974e19ef2dfb5238d38e1",
+      "blockNumber": "152670623",
+      "runtimeCodeHash": "0x640d57822bdf154f191ab017e839070447a7a108601b51275209dffc99ff4e9e"
+    },
+    "TimelineRouter": {
+      "address": "0xCE57d42a941532b325FE58E531c0635c482F572D",
+      "transactionHash": "0x745d9623e1fdce8a0fcaab4af1ee822aa4bb08f30903048fae73e743c9900508",
+      "blockNumber": "152670630",
+      "runtimeCodeHash": "0x40d6e2352910e57272532ff711c363c625e4ad508344539f9517e42a68e668f7"
+    },
+    "QTLVoting": {
+      "address": "0xDb9115205318FC9a5fAf7baF5E0053Ea456b32fE",
+      "transactionHash": "0xb6da2f2c0539114ad3523173ac08761b58cf7a89b507bd877533e2b51ba8568d",
+      "blockNumber": "152670633",
+      "runtimeCodeHash": "0x690a96b65139a03f5c6ec88718c25578731bea06200be5e3aa9549ca2e2ed00d"
+    },
+    "deployerPKBlob": {
+      "address": "0xb3AC4987aA825f1021FcCcec5f9D454Bd847CD6E",
+      "transactionHash": "0x6f1192d9bd8c83ed88fa47f607de55be36905d8bba9bf2d6e337230e81b42aa6",
+      "blockNumber": "152670651",
+      "runtimeCodeHash": "0x7b22ad73e5a40cf9008b59a54cafae8325c0943f524ac3e85ed958dfab56077c"
+    },
+    "botPKBlob": {
+      "address": "0xb46daBf15760B57FC7046CA37d7F5Ce136a9B5e5",
+      "transactionHash": "0x4978ac68e0bc89f2e786ea5e0c92689396823082033b31f984d69bcb1c6ace67",
+      "blockNumber": "152670664",
+      "runtimeCodeHash": "0x656537f0ed228aaa5b9e394493bc2c7e0ee4a55590054b9cb40acb0ba9bb9535"
+    }
+  },
+  "wiring": {
+    "factoryHookDeployerSet": {
+      "transactionHash": "0xb640db61cd18c857a8fcc2ed3854bc45959bccc5ee30f4b1735286a4d7b8a86a",
+      "blockNumber": "152670636"
+    },
+    "registryWiredAndSealed": {
+      "transactionHash": "0xedea407f2379124d8ec346993d152c6fd24a7da6a6d6353d0f519b1146923b7b",
+      "blockNumber": "152670640"
+    },
+    "pqKeyRegistrySealed": {
+      "transactionHash": "0x6e8fbbca65002eacdd50920f1d5c1e10d30b31ba7c03662a4b6f5a2c0d797703",
+      "blockNumber": "152670676"
+    },
+    "testUsdGFaucet": {
+      "transactionHash": "0xaea108ff3948cb1dd46f70f8793e2bfbb1d9fe0d67ea04da3148f41a997adbe1",
+      "blockNumber": "153073981",
+      "amount": "10000000000"
+    }
+  },
+  "lastCheckedBlock": "153073960",
+  "addresses": {
+    "PoolManager": "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+    "PositionManager": "0x58daec3116aae6d93017baaea7749052e8a04fa7",
+    "Quoter": "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
+    "TestUSDG": "0xEB6B998C6dCB9E684CAe0aa14Fc7d26eFB1423d4",
+    "F1600Helper": "0x163Cd6E0114A712C3523BdC901243B6A2c9482ee",
+    "MLDSA44Verifier": "0x3D3171AEa9BCc49355C3116bd00bD6588F435eB4",
+    "MarketRegistry": "0x3191F8E3795659E1f82e524F374D3Cd0609c969a",
+    "PQKeyRegistry": "0x05bAaBF2Fa9FB75bef9D983ec2608b6600271965",
+    "MarketFactory": "0xd642C8a275f1C34f92709c6099129ED9dC86c056",
+    "ResolutionAdapter": "0xeA46ACEEA1083A898656F1BdA3DC761DA33D3a71",
+    "TimelineHookDeployer": "0x51941B089Df462df0c3B926B97B42D3a81bF5157",
+    "TimelineRouter": "0xCE57d42a941532b325FE58E531c0635c482F572D",
+    "QTLVoting": "0xDb9115205318FC9a5fAf7baF5E0053Ea456b32fE"
+  },
+  "resolverSigner": "0x246c6274f583EB1f1C58427F992A61586fa4421f",
+  "shortTestnetMode": true,
+  "testnetKeys": {
+    "deployer": {
+      "signer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+      "pkBlob": "0xb3AC4987aA825f1021FcCcec5f9D454Bd847CD6E",
+      "alreadyRegistered": true
+    },
+    "bot": {
+      "signer": "0x246c6274f583EB1f1C58427F992A61586fa4421f",
+      "pkBlob": "0xb46daBf15760B57FC7046CA37d7F5Ce136a9B5e5",
+      "alreadyRegistered": true
+    }
+  },
+  "pqKeyRegistrySealed": true,
+  "testUsdGBalance": "10000000000",
+  "note": "Testnet-only smoke market has three seeded v4 liquidity positions and is activated; trading remains time-gated until opensAt.",
+  "smokeMarket": {
+    "marketId": "0x00242b5fdc001d263487e3dd545e718b1303d0eef0cf503d5daa3b06a368c935",
+    "configHash": "0xdff40e186c413df29c9eccafa76bc395b13db4f38e6ab30e77a0ff650a7c9073",
+    "opensAt": "1794636140",
+    "cutoffAt": "1794636440",
+    "releaseAt": "1794636450",
+    "deadline": "1794636570",
+    "hook": "0x37A3B0525865c3Ee4B0ecE771A7Ed287Ac17A880",
+    "createTransactionHash": "0xe9f9a1050231ec9477f4d48196249b27377075933061b31d41e0be8cacc8f0f5",
+    "createBlockNumber": "153073996",
+    "poolsInitialized": true,
+    "initializeTransactionHash": "0x5484da7e1172fc048744468d05c6e8ba3b0e4b1d23ddc887cdf4e3a3888265b0",
+    "initializeBlockNumber": "153074001",
+    "liquiditySeed": {
+      "ethCollateral": "1000000000",
+      "usdgCollateral": "200000000",
+      "liquidity": "100000000",
+      "tickLower": -60000,
+      "tickUpper": 60000,
+      "positionIds": [
+        "1069022",
+        "1069023",
+        "1069024"
+      ],
+      "positionLiquidity": [
+        "100000000",
+        "100000000",
+        "100000000"
+      ],
+      "poolIds": [
+        "0x4b10341a3a260a0b7276190b2040aedca1e2f682b7ceadde0f9fefb881a6a498",
+        "0x297df1c199856110eb7eca4d6c390005a9c0099276e917d54d77397542bf9211",
+        "0xb9fe0b37a86bd0d9efc8476be99d1310674a133c7da667fd8da473e9a0dcf9b7"
+      ],
+      "transactions": {
+        "nativeSplit": "0x049b435515ed27e7c7f85298eab4d79759c8af517f54bade49f3aab973ff0f31",
+        "usdgSplit": "0x18cf59b646e162d70daa6d31ea49cf8d6e0b81a7f3fc93f2a8103c86bf81bcec",
+        "approvals": [
+          "0x67f8af3455ffdfc21d15d61326a4a92eb56a4690d4415fbaf6de55cabd0438b7",
+          "0x3e98c6c6ad02b75c76dae0e8d08a81a57a4e487790bdd9827599e73b8e2b22e0",
+          "0x31b7b4716e5308c5cdc20ac2dfebd6c07a90ee1d8b1041a53a787ea2fb110005",
+          "0xbb1c7d70cc8b3ace5612ccd8cc8a5a3559cf9277c2f296c26bf49519a1fc5726",
+          "0x09be25eb1faf8cc7b983bbc5e0b7e9893e904fcba7cbf5fdd57d42eee60ccffd",
+          "0xf7fba9c45866260b1eb02e2b38a77e7a58574a51838c21b9dc903a80a84b02c7",
+          "0xc3eb5e196c1b4f3ca0d37d74686a7f64e41a17422d4b675fe48e94aafb9469d6",
+          "0x5da1565abf719c813dbe87a7c131469068acab7c848124067b56b8ca8fa729bf"
+        ],
+        "positions": [
+          "0xe05dc03e2957a760cd4aca5a07dde8066848012f1791399efee6f043e8ae1f19",
+          "0xb5e786b5d32fcd10a3e0523a4cb43db70ae20df91d13e2ec3379457ee3eabd36",
+          "0x3ecb699fb8239fd2c9218378d9f1baf27da1d7ac93097f0b5d784d94092a4bc5"
+        ],
+        "activation": "0xdb6b52e5cf0a9a3b644f3866024fa8246692b7693bd5192e0edf7b64cd654817"
+      }
+    },
+    "vault": "0x57FBf90fa5A5eAf794102E5F2DC71C83E993cB4E",
+    "status": "Scheduled",
+    "activated": true,
+    "mockBeaFixture": {
+      "period": "2026-07",
+      "printed": "0.2%",
+      "valueBps": 20,
+      "expected": "Final NO (20 bps is below the 30 bps threshold)",
+      "evidence": {
+        "source": "bea:core-pce:mom:first-release",
+        "url": "https://www.bea.gov/index.php/news/2026/personal-income-and-outlays-july-2026",
+        "period": "2026-07",
+        "table": "Percent Change From Preceding Month",
+        "row": "PCE price index excluding food and energy",
+        "printedValue": "0.2%",
+        "responseSha256": "4e179daaedbdbd49ad2c6c868b768b1cb75a123e6f9739cc0020804d03aa4a9f",
+        "fetchedAt": "2026-11-14T06:04:31.015Z",
+        "fixtureMode": true
+      },
+      "evidenceHash": "0xcff084bbf67ff25b9c3c67e26930bc0f204a4539ab35ee643e2122ebab170706",
+      "transactionHash": "0x96ca3cd47c6374607605239c781737d78e94b74fd04352b577f920ae4ed42f61",
+      "blockNumber": "153075703",
+      "finalStatus": "Final NO",
+      "chainId": 46630,
+      "testnetOnly": true
+    }
+  },
+  "testnetVoting": {
+    "token": "0x7416a4131427D661407074eb4Fa9022f55861DdA",
+    "inheritedBindingFromExistingShortTestnetStack": true
+  },
+  "marketActivated": true
+}
