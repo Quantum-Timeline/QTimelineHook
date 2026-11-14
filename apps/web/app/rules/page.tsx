@@ -29,7 +29,9 @@ export default function RulesPage() {
           { label: "Assets", wide: true, value: <><span><TokenLogo asset="ETH" size={30} /> ETH</span><i aria-hidden="true">⇄</i><span><TokenLogo asset="USDG" size={30} /> USDG</span></>, sub: "ETH native and USDG; pair fixed per market" },
           { label: "Venue", value: "Uniswap v4", sub: "Hook-gated by lifecycle" },
           { label: "Signatures", value: "ECDSA + ML-DSA-44", sub: "Both must verify on-chain" },
-          { label: "Custody", value: "No admin exit", sub: "Deployer cannot move collateral" },
+          eventProfile.id === "ipo"
+            ? { label: "Custody", value: "Upgradeable", sub: "Deployer can replace contract logic" }
+            : { label: "Custody", value: "No admin exit", sub: "Deployer cannot move collateral" },
         ]}
       />
       <Reveal><FlowDiagram /></Reveal>

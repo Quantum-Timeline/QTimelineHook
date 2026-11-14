@@ -2,15 +2,21 @@
 pragma solidity 0.8.30;
 
 import {Test} from "forge-std/Test.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {TransparentUpgradeableProxy, ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {IQTimelineMarketRegistry} from "../src/interfaces/IQTimeline.sol";
-import {ConditionalVault} from "../src/ConditionalVault.sol";
-import {OutcomeToken} from "../src/OutcomeToken.sol";
-import {TimelineHookDeployer} from "../src/TimelineHookDeployer.sol";
 import {TestUSDG} from "../src/testnet/TestUSDG.sol";
 import {IpoMarketRegistry} from "../src/ipo/IpoMarketRegistry.sol";
 import {IpoMarketFactory, IIpoKeyLookup, IIpoSignatureVerifier} from "../src/ipo/IpoMarketFactory.sol";
 import {IpoResolutionAdapter, IIpoPQKeyRegistry, IIpoMLDSA44Verifier} from "../src/ipo/IpoResolutionAdapter.sol";
+import {IpoConditionalVault} from "../src/ipo/IpoConditionalVault.sol";
+import {IpoOutcomeToken} from "../src/ipo/IpoOutcomeToken.sol";
+import {IpoTimelineHook} from "../src/ipo/IpoTimelineHook.sol";
+import {IpoHookDeployer} from "../src/ipo/IpoHookDeployer.sol";
 
 contract IpoStubPoolManager {}
 
@@ -25,8 +31,19 @@ contract IpoStubVerifier {
     function verify(address, bytes calldata, bytes calldata signature) external pure returns (bool) { return keccak256(signature) == keccak256("pq-ok"); }
 }
 
-/// @notice Offline coverage of the Anthropic IPO pricing system: schedule rules, price report handling, and payouts.
+// Next-version stand-ins used to prove that upgrades keep state and that only the admin can perform them.
+contract RegistryV2 is IpoMarketRegistry { function version() external pure returns (uint256) { return 2; } }
+contract AdapterV2 is IpoResolutionAdapter { function version() external pure returns (uint256) { return 2; } }
+contract VaultV2 is IpoConditionalVault { function version() external pure returns (uint256) { return 2; } }
+contract HookV2 is IpoTimelineHook {
+    constructor(IPoolManager manager) IpoTimelineHook(manager) {}
+    function version() external pure returns (uint256) { return 2; }
+}
+
+/// @notice Offline coverage of the upgradeable Anthropic IPO pricing system: schedule rules, price report handling, payouts,
+///         and that every upgrade path keeps state and obeys the admin.
 contract IpoMarketTest is Test {
+    bytes32 private constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
     uint256 private constant DEPLOYER_KEY = 0xA11CE;
     uint256 private constant SIGNER_KEY = 0xB0B;
     int32 private constant THRESHOLD_CENTS = 7400; // $74.00, the midpoint of the announced $70-$78 range
@@ -42,12 +59,15 @@ contract IpoMarketTest is Test {
     IpoResolutionAdapter private adapter;
     IpoStubKeys private keys;
     IpoStubVerifier private verifier;
-    TimelineHookDeployer private hookDeployer;
+    IpoHookDeployer private hookDeployer;
+    UpgradeableBeacon private tokenBeacon;
+    UpgradeableBeacon private vaultBeacon;
+    UpgradeableBeacon private hookBeacon;
     TestUSDG private usdg;
     IpoStubPoolManager private manager;
 
     bytes32 private marketId;
-    ConditionalVault private vault;
+    IpoConditionalVault private vault;
     uint64 private opensAt;
     uint64 private cutoffAt;
     uint64 private releaseAt;
@@ -58,16 +78,32 @@ contract IpoMarketTest is Test {
         deployer = vm.addr(DEPLOYER_KEY);
         signer = vm.addr(SIGNER_KEY);
         usdg = new TestUSDG();
-        registry = new IpoMarketRegistry(deployer, RELEASE_DELAY, WINDOW, MIN_TRADING);
         verifier = new IpoStubVerifier();
         keys = new IpoStubKeys();
         keys.setBlob(deployer, address(0xCAFE));
         keys.setBlob(signer, address(0xBEEF));
         manager = new IpoStubPoolManager();
-        factory = new IpoMarketFactory(deployer, address(usdg), IPoolManager(address(manager)), registry, IIpoKeyLookup(address(keys)), IIpoSignatureVerifier(address(verifier)));
-        hookDeployer = new TimelineHookDeployer(address(factory));
-        adapter = new IpoResolutionAdapter(registry, IIpoPQKeyRegistry(address(keys)), IIpoMLDSA44Verifier(address(verifier)), signer);
+
+        registry = IpoMarketRegistry(_proxy(address(new IpoMarketRegistry()), abi.encodeCall(IpoMarketRegistry.initialize, (deployer, RELEASE_DELAY, WINDOW, MIN_TRADING))));
+
+        // Per-market logic sits behind beacons; the hook implementation must itself carry the v4 permission bits.
+        hookDeployer = new IpoHookDeployer(deployer);
+        bytes32 implSalt = _mineSalt(address(hookDeployer), keccak256(abi.encodePacked(type(IpoTimelineHook).creationCode, abi.encode(manager))));
+        vm.prank(deployer);
+        address hookImpl = hookDeployer.deployImplementation(IPoolManager(address(manager)), implSalt);
+        tokenBeacon = new UpgradeableBeacon(address(new IpoOutcomeToken()), deployer);
+        vaultBeacon = new UpgradeableBeacon(address(new IpoConditionalVault()), deployer);
+        hookBeacon = new UpgradeableBeacon(hookImpl, deployer);
+
+        factory = IpoMarketFactory(_proxy(address(new IpoMarketFactory()), abi.encodeCall(IpoMarketFactory.initialize, (
+            deployer, address(usdg), IPoolManager(address(manager)), registry, IIpoKeyLookup(address(keys)), IIpoSignatureVerifier(address(verifier)),
+            address(tokenBeacon), address(vaultBeacon)
+        ))));
+        adapter = IpoResolutionAdapter(_proxy(address(new IpoResolutionAdapter()), abi.encodeCall(IpoResolutionAdapter.initialize, (
+            registry, IIpoPQKeyRegistry(address(keys)), IIpoMLDSA44Verifier(address(verifier)), signer
+        ))));
         vm.startPrank(deployer);
+        hookDeployer.configure(address(factory), address(hookBeacon));
         factory.setHookDeployer(hookDeployer);
         registry.wireAndSeal(address(factory), address(adapter));
         vm.stopPrank();
@@ -77,20 +113,21 @@ contract IpoMarketTest is Test {
         releaseAt = cutoffAt + RELEASE_DELAY;
         deadline = releaseAt + WINDOW;
         marketId = _create(opensAt, cutoffAt, releaseAt, deadline, THRESHOLD_CENTS, 0);
-        vault = ConditionalVault(payable(factory.vaultOf(marketId)));
+        vault = IpoConditionalVault(payable(factory.vaultOf(marketId)));
     }
 
     // ---------------------------------------------------------------- schedule and configuration
 
     function testRegistryRejectsOutOfRangeScheduleParameters() public {
+        address impl = address(new IpoMarketRegistry());
         vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
-        new IpoMarketRegistry(deployer, 299, WINDOW, MIN_TRADING);
+        _proxy(impl, abi.encodeCall(IpoMarketRegistry.initialize, (deployer, 299, WINDOW, MIN_TRADING)));
         vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
-        new IpoMarketRegistry(deployer, RELEASE_DELAY, 1 hours, MIN_TRADING);
+        _proxy(impl, abi.encodeCall(IpoMarketRegistry.initialize, (deployer, RELEASE_DELAY, 1 hours, MIN_TRADING)));
         vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
-        new IpoMarketRegistry(deployer, RELEASE_DELAY, WINDOW, 30 minutes);
+        _proxy(impl, abi.encodeCall(IpoMarketRegistry.initialize, (deployer, RELEASE_DELAY, WINDOW, 30 minutes)));
         vm.expectRevert(IpoMarketRegistry.InvalidConfig.selector);
-        new IpoMarketRegistry(address(0), RELEASE_DELAY, WINDOW, MIN_TRADING);
+        _proxy(impl, abi.encodeCall(IpoMarketRegistry.initialize, (address(0), RELEASE_DELAY, WINDOW, MIN_TRADING)));
     }
 
     function testFactoryReadsTheRegistrySchedule() public view {
@@ -261,8 +298,8 @@ contract IpoMarketTest is Test {
         vault.split{value: 0.01 ether}(address(0), 0.01 ether, deployer);
         _activate();
         _report(7800, PERIOD); // YES
-        OutcomeToken yes = OutcomeToken(vault.outcomeToken(address(0), true));
-        OutcomeToken no = OutcomeToken(vault.outcomeToken(address(0), false));
+        IpoOutcomeToken yes = IpoOutcomeToken(vault.outcomeToken(address(0), true));
+        IpoOutcomeToken no = IpoOutcomeToken(vault.outcomeToken(address(0), false));
         uint256 before = deployer.balance;
         vm.startPrank(deployer);
         vault.redeem(address(0), true, 0.01 ether, deployer);
@@ -297,7 +334,141 @@ contract IpoMarketTest is Test {
         assertTrue(adapter.SOURCE_ID() != keccak256("bea:core-pce:mom:first-release"));
     }
 
+    // ---------------------------------------------------------------- upgradeability
+
+    function testImplementationsAndProxiesCannotBeInitializedAgain() public {
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        registry.initialize(address(1), RELEASE_DELAY, WINDOW, MIN_TRADING);
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        vault.initialize(address(1), address(1), bytes32(uint256(1)), registry, address(0), address(2), address(3), 1, address(4), address(5), address(6), 1);
+        address bareImpl = address(new IpoResolutionAdapter());
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        IpoResolutionAdapter(bareImpl).initialize(registry, IIpoPQKeyRegistry(address(keys)), IIpoMLDSA44Verifier(address(verifier)), signer);
+    }
+
+    function testOnlyTheProxyAdminOwnerCanUpgradeAndTheNewLogicKeepsAllState() public {
+        // fill the registry and the vault with state first
+        vm.deal(deployer, 1 ether);
+        vm.prank(deployer);
+        vault.split{value: 0.01 ether}(address(0), 0.01 ether, deployer);
+        IQTimelineMarketRegistry.Market memory before = registry.market(marketId);
+
+        address newImpl = address(new RegistryV2());
+        ProxyAdmin admin = _adminOf(address(registry));
+        assertEq(admin.owner(), deployer);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
+        admin.upgradeAndCall(ITransparentUpgradeableProxy(address(registry)), newImpl, "");
+        vm.prank(deployer);
+        admin.upgradeAndCall(ITransparentUpgradeableProxy(address(registry)), newImpl, "");
+
+        assertEq(RegistryV2(address(registry)).version(), 2);
+        IQTimelineMarketRegistry.Market memory afterUpgrade = registry.market(marketId);
+        assertEq(afterUpgrade.configHash, before.configHash);
+        assertEq(afterUpgrade.vault, before.vault);
+        assertEq(registry.factory(), address(factory));
+        assertEq(registry.resolver(), address(adapter));
+        assertEq(registry.releaseDelay(), RELEASE_DELAY);
+        assertEq(vault.accountedCollateral(address(0)), 0.01 ether);
+    }
+
+    function testAdapterUpgradeKeepsItsWiring() public {
+        address newImpl = address(new AdapterV2());
+        vm.prank(deployer);
+        _adminOf(address(adapter)).upgradeAndCall(ITransparentUpgradeableProxy(address(adapter)), newImpl, "");
+        assertEq(AdapterV2(address(adapter)).version(), 2);
+        assertEq(adapter.authorizedSigner(), signer);
+        assertEq(address(adapter.registry()), address(registry));
+        // still resolves
+        _activate();
+        _report(7800, PERIOD);
+        assertEq(uint8(registry.market(marketId).status), uint8(IQTimelineMarketRegistry.Status.FinalYes));
+    }
+
+    function testVaultBeaconUpgradeKeepsBalancesAndStillPays() public {
+        vm.deal(deployer, 1 ether);
+        vm.prank(deployer);
+        vault.split{value: 0.01 ether}(address(0), 0.01 ether, deployer);
+        address newImpl = address(new VaultV2());
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this)));
+        vaultBeacon.upgradeTo(newImpl);
+        vm.prank(deployer);
+        vaultBeacon.upgradeTo(newImpl);
+        assertEq(VaultV2(payable(address(vault))).version(), 2);
+        assertEq(vault.accountedCollateral(address(0)), 0.01 ether);
+        assertEq(address(vault).balance, 0.01 ether);
+        _activate();
+        _report(7800, PERIOD);
+        uint256 before = deployer.balance;
+        vm.prank(deployer);
+        vault.redeem(address(0), true, 0.01 ether, deployer);
+        assertEq(deployer.balance - before, 0.01 ether);
+    }
+
+    function testHookBeaconUpgradeNeedsANewMinedImplementationAndKeepsTheMarketBinding() public {
+        address hook = factory.hookOf(marketId);
+        assertEq(IpoTimelineHook(hook).marketId(), marketId);
+        // a new implementation that does not carry the v4 permission bits cannot even be constructed
+        vm.expectRevert();
+        new HookV2(IPoolManager(address(manager)));
+        // mined, it deploys and the beacon can adopt it
+        bytes32 salt = _mineSalt(address(this), keccak256(abi.encodePacked(type(HookV2).creationCode, abi.encode(manager))));
+        address newImpl = address(new HookV2{salt: salt}(IPoolManager(address(manager))));
+        vm.prank(deployer);
+        hookBeacon.upgradeTo(newImpl);
+        assertEq(HookV2(hook).version(), 2);
+        assertEq(IpoTimelineHook(hook).marketId(), marketId);
+        assertEq(address(IpoTimelineHook(hook).registry()), address(registry));
+        assertEq(IpoTimelineHook(hook).factory(), address(factory));
+    }
+
+    function testTheAdminCanHandOverOrPermanentlyGiveUpUpgradeRights() public {
+        ProxyAdmin admin = _adminOf(address(registry));
+        address newImpl = address(new RegistryV2());
+        address anotherImpl = address(new RegistryV2()); // built before the cheatcodes: a creation would consume them
+        address newOwner = address(0xAD11);
+        vm.prank(deployer);
+        admin.transferOwnership(newOwner);
+        vm.prank(deployer);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, deployer));
+        admin.upgradeAndCall(ITransparentUpgradeableProxy(address(registry)), newImpl, "");
+        vm.prank(newOwner);
+        admin.upgradeAndCall(ITransparentUpgradeableProxy(address(registry)), newImpl, "");
+        assertEq(RegistryV2(address(registry)).version(), 2);
+        // renouncing freezes the contract for good
+        vm.prank(newOwner);
+        admin.renounceOwnership();
+        vm.prank(newOwner);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, newOwner));
+        admin.upgradeAndCall(ITransparentUpgradeableProxy(address(registry)), anotherImpl, "");
+    }
+
+    function testEveryProxyAndBeaconIsOwnedByTheDeployer() public view {
+        assertEq(_adminOf(address(registry)).owner(), deployer);
+        assertEq(_adminOf(address(factory)).owner(), deployer);
+        assertEq(_adminOf(address(adapter)).owner(), deployer);
+        assertEq(tokenBeacon.owner(), deployer);
+        assertEq(vaultBeacon.owner(), deployer);
+        assertEq(hookBeacon.owner(), deployer);
+    }
+
     // ---------------------------------------------------------------- helpers
+
+    function _proxy(address impl, bytes memory data) private returns (address) {
+        return address(new TransparentUpgradeableProxy(impl, deployer, data));
+    }
+
+    function _adminOf(address proxy) private view returns (ProxyAdmin) {
+        return ProxyAdmin(address(uint160(uint256(vm.load(proxy, ADMIN_SLOT)))));
+    }
+
+    function _mineSalt(address from, bytes32 initCodeHash) private pure returns (bytes32 salt) {
+        for (uint256 i; i < 2_000_000; ++i) {
+            salt = bytes32(i);
+            address predicted = address(uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), from, salt, initCodeHash)))));
+            if ((uint160(predicted) & 0x3fff) == 0x2880) return salt;
+        }
+        revert("no salt");
+    }
 
     function _activate() private {
         vm.warp(cutoffAt - MIN_TRADING);
@@ -353,7 +524,7 @@ contract IpoMarketTest is Test {
         bytes32 id = keccak256(abi.encode(configHash, c.nonce));
         for (uint256 i; i < 2_000_000; ++i) {
             salt = bytes32(i);
-            if ((uint160(hookDeployer.predict(IPoolManager(address(manager)), registry, id, salt)) & 0x3fff) == 0x2880) break;
+            if ((uint160(hookDeployer.predict(registry, id, salt)) & 0x3fff) == 0x2880) break;
         }
     }
 

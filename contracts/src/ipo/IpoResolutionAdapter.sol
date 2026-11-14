@@ -3,16 +3,18 @@ pragma solidity 0.8.30;
 
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IQTimelineMarketRegistry} from "../interfaces/IQTimeline.sol";
 
 interface IIpoPQKeyRegistry { function publicKeyBlob(address signer) external view returns (address); }
 interface IIpoMLDSA44Verifier { function verify(address publicKeyBlob, bytes calldata message, bytes calldata signature) external view returns (bool); }
 
 /// @notice Resolves the Anthropic IPO pricing market from the final offering price printed in the SEC final prospectus (424B4),
-///         or permissionlessly cancels at expiry. A deployment fully separate from the Core PCE adapter.
+///         or permissionlessly cancels at expiry. Upgradeable behind a transparent proxy; a deployment fully separate from Core PCE.
 /// @dev `valueBps` carries the final offering price in US cents ($74.00 is 7400), and the market's `thresholdBps` is a price in
-///      cents too. The field name is kept so the signed report layout matches the shared registry and bot code.
-contract IpoResolutionAdapter is EIP712 {
+///      cents too. The field name is kept so the signed report layout matches the shared registry and bot code. The EIP-712 domain
+///      binds to the proxy address, so a signature for another contract does not verify here.
+contract IpoResolutionAdapter is Initializable, EIP712 {
     using ECDSA for bytes32;
 
     error InvalidReport();
@@ -24,10 +26,11 @@ contract IpoResolutionAdapter is EIP712 {
     bytes32 public constant SOURCE_ID = keccak256("sec:edgar:424b4:ipo-offer-price-cents:first-filing");
     uint256 public constant MAX_EVIDENCE_BYTES = 4096;
 
-    IQTimelineMarketRegistry public immutable registry;
-    IIpoPQKeyRegistry public immutable keyRegistry;
-    IIpoMLDSA44Verifier public immutable verifier;
-    address public immutable authorizedSigner;
+    IQTimelineMarketRegistry public registry;
+    IIpoPQKeyRegistry public keyRegistry;
+    IIpoMLDSA44Verifier public verifier;
+    address public authorizedSigner;
+    uint256[46] private __gap;
 
     event ValueReported(bytes32 indexed marketId, bytes32 indexed periodId, int32 valueBps, bytes32 evidenceHash, address relayer);
     event MarketCancelled(bytes32 indexed marketId, address indexed caller);
@@ -41,9 +44,10 @@ contract IpoResolutionAdapter is EIP712 {
         uint64 signatureExpiry;
     }
 
-    constructor(IQTimelineMarketRegistry registry_, IIpoPQKeyRegistry keys_, IIpoMLDSA44Verifier verifier_, address signer_)
-        EIP712("QTimeline", "1")
-    {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() EIP712("QTimeline", "1") { _disableInitializers(); }
+
+    function initialize(IQTimelineMarketRegistry registry_, IIpoPQKeyRegistry keys_, IIpoMLDSA44Verifier verifier_, address signer_) external initializer {
         require(address(registry_) != address(0) && address(keys_) != address(0) && address(verifier_) != address(0) && signer_ != address(0), "zero address");
         registry = registry_;
         keyRegistry = keys_;

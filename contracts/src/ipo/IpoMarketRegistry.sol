@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.30;
 
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IQTimelineMarketRegistry} from "../interfaces/IQTimeline.sol";
 
 /// @notice Timing parameters the IPO factory reads so market creation and registration agree on one schedule.
@@ -10,12 +11,13 @@ interface IIpoScheduleParams {
     function minimumTradingWindow() external view returns (uint64);
 }
 
-/// @notice Lifecycle source for the Anthropic IPO pricing market, a deployment fully separate from the Core PCE system.
-/// @dev Same lifecycle and interface as MarketRegistry, so the shared vault, hook and router work unchanged. The differences are
-///      that the gap between swap cutoff and the earliest report, the report window, and the minimum trading window are
-///      constructor parameters instead of fixed constants. An IPO is priced in the evening and its final prospectus is filed the
-///      next morning, so the cutoff must sit hours (not minutes) before the earliest report.
-contract IpoMarketRegistry is IQTimelineMarketRegistry, IIpoScheduleParams {
+/// @notice Upgradeable lifecycle source for the Anthropic IPO pricing market, behind a transparent proxy. A deployment fully separate
+///         from the Core PCE system, which stays immutable.
+/// @dev Same lifecycle and interface as MarketRegistry, so the shared vault logic, hook and router work unchanged. The gap between swap
+///      cutoff and the earliest report, the report window, and the minimum trading window are initializer parameters. An IPO is priced in
+///      the evening and its final prospectus is filed the next morning, so the cutoff sits hours (not minutes) before the earliest report.
+///      The proxy admin can replace this logic; market state lives in the proxy and survives upgrades.
+contract IpoMarketRegistry is Initializable, IQTimelineMarketRegistry, IIpoScheduleParams {
     error Unauthorized();
     error AlreadyWired();
     error NotWired();
@@ -23,13 +25,10 @@ contract IpoMarketRegistry is IQTimelineMarketRegistry, IIpoScheduleParams {
     error AlreadyExists();
     error InvalidTransition();
 
-    address public immutable deployer;
-    /// @inheritdoc IIpoScheduleParams
-    uint64 public immutable releaseDelay;
-    /// @inheritdoc IIpoScheduleParams
-    uint64 public immutable resolutionWindow;
-    /// @inheritdoc IIpoScheduleParams
-    uint64 public immutable minimumTradingWindow;
+    address public deployer;
+    uint64 public releaseDelay;
+    uint64 public resolutionWindow;
+    uint64 public minimumTradingWindow;
     address public factory;
     address public resolver;
     bool public isSealed;
@@ -38,12 +37,16 @@ contract IpoMarketRegistry is IQTimelineMarketRegistry, IIpoScheduleParams {
     mapping(bytes32 => mapping(bytes32 => bool)) private _registeredPools;
     mapping(bytes32 => int32) public reportedValueBps;
     mapping(bytes32 => bytes32) public evidenceHash;
+    uint256[40] private __gap;
 
     event WiringSealed(address indexed factory, address indexed resolver);
     event MarketRegistered(bytes32 indexed marketId, bytes32 configHash, address vault);
     event MarketStatusChanged(bytes32 indexed marketId, Status status, int32 valueBps, bytes32 evidenceHash);
 
-    constructor(address deployer_, uint64 releaseDelay_, uint64 resolutionWindow_, uint64 minimumTradingWindow_) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() { _disableInitializers(); }
+
+    function initialize(address deployer_, uint64 releaseDelay_, uint64 resolutionWindow_, uint64 minimumTradingWindow_) external initializer {
         if (deployer_ == address(0)) revert InvalidConfig();
         // Bounds keep a typo from producing a market that can never open, never resolve, or cancels almost immediately.
         if (releaseDelay_ < 300 || releaseDelay_ > 7 days) revert InvalidConfig();

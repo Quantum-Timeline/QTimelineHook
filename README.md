@@ -43,8 +43,8 @@ A second, fully separate system resolves one question: whether the final IPO off
 
 | | Core PCE | Anthropic IPO pricing |
 |---|---|---|
-| Contracts | `MarketRegistry`, `MarketFactory`, `ResolutionAdapter` | `IpoMarketRegistry`, `IpoMarketFactory`, `IpoResolutionAdapter` in `contracts/src/ipo/` |
-| Shared code, new instances | | vault, outcome tokens, hook, router, verifier and key registry, deployed again at new addresses |
+| Contracts | `MarketRegistry`, `MarketFactory`, `ResolutionAdapter` (immutable) | `IpoMarketRegistry`, `IpoMarketFactory`, `IpoResolutionAdapter` in `contracts/src/ipo/`, upgradeable |
+| Shared code, new instances | | vault, outcome tokens, hook, router, verifier and key registry, deployed again at new addresses (proxy-based variants) |
 | Source of truth | BEA first release, monthly Core PCE | SEC EDGAR final prospectus (Form 424B4), the first one filed, offering price per share |
 | Reported value | basis points | US cents (`$74.00` is 7400); the threshold is in cents too |
 | Cutoff to earliest report | fixed 5 minutes | constructor parameter, default 18 hours (priced in the evening, filed the next morning) |
@@ -53,6 +53,8 @@ A second, fully separate system resolves one question: whether the final IPO off
 | Bot keys | `mainnet-bot-*` | `mainnet-ipo-bot-*`, a different signer; the deployer wallet is shared |
 | Workflow and Environment | `resolve-mainnet.yml`, `robinhood-mainnet` | `resolve-mainnet-ipo.yml`, `robinhood-mainnet-ipo` |
 | Static site | `apps/web/out` | `apps/web/out-ipo` (`NEXT_PUBLIC_EVENT_PROFILE=ipo`) |
+
+**Upgradeability (IPO system only).** Registry, key registry, factory, adapter and router are OpenZeppelin `TransparentUpgradeableProxy` instances; each market's vault, four claim tokens and hook are `BeaconProxy` instances behind three `UpgradeableBeacon`s (the hook proxy and its implementation are CREATE2-mined for the v4 permission bits through `IpoHookDeployer`). The deployer owns every ProxyAdmin and beacon, so it can replace logic, including vault logic that holds collateral. That is a trust assumption on the deployer key, not a trustless design; the owner can hand over or renounce upgrade rights. Core PCE has no such powers. Upgrade with `QT_IPO_UPGRADE_TARGET=<key> QT_IPO_UPGRADE_CONTRACT=<artifact> pnpm upgrade:ipo [-- --broadcast]`; the manifest records `upgradeControl` and `upgradeHistory`.
 
 The adapter rejects a report whose source id is not the IPO source, so a Core PCE report can never resolve the IPO market, and a report signed for one adapter's EIP-712 domain does not verify on the other.
 

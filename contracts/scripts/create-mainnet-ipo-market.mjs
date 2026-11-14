@@ -82,9 +82,9 @@ async function main() {
 
   const factoryArt = await artifact("IpoMarketFactory");
   const registryArt = await artifact("IpoMarketRegistry");
-  const hookDeployerArt = await artifact("TimelineHookDeployer");
+  const hookDeployerArt = await artifact("IpoHookDeployer");
   const verifierArt = await artifact("MLDSA44Verifier");
-  const vaultArt = await artifact("ConditionalVault");
+  const vaultArt = await artifact("IpoConditionalVault");
   const factory = a.IpoMarketFactory;
 
   if (mode === "quote") return quote({ client, manifest, factoryArt, registryArt, factory });
@@ -177,11 +177,11 @@ async function main() {
     const accepted = await client.readContract({ address: a.MLDSA44Verifier, abi: verifierArt.abi, functionName: "verify", args: [blob, digest, pqSignature] });
     if (!accepted) throw new Error("Deployed verifier rejected the market-creation ML-DSA signature");
     const ecdsaSignature = await account.signTypedData({ domain, types: createMarketTypes, primaryType: "CreateMarket", message });
-    const ich = await client.readContract({ address: a.TimelineHookDeployer, abi: hookDeployerArt.abi, functionName: "initCodeHash", args: [a.PoolManager, a.IpoMarketRegistry, marketId] });
+    const ich = await client.readContract({ address: a.IpoHookDeployer, abi: hookDeployerArt.abi, functionName: "proxyInitCodeHash", args: [a.IpoMarketRegistry, marketId] });
     let salt; let hook;
     for (let i = 0n; i < 5_000_000n; i += 1n) {
       const candidate = toHex(i, { size: 32 });
-      const predicted = getCreate2Address({ from: a.TimelineHookDeployer, salt: candidate, bytecodeHash: ich });
+      const predicted = getCreate2Address({ from: a.IpoHookDeployer, salt: candidate, bytecodeHash: ich });
       if ((BigInt(predicted) & 0x3fffn) === 0x2880n) { salt = candidate; hook = predicted; break; }
     }
     if (!salt) throw new Error("No CREATE2 salt found for the hook permission bits");

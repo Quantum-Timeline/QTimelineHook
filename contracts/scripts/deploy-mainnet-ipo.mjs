@@ -1,5 +1,7 @@
 // Deploys the Anthropic IPO pricing system on Robinhood Chain Mainnet (4663).
 // It is a separate deployment from Core PCE: its own registry, factory, adapter, verifier, key registry, bot keys and manifest.
+// Every contract is upgradeable: singletons sit behind TransparentUpgradeableProxy, per-market vaults, claim tokens and hooks behind beacons.
+// The deployer owns every ProxyAdmin and beacon, so it can replace logic (including logic that holds collateral); ownership can be moved or renounced.
 // Preflight is the default; --broadcast sends transactions. Core PCE tooling and artifacts are untouched.
 import { sign as signMlDsa, verify as verifyMlDsa } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -13,8 +15,8 @@ import { MAINNET_CHAIN_ID, MAINNET_CORE, mainnetRpcUrl, requireMainnetBroadcast,
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const require = createRequire(resolve(root, "apps/web/package.json"));
 const {
-  createPublicClient, createWalletClient, defineChain, formatEther, getAddress, hashTypedData,
-  http, keccak256, toBytes,
+  createPublicClient, createWalletClient, defineChain, encodeFunctionData, formatEther, getAddress, getCreate2Address, hashTypedData,
+  http, keccak256, toBytes, toHex,
 } = require("viem");
 const { privateKeyToAccount } = require("viem/accounts");
 const envPath = resolve(root, "contracts/.env");
@@ -132,16 +134,16 @@ async function checkMainnet({ client, deployer, resolver, pythonPath, requireFun
   return { chainId, blockNumber, code, usdgSymbol, usdgDecimals, wethSymbol, wethDecimals, deployerBalance, keys };
 }
 
-async function deployContract({ name, args = [], client, wallet, account, manifest }) {
+async function deployContract({ name, artifactName = name, args = [], client, wallet, account, manifest }) {
   const previous = manifest.deployments[name];
   if (previous?.address) {
     const code = await requireCode(client, getAddress(previous.address), name);
     if (keccak256(code) !== previous.runtimeCodeHash) throw new Error(`${name} saved address has an unexpected runtime code hash`);
     return getAddress(previous.address);
   }
-  const item = await artifact(name);
+  const item = await artifact(artifactName);
   if (!item.bytecode?.object || item.bytecode.object.includes("__")) throw new Error(`${name} artifact is unlinked or empty`);
-  validateDeploymentArtifact(name, item);
+  validateDeploymentArtifact(artifactName, item);
   const hash = await wallet.deployContract({ account, abi: item.abi, bytecode: `0x${item.bytecode.object.replace(/^0x/i, "")}`, args });
   console.log(`${name} deployment tx: ${hash}`);
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
@@ -196,7 +198,7 @@ async function writeAndConfirm({ client, wallet, account, address, abi, function
 }
 
 async function registerKey({ role, signer, ecdsaAccount, key, keyRegistry, verifier, client, wallet, deployer, manifest }) {
-  const registryArtifact = await artifact("PQKeyRegistry");
+  const registryArtifact = await artifact("IpoPQKeyRegistry");
   const verifierArtifact = await artifact("MLDSA44Verifier");
   const blobKey = `${role}PKBlob`;
   const previousBlob = await client.readContract({ address: keyRegistry, abi: registryArtifact.abi, functionName: "publicKeyBlob", args: [signer] });
@@ -279,19 +281,58 @@ async function main() {
   const helperPath = resolve(root, "contracts/lib/evm-ml-dsa-verifier/helpers/f1600_170.hex");
   const helperHex = (await readFile(helperPath, "utf8")).replace(/^0x/i, "").replace(/\s/g, "");
   if (keccak256(`0x${helperHex}`) !== helperHash) throw new Error("Pinned Keccak helper hash mismatch");
-  for (const name of ["MLDSA44Verifier", "IpoMarketRegistry", "PQKeyRegistry", "IpoMarketFactory", "IpoResolutionAdapter", "TimelineHookDeployer", "TimelineRouter"]) {
+  const logicNames = ["IpoMarketRegistry", "IpoPQKeyRegistry", "IpoMarketFactory", "IpoResolutionAdapter", "IpoTimelineRouter", "IpoConditionalVault", "IpoOutcomeToken"];
+  for (const name of ["MLDSA44Verifier", ...logicNames, "IpoTimelineHook", "IpoHookDeployer", "TransparentUpgradeableProxy", "UpgradeableBeacon"]) {
     validateDeploymentArtifact(name, await artifact(name));
   }
   const helper = await deployRuntime({ name: "F1600Helper", runtimeHex: helperHex, expectedHash: helperHash, client, wallet, account: deployer, manifest });
   const verifier = await deployContract({ name: "MLDSA44Verifier", args: [helper], client, wallet, account: deployer, manifest });
-  const registry = await deployContract({ name: "IpoMarketRegistry", args: [deployer.address, scheduleParams.releaseDelay, scheduleParams.resolutionWindow, scheduleParams.minimumTradingWindow], client, wallet, account: deployer, manifest });
-  const keyRegistry = await deployContract({ name: "PQKeyRegistry", args: [deployer.address, verifier], client, wallet, account: deployer, manifest });
-  const factory = await deployContract({ name: "IpoMarketFactory", args: [deployer.address, core.USDG, core.PoolManager, registry, keyRegistry, verifier], client, wallet, account: deployer, manifest });
-  const adapter = await deployContract({ name: "IpoResolutionAdapter", args: [registry, keyRegistry, verifier, resolver.address], client, wallet, account: deployer, manifest });
-  const hookDeployer = await deployContract({ name: "TimelineHookDeployer", args: [factory], client, wallet, account: deployer, manifest });
-  const router = await deployContract({ name: "TimelineRouter", args: [core.PoolManager, registry], client, wallet, account: deployer, manifest });
 
-  manifest.addresses = { ...core, F1600Helper: helper, MLDSA44Verifier: verifier, IpoMarketRegistry: registry, PQKeyRegistry: keyRegistry, IpoMarketFactory: factory, IpoResolutionAdapter: adapter, TimelineHookDeployer: hookDeployer, TimelineRouter: router };
+  // Logic contracts (implementations). Their own initializers are locked; only proxies can be initialized.
+  const impl = {};
+  for (const name of logicNames) impl[name] = await deployContract({ name: `${name}Impl`, artifactName: name, client, wallet, account: deployer, manifest });
+
+  // Uniswap v4 reads permission flags from the hook address, so the hook logic is deployed through CREATE2 at a mined address.
+  const hookDeployerArtifact = await artifact("IpoHookDeployer");
+  const hookDeployer = await deployContract({ name: "IpoHookDeployer", args: [deployer.address], client, wallet, account: deployer, manifest });
+  let hookImpl = manifest.deployments.IpoTimelineHookImpl?.address ? getAddress(manifest.deployments.IpoTimelineHookImpl.address) : undefined;
+  if (!hookImpl) {
+    const bytecodeHash = await client.readContract({ address: hookDeployer, abi: hookDeployerArtifact.abi, functionName: "implementationInitCodeHash", args: [core.PoolManager] });
+    let salt;
+    for (let i = 0n; i < 5_000_000n; i += 1n) {
+      const candidate = toHex(i, { size: 32 });
+      if ((BigInt(getCreate2Address({ from: hookDeployer, salt: candidate, bytecodeHash })) & 0x3fffn) === 0x2880n) { salt = candidate; break; }
+    }
+    if (!salt) throw new Error("Could not find a CREATE2 salt for the hook implementation");
+    const sent = await writeAndConfirm({ client, wallet, account: deployer, address: hookDeployer, abi: hookDeployerArtifact.abi, functionName: "deployImplementation", args: [core.PoolManager, salt], label: "IpoHookDeployer.deployImplementation" });
+    hookImpl = getAddress(await client.readContract({ address: hookDeployer, abi: hookDeployerArtifact.abi, functionName: "latestImplementation" }));
+    manifest.deployments.IpoTimelineHookImpl = { address: hookImpl, transactionHash: sent.hash, blockNumber: sent.blockNumber, gasUsed: sent.gasUsed, runtimeCodeHash: keccak256(await requireCode(client, hookImpl, "IpoTimelineHookImpl")) };
+    await saveManifest(manifest);
+  }
+
+  // Beacons: one upgrade of a beacon changes the logic of every market's vault, claim tokens or hook at once.
+  const beaconOf = (name, implementation) => deployContract({ name, artifactName: "UpgradeableBeacon", args: [implementation, deployer.address], client, wallet, account: deployer, manifest });
+  const tokenBeacon = await beaconOf("IpoOutcomeTokenBeacon", impl.IpoOutcomeToken);
+  const vaultBeacon = await beaconOf("IpoConditionalVaultBeacon", impl.IpoConditionalVault);
+  const hookBeacon = await beaconOf("IpoTimelineHookBeacon", hookImpl);
+
+  // Singletons behind transparent proxies. Each proxy deploys its own ProxyAdmin owned by the deployer.
+  const proxyOf = async (key, logic, logicName, args) => {
+    const data = encodeFunctionData({ abi: (await artifact(logicName)).abi, functionName: "initialize", args });
+    return deployContract({ name: key, artifactName: "TransparentUpgradeableProxy", args: [logic, deployer.address, data], client, wallet, account: deployer, manifest });
+  };
+  const registry = await proxyOf("IpoMarketRegistry", impl.IpoMarketRegistry, "IpoMarketRegistry", [deployer.address, scheduleParams.releaseDelay, scheduleParams.resolutionWindow, scheduleParams.minimumTradingWindow]);
+  const keyRegistry = await proxyOf("PQKeyRegistry", impl.IpoPQKeyRegistry, "IpoPQKeyRegistry", [deployer.address, verifier]);
+  const factory = await proxyOf("IpoMarketFactory", impl.IpoMarketFactory, "IpoMarketFactory", [deployer.address, core.USDG, core.PoolManager, registry, keyRegistry, verifier, tokenBeacon, vaultBeacon]);
+  const adapter = await proxyOf("IpoResolutionAdapter", impl.IpoResolutionAdapter, "IpoResolutionAdapter", [registry, keyRegistry, verifier, resolver.address]);
+  const router = await proxyOf("TimelineRouter", impl.IpoTimelineRouter, "IpoTimelineRouter", [core.PoolManager, registry]);
+
+  manifest.addresses = {
+    ...core, F1600Helper: helper, MLDSA44Verifier: verifier, IpoMarketRegistry: registry, PQKeyRegistry: keyRegistry, IpoMarketFactory: factory,
+    IpoResolutionAdapter: adapter, IpoHookDeployer: hookDeployer, TimelineRouter: router,
+  };
+  manifest.implementations = { ...impl, IpoTimelineHook: hookImpl };
+  manifest.beacons = { outcomeToken: tokenBeacon, vault: vaultBeacon, hook: hookBeacon };
   manifest.resolverSigner = getAddress(resolver.address);
   manifest.schedule = { releaseDelaySeconds: scheduleParams.releaseDelay.toString(), resolutionWindowSeconds: scheduleParams.resolutionWindow.toString(), minimumTradingWindowSeconds: scheduleParams.minimumTradingWindow.toString() };
   await saveManifest(manifest);
@@ -300,14 +341,19 @@ async function main() {
   await registerKey({ role: "deployer", signer: deployer.address, ecdsaAccount: deployer, key: deployerKey, keyRegistry, verifier, client, wallet, deployer, manifest });
   await registerKey({ role: "bot", signer: resolver.address, ecdsaAccount: resolver, key: resolverKey, keyRegistry, verifier, client, wallet, deployer, manifest });
 
-  const keyRegistryArtifact = await artifact("PQKeyRegistry");
+  const keyRegistryArtifact = await artifact("IpoPQKeyRegistry");
   const keysSealed = await client.readContract({ address: keyRegistry, abi: keyRegistryArtifact.abi, functionName: "isSealed" });
   if (!keysSealed) {
-    manifest.wiring.pqKeyRegistrySealed = await writeAndConfirm({ client, wallet, account: deployer, address: keyRegistry, abi: keyRegistryArtifact.abi, functionName: "seal", args: [], label: "PQKeyRegistry.seal" });
+    manifest.wiring.pqKeyRegistrySealed = await writeAndConfirm({ client, wallet, account: deployer, address: keyRegistry, abi: keyRegistryArtifact.abi, functionName: "seal", args: [], label: "IpoPQKeyRegistry.seal" });
     await saveManifest(manifest);
   }
 
   const factoryArtifact = await artifact("IpoMarketFactory");
+  const configuredFactory = await client.readContract({ address: hookDeployer, abi: hookDeployerArtifact.abi, functionName: "factory" });
+  if (configuredFactory === "0x0000000000000000000000000000000000000000") {
+    manifest.wiring.hookDeployerConfigured = await writeAndConfirm({ client, wallet, account: deployer, address: hookDeployer, abi: hookDeployerArtifact.abi, functionName: "configure", args: [factory, hookBeacon], label: "IpoHookDeployer.configure" });
+    await saveManifest(manifest);
+  } else if (getAddress(configuredFactory) !== factory) throw new Error("The hook deployer is already configured for a different factory");
   const currentHookDeployer = await client.readContract({ address: factory, abi: factoryArtifact.abi, functionName: "hookDeployer" });
   if (currentHookDeployer === "0x0000000000000000000000000000000000000000") {
     manifest.wiring.factoryHookDeployerSet = await writeAndConfirm({ client, wallet, account: deployer, address: factory, abi: factoryArtifact.abi, functionName: "setHookDeployer", args: [hookDeployer], label: "IpoMarketFactory.setHookDeployer" });
@@ -346,6 +392,30 @@ async function main() {
   if (BigInt(onchainDelay) !== scheduleParams.releaseDelay || BigInt(onchainWindow) !== scheduleParams.resolutionWindow || BigInt(onchainMinimum) !== scheduleParams.minimumTradingWindow
       || BigInt(factoryDelay) !== scheduleParams.releaseDelay || BigInt(factoryWindow) !== scheduleParams.resolutionWindow) throw new Error("IPO schedule readback did not match the intended parameters");
 
+  // Upgrade-control readback: who can change what, recorded in the manifest for anyone to audit.
+  const ERC1967_IMPLEMENTATION_SLOT = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
+  const ERC1967_ADMIN_SLOT = "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103";
+  const slotAddress = async (address, slot) => getAddress(`0x${(await client.getStorageAt({ address, slot })).slice(-40)}`);
+  const proxyAdminArtifact = await artifact("ProxyAdmin");
+  const beaconArtifact = await artifact("UpgradeableBeacon");
+  const upgradeControl = { proxies: {}, beacons: {} };
+  for (const [key, proxyAddress, logic] of [["IpoMarketRegistry", registry, impl.IpoMarketRegistry], ["PQKeyRegistry", keyRegistry, impl.IpoPQKeyRegistry], ["IpoMarketFactory", factory, impl.IpoMarketFactory], ["IpoResolutionAdapter", adapter, impl.IpoResolutionAdapter], ["TimelineRouter", router, impl.IpoTimelineRouter]]) {
+    if (await slotAddress(proxyAddress, ERC1967_IMPLEMENTATION_SLOT) !== getAddress(logic)) throw new Error(`${key} proxy does not point at its recorded implementation`);
+    const admin = await slotAddress(proxyAddress, ERC1967_ADMIN_SLOT);
+    const owner = getAddress(await client.readContract({ address: admin, abi: proxyAdminArtifact.abi, functionName: "owner" }));
+    if (owner !== getAddress(deployer.address)) throw new Error(`${key} proxy admin is not owned by the deployer`);
+    upgradeControl.proxies[key] = { proxy: proxyAddress, implementation: getAddress(logic), proxyAdmin: admin, owner };
+  }
+  for (const [key, beacon, logic] of [["outcomeToken", tokenBeacon, impl.IpoOutcomeToken], ["vault", vaultBeacon, impl.IpoConditionalVault], ["hook", hookBeacon, hookImpl]]) {
+    const [beaconImpl, owner] = await Promise.all([
+      client.readContract({ address: beacon, abi: beaconArtifact.abi, functionName: "implementation" }),
+      client.readContract({ address: beacon, abi: beaconArtifact.abi, functionName: "owner" }),
+    ]);
+    if (getAddress(beaconImpl) !== getAddress(logic) || getAddress(owner) !== getAddress(deployer.address)) throw new Error(`${key} beacon readback did not match`);
+    upgradeControl.beacons[key] = { beacon, implementation: getAddress(logic), owner: getAddress(owner) };
+  }
+  manifest.upgradeControl = upgradeControl;
+
   for (const [name, address] of Object.entries(manifest.addresses)) {
     const code = await requireCode(client, address, name);
     const recordedHash = manifest.deployments[name]?.runtimeCodeHash;
@@ -356,7 +426,7 @@ async function main() {
   manifest.deploymentBlock = (await client.getBlockNumber()).toString();
   manifest.wiring.verified = true;
   await saveManifest(manifest);
-  console.log(JSON.stringify({ chainId: MAINNET_CHAIN_ID, manifest: manifestPath, addresses: manifest.addresses, deployedAndSealed: true, wiringReadbackVerified: true, marketCreated: false, note: "IPO contracts are deployed and wired only. Market creation and liquidity seeding remain separate release transactions." }, null, 2));
+  console.log(JSON.stringify({ chainId: MAINNET_CHAIN_ID, manifest: manifestPath, addresses: manifest.addresses, upgradeableBy: getAddress(deployer.address), deployedAndSealed: true, wiringReadbackVerified: true, marketCreated: false, note: "IPO contracts are deployed behind proxies and beacons and wired. Market creation and liquidity seeding remain separate release transactions." }, null, 2));
 }
 
 try {

@@ -6,6 +6,7 @@ out = "out"
 libs = ["lib", "../node_modules"]
 remappings = [
   "@openzeppelin/contracts/=../node_modules/@openzeppelin/contracts/",
+  "@openzeppelin/contracts-upgradeable/=../node_modules/@openzeppelin/contracts-upgradeable/",
   "@openzeppelin/uniswap-hooks/=../node_modules/@openzeppelin/uniswap-hooks/",
   "@uniswap/v4-core/=../node_modules/@uniswap/v4-core/",
   "@uniswap/v4-periphery/=../node_modules/@uniswap/v4-periphery/",
