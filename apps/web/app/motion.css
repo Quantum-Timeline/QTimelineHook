@@ -1,0 +1,270 @@
+/* Product-shell motion layer. Loaded after brand-theme.css; every effect is gated by prefers-reduced-motion at the bottom. */
+
+:root {
+  --no: #f0a58f;
+  --no-soft: rgba(240, 165, 143, 0.12);
+  --yes-soft: rgba(207, 239, 140, 0.12);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Ambient backdrop: drifting glow and a slowly moving grid ── */
+.qt-erestyra.product-shell::before {
+  animation: ambient-drift 28s ease-in-out infinite alternate;
+  will-change: background-position;
+}
+@keyframes ambient-drift {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: -6% 4%, 5% -4%, 64px 64px, 64px 64px; }
+}
+
+/* ── Route entrance ── */
+.product-shell .product-body { animation: route-in 0.55s var(--ease-out) both; }
+@keyframes route-in { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
+
+.product-shell .hero.subhero .eyebrow { animation: lift-in 0.6s var(--ease-out) 0.05s both; }
+.product-shell .hero.subhero h1 { animation: lift-in 0.7s var(--ease-out) 0.12s both; }
+.product-shell .hero.subhero .intro { animation: lift-in 0.7s var(--ease-out) 0.2s both; }
+@keyframes lift-in { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
+
+.market-workspace > * { animation: lift-in 0.7s var(--ease-out) both; }
+.market-workspace > *:nth-child(1) { animation-delay: 0.18s; }
+.market-workspace > *:nth-child(2) { animation-delay: 0.3s; }
+
+/* ── Header ── */
+.product-shell .topbar { transition: height 0.3s var(--ease-out), background-color 0.3s var(--ease), backdrop-filter 0.3s var(--ease); position: sticky; top: 0; z-index: 30; }
+.product-shell .topbar--scrolled { height: 64px; background: rgba(8, 10, 9, 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+.product-shell .topbar__nav { position: relative; }
+.product-shell .topbar__nav a { position: relative; z-index: 1; }
+.product-shell .topbar__nav a.is-active { background: transparent; }
+.product-shell .topbar__pill {
+  position: absolute; top: 4px; bottom: 4px; left: 0; z-index: 0;
+  border-radius: 999px; background: var(--lime);
+  transition: transform 0.45s var(--ease-out), width 0.45s var(--ease-out), opacity 0.2s var(--ease);
+  box-shadow: 0 0 22px rgba(207, 239, 140, 0.28);
+}
+.product-shell .topbar__nav a.is-active { color: var(--bg); }
+
+.product-shell .net-pill i { animation: live-dot 2.4s ease-in-out infinite; }
+@keyframes live-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(207, 239, 140, 0.55); }
+  50%      { box-shadow: 0 0 0 6px rgba(207, 239, 140, 0); }
+}
+
+/* ── Cards: hover lift and a lime edge that sweeps in ── */
+.product-shell .detail-card,
+.product-shell .chain-panel,
+.product-shell .rules-grid article,
+.product-shell .claim-card,
+.product-shell .candidate-card {
+  position: relative;
+  transition: border-color 0.3s var(--ease), transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease);
+}
+.product-shell .rules-grid article:hover,
+.product-shell .claim-card:hover,
+.product-shell .candidate-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(207, 239, 140, 0.34);
+  box-shadow: 0 18px 40px -22px rgba(207, 239, 140, 0.28);
+}
+.product-shell .rules-grid article::after {
+  content: ""; position: absolute; left: 0; top: 0; height: 2px; width: 100%;
+  background: linear-gradient(90deg, var(--lime), transparent);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.55s var(--ease-out);
+}
+.product-shell .rules-grid article:hover::after { transform: scaleX(1); }
+
+/* ── Scroll reveal (armed only when JS can reveal it) ── */
+.reveal--armed { opacity: 0; transform: translate3d(0, 22px, 0); }
+.reveal--shown { opacity: 1; transform: none; transition: opacity 0.7s var(--ease-out) var(--reveal-delay, 0ms), transform 0.7s var(--ease-out) var(--reveal-delay, 0ms); }
+
+/* ── Segmented controls with a sliding indicator ── */
+.product-shell .segmented { position: relative; isolation: isolate; }
+.product-shell .segmented::before {
+  content: ""; position: absolute; z-index: -1; top: 4px; bottom: 4px; left: 4px;
+  width: calc((100% - 12px) / 2);
+  transform: translateX(calc(var(--i, 0) * (100% + 4px)));
+  background: var(--bg-3); border: 1px solid var(--line-strong);
+  transition: transform 0.4s var(--ease-out), background-color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.product-shell .segmented button.selected,
+.product-shell .segmented.outcome button.selected:first-child,
+.product-shell .segmented.outcome button.selected:last-child { background: transparent; border-color: transparent; }
+.product-shell .segmented.outcome[data-side="yes"]::before { background: var(--yes-soft); border-color: rgba(207, 239, 140, 0.6); }
+.product-shell .segmented.outcome[data-side="no"]::before { background: var(--no-soft); border-color: rgba(240, 165, 143, 0.6); }
+.product-shell .segmented.outcome[data-side="yes"] button.selected { color: var(--lime); }
+.product-shell .segmented.outcome[data-side="no"] button.selected { color: var(--no); }
+.product-shell .segmented button:active { transform: scale(0.98); }
+
+/* the whole panel quietly takes the colour of the side being traded */
+.product-shell .trade-panel { transition: border-top-color 0.4s var(--ease), box-shadow 0.5s var(--ease); box-shadow: 0 -26px 60px -50px rgba(207, 239, 140, 0.5); }
+.product-shell .trade-panel[data-outcome="no"] { border-top-color: var(--no); box-shadow: 0 -26px 60px -50px rgba(240, 165, 143, 0.5); }
+
+/* ── Amount chips ── */
+.product-shell .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -4px; }
+.product-shell .chips button {
+  padding: 6px 12px; border: 1px solid var(--line); background: transparent; color: var(--muted);
+  font-family: "JetBrains Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background-color 0.2s var(--ease), transform 0.2s var(--ease-out);
+}
+.product-shell .chips button:hover { color: var(--ink); border-color: var(--line-strong); transform: translateY(-1px); }
+.product-shell .chips button.is-on { color: var(--lime); border-color: rgba(207, 239, 140, 0.55); background: var(--yes-soft); }
+.product-shell .trade-panel[data-outcome="no"] .chips button.is-on { color: var(--no); border-color: rgba(240, 165, 143, 0.55); background: var(--no-soft); }
+
+/* ── Quote box ── */
+.product-shell .quote-box { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.product-shell .quote-box .quote-row { border: 0; }
+.product-shell .quote-row--sub { padding-top: 0; }
+.product-shell .quote-row--sub span, .product-shell .quote-row--sub strong { font-size: 0.7rem; opacity: 0.8; }
+.product-shell .quote-row strong { animation: quote-pop 0.5s var(--ease-out); font-variant-numeric: tabular-nums; }
+@keyframes quote-pop { from { transform: translateY(-3px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+.animated-number { font-variant-numeric: tabular-nums; }
+.shimmer-text {
+  background: linear-gradient(90deg, var(--muted) 20%, var(--ink) 50%, var(--muted) 80%);
+  background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* ── Primary button: shine sweep, press feedback ── */
+.product-shell .primary { position: relative; overflow: hidden; transition: transform 0.2s var(--ease-out), background-color 0.25s var(--ease), color 0.25s var(--ease); }
+.product-shell .primary::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+}
+.product-shell .primary:hover:not(:disabled)::after { animation: shine 0.9s var(--ease-out); }
+@keyframes shine { to { transform: translateX(120%); } }
+.product-shell .primary:active:not(:disabled) { transform: scale(0.985); }
+.product-shell .trade-panel[data-outcome="no"] .primary { background: var(--no); border-color: var(--no); }
+
+/* ── Transaction stepper ── */
+.tprog { list-style: none; margin: 4px 0 0; padding: 14px 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--line); background: var(--bg); animation: lift-in 0.45s var(--ease-out) both; }
+.tprog__step { position: relative; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.tprog__step::before { content: ""; position: absolute; top: 11px; left: -50%; width: 100%; height: 2px; background: var(--line); z-index: 0; }
+.tprog__step:first-child::before { display: none; }
+.tprog__step.is-done::before, .tprog__step.is-active::before { background: var(--lime); }
+.tprog__step.is-failed::before { background: var(--no); }
+.tprog__node { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--bg-2); border: 1.5px solid var(--line-strong); transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease); }
+.tprog__node i { width: 6px; height: 6px; border-radius: 999px; background: var(--muted); }
+.tprog__node svg { width: 14px; height: 14px; fill: none; stroke: var(--bg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; animation: draw 0.45s var(--ease-out) 0.05s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.tprog__step.is-done .tprog__node { background: var(--lime); border-color: var(--lime); }
+.tprog__step.is-failed .tprog__node { background: var(--no); border-color: var(--no); }
+.tprog__step.is-active .tprog__node { border-color: var(--lime); animation: node-pulse 1.4s ease-in-out infinite; }
+.tprog__step.is-active .tprog__node i { background: var(--lime); }
+@keyframes node-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(207, 239, 140, 0.5); } 50% { box-shadow: 0 0 0 7px rgba(207, 239, 140, 0); } }
+.tprog__label { font-family: "JetBrains Mono", monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.tprog__step.is-active .tprog__label, .tprog__step.is-done .tprog__label { color: var(--ink); }
+.product-shell .trade-message[data-state="success"] { color: var(--lime); }
+.product-shell .trade-message[data-state="error"] { color: var(--no); }
+
+/* ── Lifecycle rail ── */
+.mtl { margin-top: 20px; padding: 18px; border: 1px solid var(--line); background: var(--bg-3); display: grid; gap: 14px; }
+.mtl__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.mtl__label { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 0.65rem; letter-spacing: 0.14em; }
+.mtl__count { display: grid; justify-items: end; gap: 2px; }
+.mtl__count small { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.mtl__clock { color: var(--lime); font-family: "JetBrains Mono", monospace; font-size: 1.15rem; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+.mtl__rail { position: relative; height: 18px; margin: 0 6px; }
+.mtl__track, .mtl__fill { position: absolute; left: 0; right: 0; top: 8px; height: 2px; }
+.mtl__track { background: var(--line-strong); }
+.mtl__fill { background: linear-gradient(90deg, var(--forest), var(--lime)); transform-origin: left; transition: transform 1s var(--ease-out); box-shadow: 0 0 12px rgba(207, 239, 140, 0.55); }
+.mtl__stop { position: absolute; top: 3px; width: 12px; height: 12px; margin-left: -6px; }
+.mtl__stop i { display: block; width: 12px; height: 12px; border-radius: 999px; background: var(--bg-3); border: 1.5px solid var(--line-strong); transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease); }
+.mtl__stop.is-done i { background: var(--lime); border-color: var(--lime); }
+.mtl__stop.is-current i { animation: node-pulse 1.6s ease-in-out infinite; }
+.mtl__head-dot { position: absolute; top: 5px; width: 8px; height: 8px; margin-left: -4px; border-radius: 999px; background: var(--ink); box-shadow: 0 0 0 3px rgba(243, 242, 236, 0.12); transition: left 1s var(--ease-out); }
+.mtl[data-state="terminal"] .mtl__head-dot { display: none; }
+.mtl__legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mtl__legend div { display: grid; gap: 2px; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+.mtl__legend span { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.mtl__legend time { font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.mtl__legend .is-done { color: var(--ink); }
+.mtl__legend div:nth-child(2) { text-align: center; } .mtl__legend div:nth-child(3) { text-align: center; } .mtl__legend div:last-child { text-align: right; }
+
+/* ── Implied odds ── */
+.odds { margin-top: 20px; padding: 18px; border: 1px solid var(--line); background: var(--bg-3); display: grid; gap: 12px; }
+.odds__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.odds__label { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 0.65rem; letter-spacing: 0.14em; }
+.odds__values { display: inline-flex; gap: 18px; font-family: "JetBrains Mono", monospace; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.odds__yes { color: var(--lime); font-weight: 500; } .odds__no { color: var(--no); font-weight: 500; }
+.odds__bar { position: relative; height: 10px; background: var(--no-soft); border: 1px solid var(--line); overflow: hidden; }
+.odds__yes-fill { height: 100%; background: linear-gradient(90deg, var(--forest), var(--lime)); transition: width 0.9s var(--ease-out); }
+.odds[data-ready="false"] .odds__yes-fill { background: repeating-linear-gradient(45deg, var(--line-strong) 0 6px, transparent 6px 12px); animation: stripes 1.2s linear infinite; }
+@keyframes stripes { to { background-position: 24px 0; } }
+.odds__marker { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--ink); transition: left 0.9s var(--ease-out); }
+.odds p { margin: 0; color: var(--muted); font-size: 0.74rem; }
+
+/* ── Snapshot skeleton ── */
+.snapshot-skeleton { margin-top: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.snapshot-skeleton span { height: 62px; border: 1px solid var(--line); background: linear-gradient(100deg, var(--bg-3) 30%, #1b231e 50%, var(--bg-3) 70%); background-size: 220% 100%; animation: shimmer 1.5s linear infinite; }
+
+/* ── Claims ── */
+.product-shell .claim-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.product-shell .claim-card { animation: lift-in 0.6s var(--ease-out) both; animation-delay: calc(var(--n, 0) * 70ms); }
+.product-shell .claim-card--yes > div b { color: var(--lime); }
+.product-shell .claim-card--no > div b { color: var(--no); }
+.product-shell .claim-card--no.has-balance { border-color: rgba(240, 165, 143, 0.3); }
+.product-shell .claim-card--yes.has-balance { border-color: rgba(207, 239, 140, 0.3); }
+.product-shell .action-button { transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease-out); }
+.product-shell .action-button:active:not(:disabled) { transform: scale(0.97); }
+
+/* ── Flow diagram ── */
+.flow { margin: 0 0 24px; padding: 20px; border: 1px solid var(--line); background: var(--bg-2); overflow-x: auto; }
+.flow svg { width: 100%; min-width: 640px; height: auto; display: block; }
+.flow__wire { fill: none; stroke: var(--line-strong); stroke-width: 1.5; stroke-dasharray: 6 6; animation: flow-dash 1.2s linear infinite; }
+.flow__wire--yes { stroke: rgba(207, 239, 140, 0.6); } .flow__wire--no { stroke: rgba(240, 165, 143, 0.6); }
+@keyframes flow-dash { to { stroke-dashoffset: -12; } }
+.flow__node rect { fill: var(--bg-3); stroke: var(--line-strong); stroke-width: 1; transition: stroke 0.3s var(--ease); }
+.flow__node:hover rect { stroke: var(--lime); }
+.flow__node--yes rect { stroke: rgba(207, 239, 140, 0.55); } .flow__node--no rect { stroke: rgba(240, 165, 143, 0.55); } .flow__node--core rect { stroke: rgba(207, 239, 140, 0.35); fill: #18201b; }
+.flow__node text { fill: var(--ink); font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-anchor: middle; }
+.flow__node .flow__sub { fill: var(--muted); font-size: 9px; letter-spacing: 0.06em; }
+.flow__pulse { fill: var(--lime); filter: drop-shadow(0 0 6px var(--lime)); } .flow__pulse--no { fill: var(--no); filter: drop-shadow(0 0 6px var(--no)); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .product-shell .claim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .product-shell .topbar { position: static; }
+}
+@media (max-width: 560px) {
+  .tprog { padding: 12px 8px; } .tprog__label { font-size: 0.58rem; letter-spacing: 0.06em; }
+  .mtl__legend time { font-size: 0.6rem; } .mtl__clock { font-size: 1rem; }
+}
+
+/* ── Reduced motion: keep every state visible, drop the movement ── */
+@media (prefers-reduced-motion: reduce) {
+  .qt-erestyra.product-shell::before, .product-shell .product-body, .product-shell .hero.subhero *, .market-workspace > *, .product-shell .claim-card,
+  .product-shell .net-pill i, .flow__wire, .shimmer-text, .snapshot-skeleton span, .tprog, .tprog__step.is-active .tprog__node, .mtl__stop.is-current i, .odds[data-ready="false"] .odds__yes-fill { animation: none !important; }
+  .reveal--armed { opacity: 1; transform: none; }
+  .product-shell .topbar__pill, .mtl__fill, .mtl__head-dot, .odds__yes-fill, .odds__marker, .product-shell .segmented::before { transition: none; }
+  .flow__pulse { display: none; }
+}
+
+/* ── Voting tally ── */
+.tally { margin: 18px 0 4px; padding: 16px; border: 1px solid var(--line); background: var(--bg-3); display: grid; gap: 12px; }
+.tally__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.tally__phase { display: inline-flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.tally__phase i { width: 7px; height: 7px; border-radius: 999px; background: var(--muted); }
+.tally[data-phase="voting-live"] .tally__phase i, .tally[data-phase="deposits-open"] .tally__phase i { background: var(--lime); animation: live-dot 2s ease-in-out infinite; }
+.tally__clock { color: var(--lime); font-family: "JetBrains Mono", monospace; font-size: 1rem; font-variant-numeric: tabular-nums; }
+.tally__bar { position: relative; height: 10px; display: flex; background: var(--no-soft); border: 1px solid var(--line); overflow: hidden; }
+.tally__a { height: 100%; background: linear-gradient(90deg, var(--forest), var(--lime)); transition: width 0.9s var(--ease-out); }
+.tally__b { flex: 1; background: rgba(240, 165, 143, 0.5); }
+.tally__legend { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 0.68rem; font-variant-numeric: tabular-nums; }
+.tally__legend span:first-child { color: var(--lime); } .tally__legend span:last-child { color: var(--no); }
+.product-shell .candidate-card { animation: lift-in 0.6s var(--ease-out) both; }
+.product-shell .candidate-card--b { animation-delay: 80ms; }
+
+/* ── Positions empty state ── */
+.empty-claims { display: grid; justify-items: center; gap: 10px; padding: 28px 12px; border: 1px dashed var(--line-strong); background: var(--bg); }
+.empty-claims svg { width: min(260px, 70%); height: auto; }
+.empty-claims p { margin: 0; color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-align: center; }
+.ec__wire { fill: none; stroke: rgba(207, 239, 140, 0.5); stroke-width: 1.5; stroke-dasharray: 5 5; animation: flow-dash 1.2s linear infinite; }
+.ec__wire--no { stroke: rgba(240, 165, 143, 0.5); }
+.empty-claims circle { fill: var(--ink); } .empty-claims .ec__yes { fill: var(--lime); } .empty-claims .ec__no { fill: var(--no); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ec__wire, .product-shell .candidate-card, .tally[data-phase] .tally__phase i { animation: none !important; }
+  .tally__a { transition: none; }
+}

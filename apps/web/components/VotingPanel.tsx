@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPublicClient, createWalletClient, custom, formatUnits, http, isAddress, parseAbi, parseUnits, type Address, type Hex } from "viem";
 import { robinhoodChain } from "@qtimeline/chain";
+import { AnimatedNumber, formatCountdown } from "@/lib/motion";
 
 const votingAbi = parseAbi([
   "function tokenBound() view returns (bool)","function qtl() view returns (address)","function nextElectionId() view returns (uint256)",
@@ -113,7 +114,17 @@ export function VotingPanel() {
   const canWithdraw = !!election && (now < election.voteStart || now >= election.voteEnd) && balance > 0n;
   const canFinalize = !!election && !election.finalized && now >= election.voteEnd;
   return <section className="chain-panel"><div className="panel-head"><div><small>QTL ESCROW VOTING · ROBINHOOD CHAIN</small><h2>{election ? `Election #${electionId}` : "Next market"}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connect()}>{account ? "Refresh election" : "Connect wallet"}</button></div>
-    {election && <><div className="candidate-grid"><article className="candidate-card"><small>CANDIDATE A</small><h3>{idA === election.candidateA.toLowerCase() ? labelA : election.candidateA}</h3><strong>{formatUnits(election.votesA, decimals)} QTL</strong><button className="action-button" disabled={busy || !canVote} onClick={() => void send("voteA")}>Vote A</button></article><article className="candidate-card"><small>CANDIDATE B · DEFAULT ON TIE</small><h3>{idB === election.candidateB.toLowerCase() ? labelB : election.candidateB}</h3><strong>{formatUnits(election.votesB, decimals)} QTL</strong><button className="action-button" disabled={busy || !canVote} onClick={() => void send("voteB")}>Vote B</button></article></div>
+    {election && <>{(() => {
+        const total = election.votesA + election.votesB;
+        const shareA = total === 0n ? 50 : Number((election.votesA * 10000n) / total) / 100;
+        const phase = election.finalized ? "Finalized" : now < election.depositStart ? "Not started" : now < election.voteStart ? "Deposits open" : now < election.voteEnd ? "Voting live" : "Awaiting finalize";
+        const nextAt = election.finalized ? undefined : now < election.depositStart ? election.depositStart : now < election.voteStart ? election.voteStart : now < election.voteEnd ? election.voteEnd : undefined;
+        return <div className="tally" data-phase={phase.toLowerCase().replace(/\s+/g, "-")}>
+          <div className="tally__head"><span className="tally__phase"><i />{phase}</span>{nextAt !== undefined && <span className="tally__clock">{formatCountdown(nextAt - now)}</span>}</div>
+          <div className="tally__bar" role="img" aria-label={`Candidate A ${shareA.toFixed(1)} percent of votes`}><div className="tally__a" style={{ width: `${shareA}%` }} /><div className="tally__b" /></div>
+          <div className="tally__legend"><span>A · <AnimatedNumber value={shareA.toFixed(1)} />%</span><span>{total === 0n ? "no votes yet" : "share of escrowed weight"}</span><span>B · <AnimatedNumber value={(100 - shareA).toFixed(1)} />%</span></div>
+        </div>;
+      })()}<div className="candidate-grid"><article className="candidate-card candidate-card--a"><small>CANDIDATE A</small><h3>{idA === election.candidateA.toLowerCase() ? labelA : election.candidateA}</h3><strong><AnimatedNumber value={formatUnits(election.votesA, decimals)} /> QTL</strong><button className="action-button" disabled={busy || !canVote} onClick={() => void send("voteA")}>Vote A</button></article><article className="candidate-card candidate-card--b"><small>CANDIDATE B · DEFAULT ON TIE</small><h3>{idB === election.candidateB.toLowerCase() ? labelB : election.candidateB}</h3><strong><AnimatedNumber value={formatUnits(election.votesB, decimals)} /> QTL</strong><button className="action-button" disabled={busy || !canVote} onClick={() => void send("voteB")}>Vote B</button></article></div>
       <div className="detail-row"><span>DEPOSITS OPEN</span><strong>{fmt(election.depositStart)} – {fmt(election.voteStart)}</strong></div><div className="detail-row"><span>VOTING WINDOW</span><strong>{fmt(election.voteStart)} – {fmt(election.voteEnd)}</strong></div><div className="detail-row"><span>YOUR ESCROW</span><strong>{account ? `${formatUnits(balance, decimals)} QTL${voted ? " · voted" : ""}` : "Connect wallet to see escrow"}</strong></div>
       {canDeposit && account && <div className="inline-action"><input aria-label="QTL amount to escrow" inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)}/><button className="action-button" disabled={busy} onClick={() => void send("deposit")}>Approve & deposit QTL</button></div>}
       {canWithdraw && <div className="inline-action"><span>Escrow can be withdrawn in the current phase.</span><button className="action-button" disabled={busy} onClick={() => void send("withdraw")}>Withdraw QTL</button></div>}

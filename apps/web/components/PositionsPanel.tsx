@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPublicClient, createWalletClient, custom, formatUnits, http, isAddress, isHex, parseAbi, type Address, type Hex } from "viem";
 import { robinhoodChain, registryAbi } from "@qtimeline/chain";
 import { useMarketId } from "@/lib/use-market-id";
+import { AnimatedNumber } from "@/lib/motion";
 
 const factoryAbi = parseAbi(["function tokens(bytes32) view returns (address[4])"]);
 const vaultAbi = parseAbi(["function outcomeToken(address,bool) view returns (address)","function merge(address,uint256,address)","function redeem(address,bool,uint256,address)"]);
@@ -90,11 +91,11 @@ export function PositionsPanel() {
   }
 
   return <section className="chain-panel"><div className="panel-head"><div><small>ON-CHAIN CLAIMS</small><h2>{status === undefined ? "Your conditional balances" : `Market · ${statusNames[status] ?? "Unknown"}`}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connect()}>{account ? "Refresh balances" : "Connect wallet"}</button></div>
-    {!configured ? <div className="callout">No contract manifest is configured yet. Balances will appear here after the verified market addresses are published.</div> : !account ? <div className="callout">{message}</div> : <>
-      <div className="claim-grid">{claims.map(claim => <article className="claim-card" key={`${claim.label}-${claim.yes ? "yes" : "no"}`}><div><span>{claim.label} · {claim.yes ? "YES" : "NO"}</span><b>{claim.yes ? "↗" : "↘"}</b></div><strong>{formatUnits(claim.balance, claim.decimals)}</strong><small>conditional claim</small></article>)}</div>
+    {!configured ? <div className="callout">No contract manifest is configured yet. Balances will appear here after the verified market addresses are published.</div> : !account ? <div className="empty-claims"><svg viewBox="0 0 200 90" aria-hidden="true"><path className="ec__wire" d="M10 45 H70 C95 45 95 18 120 18 H190" /><path className="ec__wire ec__wire--no" d="M70 45 C95 45 95 72 120 72 H190" /><circle cx="10" cy="45" r="5" /><circle className="ec__yes" cx="190" cy="18" r="5" /><circle className="ec__no" cx="190" cy="72" r="5" /></svg><p>{message}</p></div> : <>
+      <div className="claim-grid">{claims.map(claim => <article className={`claim-card claim-card--${claim.yes ? "yes" : "no"} ${claim.balance > 0n ? "has-balance" : ""}`} key={`${claim.label}-${claim.yes ? "yes" : "no"}`} style={{ ["--n" as string]: claims.indexOf(claim) }}><div><span>{claim.label} · {claim.yes ? "YES" : "NO"}</span><b>{claim.yes ? "↗" : "↘"}</b></div><strong><AnimatedNumber value={formatUnits(claim.balance, claim.decimals)} /></strong><small>conditional claim</small></article>)}</div>
       <div className="position-actions"><div><strong>Before resolution</strong><span>Merge matching YES + NO claims back into ETH or USDG.</span></div><div className="action-group">{[ZERO, claims.find(x => x.label === "USDG")?.asset].filter((x): x is Address => !!x).map(asset => <button className="action-button" key={asset} disabled={busy || !claims.some(x => x.asset === asset && x.balance > 0n)} onClick={() => void act("merge", asset)}>Merge {asset === ZERO ? "ETH" : "USDG"}</button>)}</div></div>
       {status !== undefined && [4,5,6].includes(status) && <div className="position-actions"><div><strong>Redeem resolved claims</strong><span>Winning claims pay 1:1; cancelled claims pay half of face value.</span></div><div className="action-group">{claims.filter(x => x.balance > 0n).map(claim => <button className="action-button" key={claim.address} disabled={busy} onClick={() => void act("redeem", claim.asset, claim.yes)}>Redeem {claim.label} {claim.yes ? "YES" : "NO"}</button>)}</div></div>}
     </>}
-    <p className="panel-message">{message}{tx && <> · <a href={`${robinhoodChain.blockExplorers.default.url}/tx/${tx}`} target="_blank" rel="noreferrer">View transaction ↗</a></>}</p>
+    <p className="panel-message">{account ? message : ""}{tx && <> · <a href={`${robinhoodChain.blockExplorers.default.url}/tx/${tx}`} target="_blank" rel="noreferrer">View transaction ↗</a></>}</p>
   </section>;
 }

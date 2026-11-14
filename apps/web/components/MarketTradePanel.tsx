@@ -5,6 +5,8 @@ import { robinhoodChain, registryAbi } from "@qtimeline/chain";
 import { useMarketId } from "@/lib/use-market-id";
 import { canTradeAt } from "@/lib/market-lifecycle";
 import { findBestProbabilitySell } from "@/lib/probability-sell.mjs";
+import { AnimatedNumber } from "@/lib/motion";
+import { TradeProgress, type TradeStep } from "@/components/TradeProgress";
 
 const factoryAbi = parseAbi([
   "function tokens(bytes32) view returns (address[4])",
@@ -18,6 +20,7 @@ const MIN_SQRT = 4295128740n;
 const MAX_SQRT = 1461446703485210103287273970341n;
 const YES_LABEL = process.env.NEXT_PUBLIC_TEST_YES_LABEL || "YES · PCE ≥ 0.30%";
 const NO_LABEL = process.env.NEXT_PUBLIC_TEST_NO_LABEL || "NO · PCE < 0.30%";
+const TRADE_STEPS: TradeStep[] = [{ key: "prepare", label: "Prepare" }, { key: "approve", label: "Approve" }, { key: "trade", label: "Trade" }, { key: "confirm", label: "Confirm" }];
 type PoolKey = { currency0: Address; currency1: Address; fee: number; tickSpacing: number; hooks: Address };
 
 export function MarketTradePanel() {
@@ -32,6 +35,10 @@ export function MarketTradePanel() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [tx, setTx] = useState<Hex>();
+  const [step, setStep] = useState(-1);
+  const [failed, setFailed] = useState(false);
+  const [done, setDone] = useState(false);
+  const [flash, setFlash] = useState(0);
 
   const marketId = useMarketId();
   const registry = process.env.NEXT_PUBLIC_REGISTRY as Address | undefined;
@@ -94,7 +101,7 @@ export function MarketTradePanel() {
 
   async function trade() {
     if (!marketId || !registry || !factory || !router || !quoter || !account) return;
-    setBusy(true); setMessage(""); setTx(undefined);
+    setBusy(true); setMessage(""); setTx(undefined); setStep(0); setFailed(false); setDone(false);
     try {
       const wallet = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
       if (!wallet) throw new Error("Install an injected wallet first.");
@@ -146,11 +153,13 @@ export function MarketTradePanel() {
       const minAmountOut = latestQuote * 9900n / 10000n;
       const allowanceTarget = direction === "buy" ? market.asset : inputToken;
       const allowance = await client.readContract({ address: allowanceTarget, abi: erc20Abi, functionName: "allowance", args: [account, router] });
+      setStep(1);
       if (allowance < amountIn) {
         await client.simulateContract({ account, address: allowanceTarget, abi: erc20Abi, functionName: "approve", args: [router, amountIn] });
         const approval = await walletClient.writeContract({ address: allowanceTarget, abi: erc20Abi, functionName: "approve", args: [router, amountIn] });
         await client.waitForTransactionReceipt({ hash: approval });
       }
+      setStep(2);
       const tradeRequest = { marketId, vault: market.vault, key: pool, assetIn, assetOut, recipient: account, yes: outcomeYes, zeroForOne, amountIn, minAmountOut, sqrtPriceLimitX96: zeroForOne ? MIN_SQRT : MAX_SQRT - 1n, deadline: block.timestamp + 300n, nonce, expectedConfigHash: market.configHash };
       let hash: Hex;
       if (direction === "buy" && instrument === "eth") {
@@ -181,11 +190,11 @@ export function MarketTradePanel() {
           hash = await walletClient.writeContract({ account, address: router, abi: routerAbi, functionName: "closeConditional", args: [tradeRequest] });
         }
       }
-      setTx(hash); setMessage("Transaction sent; waiting for confirmationâ€¦");
+      setTx(hash); setStep(3); setMessage("Transaction sent; waiting for confirmation…");
       const receipt = await client.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Trade reverted. Refresh the quote and try again.");
-      setMessage("Trade confirmed."); void refreshQuote(true);
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Trade failed."); }
+      setDone(true); setFlash((n) => n + 1); setMessage("Trade confirmed."); void refreshQuote(true);
+    } catch (error) { setFailed(true); setMessage(error instanceof Error ? error.message : "Trade failed."); }
     finally { setBusy(false); }
   }
 
@@ -201,5 +210,52 @@ export function MarketTradePanel() {
     try { shownQuote = formatUnits(quote + parseUnits(amount, inputDecimals), outputDecimals); } catch { /* Keep the last valid quote formatting while input is incomplete. */ }
   }
 
-  return <section className="trade-panel"><div className="trade-title"><div><small>TRADE CONDITIONAL ETH</small><h2>Choose a timeline</h2></div><span className="fee-label">0.30% LP fee</span></div><div className="segmented"><button className={instrument === "eth" ? "selected" : ""} onClick={() => setInstrument("eth")}>ETH timeline</button><button className={instrument === "probability" ? "selected" : ""} onClick={() => setInstrument("probability")}>YES / NO odds</button></div><div className="segmented"><button className={direction === "buy" ? "selected" : ""} onClick={() => setDirection("buy")}>{instrument === "eth" ? "Buy ETH" : "Buy outcome"}</button><button className={direction === "sell" ? "selected" : ""} onClick={() => setDirection("sell")}>{instrument === "eth" ? "Sell ETH" : "Sell outcome"}</button></div><div className="segmented outcome"><button className={outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(true)}>{YES_LABEL}</button><button className={!outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(false)}>{NO_LABEL}</button></div><label className="amount-label">{direction === "buy" ? "USDG input" : instrument === "eth" ? "ETH claim input" : "USDG claim input"}<div><input inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} /><span>{direction === "buy" ? "USDG" : instrument === "eth" ? "ETH claim" : "USDG claim"}</span></div></label><div className="quote-row"><span>Estimated output</span><strong>{shownQuote} {instrument === "eth" && direction === "buy" ? "ETH conditional" : "USDG conditional"}</strong></div><p className="trade-note">{instrument === "eth" ? direction === "buy" ? "The split also returns the opposite claim on your input collateral." : "Selling swaps your existing ETH claim. Matching opposite USDG claims merge to collateral; unpaired output stays conditional." : direction === "buy" ? "Collateral is split, then the opposite side is exchanged in the YES/NO pool." : "Your existing outcome claim is sold; matching opposite claims merge to collateral."} Minimum swap output uses a 1% slippage bound.</p>{!account ? <button className="primary full" onClick={connectWallet}>Connect wallet to trade</button> : <button className="primary full" onClick={trade} disabled={!quote || busy}>{busy ? "Processing…" : direction === "buy" ? `Buy ${outcomeYes ? "YES" : "NO"}` : `Sell ${outcomeYes ? "YES" : "NO"}`}</button>}<div className="trade-message">{message}{tx && <> Â· <a href={`${robinhoodChain.blockExplorers.default.url}/tx/${tx}`} target="_blank" rel="noreferrer">View transaction â†—</a></>}</div></section>;
+  const outputUnit = instrument === "eth" && direction === "buy" ? "ETH conditional" : "USDG conditional";
+  const inputUnit = direction === "buy" ? "USDG" : instrument === "eth" ? "ETH claim" : "USDG claim";
+  const chips = direction === "sell" && instrument === "eth" ? ["0.0025", "0.005", "0.01"] : ["5", "10", "25", "50"];
+  const minReceived = quote === undefined ? undefined : (() => {
+    try {
+      const gross = instrument === "probability" && direction === "buy" ? quote + parseUnits(amount, inputDecimals) : quote;
+      return formatUnits(gross * 9900n / 10000n, outputDecimals);
+    } catch { return undefined; }
+  })();
+  const showProgress = busy || done || failed;
+  const quoteLoading = validConfig && quote === undefined && /^(?:\d+)(?:\.\d{1,18})?$/.test(amount) && !message;
+
+  return (
+    <section className="trade-panel" data-outcome={outcomeYes ? "yes" : "no"}>
+      <div className="trade-title">
+        <div><small>TRADE CONDITIONAL ETH</small><h2>Choose a timeline</h2></div>
+        <span className="fee-label">0.30% LP fee</span>
+      </div>
+      <div className="segmented" style={{ ["--i" as string]: instrument === "eth" ? 0 : 1 }}>
+        <button className={instrument === "eth" ? "selected" : ""} onClick={() => setInstrument("eth")}>ETH timeline</button>
+        <button className={instrument === "probability" ? "selected" : ""} onClick={() => setInstrument("probability")}>YES / NO odds</button>
+      </div>
+      <div className="segmented" style={{ ["--i" as string]: direction === "buy" ? 0 : 1 }}>
+        <button className={direction === "buy" ? "selected" : ""} onClick={() => setDirection("buy")}>{instrument === "eth" ? "Buy ETH" : "Buy outcome"}</button>
+        <button className={direction === "sell" ? "selected" : ""} onClick={() => setDirection("sell")}>{instrument === "eth" ? "Sell ETH" : "Sell outcome"}</button>
+      </div>
+      <div className="segmented outcome" data-side={outcomeYes ? "yes" : "no"} style={{ ["--i" as string]: outcomeYes ? 0 : 1 }}>
+        <button className={outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(true)}>{YES_LABEL}</button>
+        <button className={!outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(false)}>{NO_LABEL}</button>
+      </div>
+      <label className="amount-label">{direction === "buy" ? "USDG input" : instrument === "eth" ? "ETH claim input" : "USDG claim input"}
+        <div><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /><span>{inputUnit}</span></div>
+      </label>
+      <div className="chips" role="group" aria-label="Quick amounts">
+        {chips.map((chip) => <button key={chip} type="button" className={amount === chip ? "is-on" : ""} onClick={() => setAmount(chip)}>{chip}</button>)}
+      </div>
+      <div className="quote-box" data-loading={quoteLoading}>
+        <div className="quote-row"><span>Estimated output</span><strong key={flash}>{quote === undefined ? <span className="shimmer-text">{quoteLoading ? "quoting…" : "—"}</span> : <><AnimatedNumber value={shownQuote} /> {outputUnit}</>}</strong></div>
+        <div className="quote-row quote-row--sub"><span>Minimum after 1% slippage</span><strong>{minReceived ?? "—"}</strong></div>
+      </div>
+      <p className="trade-note">{instrument === "eth" ? direction === "buy" ? "The split also returns the opposite claim on your input collateral." : "Selling swaps your existing ETH claim. Matching opposite USDG claims merge to collateral; unpaired output stays conditional." : direction === "buy" ? "Collateral is split, then the opposite side is exchanged in the YES/NO pool." : "Your existing outcome claim is sold; matching opposite claims merge to collateral."} Minimum swap output uses a 1% slippage bound.</p>
+      {!account
+        ? <button className="primary full" onClick={connectWallet}>Connect wallet to trade</button>
+        : <button className="primary full" onClick={trade} disabled={!quote || busy}>{busy ? "Processing…" : direction === "buy" ? `Buy ${outcomeYes ? "YES" : "NO"}` : `Sell ${outcomeYes ? "YES" : "NO"}`}</button>}
+      {showProgress && <TradeProgress steps={TRADE_STEPS} current={Math.max(step, 0)} failed={failed} done={done} />}
+      <div className="trade-message" data-state={failed ? "error" : done ? "success" : "idle"}>{message}{tx && <> · <a href={`${robinhoodChain.blockExplorers.default.url}/tx/${tx}`} target="_blank" rel="noreferrer">View transaction ↗</a></>}</div>
+    </section>
+  );
 }

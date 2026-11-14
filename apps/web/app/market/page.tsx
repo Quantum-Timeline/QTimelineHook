@@ -1,6 +1,7 @@
 import { Frame, PageHeading } from "@/components/Frame";
 import { MarketSnapshot } from "@/components/MarketSnapshot";
 import { MarketTradePanel } from "@/components/MarketTradePanel";
+import { OddsGauge } from "@/components/OddsGauge";
 import { robinhoodChain } from "@qtimeline/chain";
 
 export default function MarketPage() {
@@ -56,6 +57,7 @@ export default function MarketPage() {
               {testnet ? "ETH claims · faucet USDG test token" : "ETH native · USDG collateral"}
             </strong>
           </div>
+          <OddsGauge />
           <MarketSnapshot />
         </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { robinhoodChain } from "@qtimeline/chain";
@@ -16,10 +16,30 @@ const links = [
 export function Frame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const isTestnet = robinhoodChain.id === 46630;
+  const navRef = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Slide a pill under the active nav link, and tighten the header once the page scrolls.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const active = navRef.current?.querySelector<HTMLElement>("a.is-active");
+      setPill(active ? { left: active.offsetLeft, width: active.offsetWidth } : null);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [pathname]);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <main className="shell qt-erestyra product-shell">
-      <header className="topbar">
+      <header className={`topbar ${scrolled ? "topbar--scrolled" : ""}`}>
         <Link className="brand" href="/">
           <svg
             width="16"
@@ -35,7 +55,8 @@ export function Frame({ children }: { children: React.ReactNode }) {
           <span>QTIMELINE</span>
         </Link>
 
-        <nav className="topbar__nav" aria-label="App navigation">
+        <nav className="topbar__nav" aria-label="App navigation" ref={navRef}>
+          <span className="topbar__pill" aria-hidden="true" style={pill ? { transform: `translateX(${pill.left}px)`, width: pill.width, opacity: 1 } : { opacity: 0 }} />
           {links.map(([label, href]) => {
             const active = pathname === href || pathname.startsWith(href.replace(/\/$/, ""));
             return (
@@ -60,7 +81,7 @@ export function Frame({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="product-body">{children}</div>
+      <div className="product-body" key={pathname}>{children}</div>
 
       <footer className="product-footer">
         <div className="product-footer__brand">
