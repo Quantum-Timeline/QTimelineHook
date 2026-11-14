@@ -1,0 +1,26 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["lib", "../node_modules"]
+remappings = [
+  "@openzeppelin/contracts/=../node_modules/@openzeppelin/contracts/",
+  "@openzeppelin/uniswap-hooks/=../node_modules/@openzeppelin/uniswap-hooks/",
+  "@uniswap/v4-core/=../node_modules/@uniswap/v4-core/",
+  "@uniswap/v4-periphery/=../node_modules/@uniswap/v4-periphery/",
+  "@mldsa/=lib/evm-ml-dsa-verifier/src/"
+]
+solc_version = "0.8.30"
+evm_version = "osaka"
+optimizer = true
+optimizer_runs = 10000
+via_ir = true
+bytecode_hash = "none"
+
+[rpc_endpoints]
+robinhood = "${RH_MAINNET_RPC}"
+robinhood_testnet = "${RH_TESTNET_RPC}"
+
+[etherscan]
+robinhood = { key = "${EXPLORER_API_KEY}" }

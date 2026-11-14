@@ -1,0 +1,292 @@
+{
+  "chainId": 46630,
+  "network": "Robinhood Chain Testnet",
+  "deployer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+  "deployments": {
+    "F1600Helper": {
+      "address": "0xad99431d36E220F86f9E1B06F438a39baE7392A5",
+      "transactionHash": "0xaf5bdcb2a5d5cb8da029626afbe9aec50f4cc496047ca8594f95474f41913898",
+      "blockNumber": "153030121",
+      "runtimeCodeHash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b"
+    },
+    "TestUSDG": {
+      "address": "0x1052cd3975a91780B49F52BD6e06429A99baa24b",
+      "transactionHash": "0xe43054a08bf197b0c0fe36fe870659c44cadb419183bcac63505c01b5a7d4153",
+      "blockNumber": "153030123",
+      "runtimeCodeHash": "0x811e2f35103e50d4648a0215bc227bb1c78f7ee2237381b999f4afea1d81faee"
+    },
+    "MLDSA44Verifier": {
+      "address": "0x9D04B60810c81fc90ad23dF7605C0eaA095899c9",
+      "transactionHash": "0x8c9c29ebe8b2dfe73b675811999bec7e71593b442cc7e73629dc69752a98fe42",
+      "blockNumber": "153030132",
+      "runtimeCodeHash": "0x9f68572c8015d9821a8d39f7931addb74f1408c9e72973d24592ea5e7d0b8f29"
+    },
+    "MarketRegistry": {
+      "address": "0x2c489f32A68ED779e1BD0ccd2112Be1F246EA293",
+      "transactionHash": "0x24a61ea77e3448d74e6a683d2427f1574a7d1e0d6e164f1042371aeb12d97f7c",
+      "blockNumber": "153030137",
+      "runtimeCodeHash": "0x104f09db7dca86284f81f4832e789705d0b49d1563a095d322282bfac48069d3"
+    },
+    "PQKeyRegistry": {
+      "address": "0x5823a4A78181BB7a4ccC48592ce590B1b10c839f",
+      "transactionHash": "0xae11debc2da6266c0e2e394f0370a3c36fcb1d2cd42ae2084d814b242598308e",
+      "blockNumber": "153030144",
+      "runtimeCodeHash": "0x3a5ceb354aaf7270cb6fe34bc29b49b3a3fa0efa24ca125b70066be845f479e2"
+    },
+    "MarketFactory": {
+      "address": "0xEE68bF18B834F85cF4a6F4A8c41227f6b2111CC5",
+      "transactionHash": "0xc37f941a767e4b17f1deec7bbeb740b64d73a75ece8f761fd1ce7c02c4fda419",
+      "blockNumber": "153030152",
+      "runtimeCodeHash": "0xcfb8636170b2c4d9cb3d0176fa6d2c9d1d005c21c524c1bb6be539a9beba8aa7"
+    },
+    "ResolutionAdapter": {
+      "address": "0x1D7210Fa3766088A510FBc788DDcf7103C96FD13",
+      "transactionHash": "0xe97dd8a2d78db6ba442eaa27dadac95864d7051014df8944ee2fac4bc73c5fcc",
+      "blockNumber": "153030158",
+      "runtimeCodeHash": "0x11ddeb1952e9ddfb8b582f01244d037aec6859aba68fc2f9ffd187a293865aaa"
+    },
+    "TimelineHookDeployer": {
+      "address": "0xd8DAC328E0B9929B2e51ED9DEDc736ECe6cb32e2",
+      "transactionHash": "0x6fc52364e3997e301d854539531d330ec039d906919e228ae133867634ca168a",
+      "blockNumber": "153030165",
+      "runtimeCodeHash": "0xb6a4758c38c21bab1a526556592f6045ecf505e2176dfd74b1652ed02cb7ebff"
+    },
+    "TimelineRouter": {
+      "address": "0x0C84B5720941E0291f6659da3a1E9aA58Ba7F9fd",
+      "transactionHash": "0x9981f218e81e7f0d67160a691c5ddd461010223d615189f54d61d654d2f7db63",
+      "blockNumber": "153030168",
+      "runtimeCodeHash": "0x808d235c438ed625d3b8cd4db3820f2af51e59555557ce7424450fa9b3e75883"
+    },
+    "QTLVoting": {
+      "address": "0x6dE10fCeeb2edF8789Fb58cbDDE5650b370094f0",
+      "transactionHash": "0x522648df3b1b25f76d958a32ddc0c454a34345d62f241daec410d3cecaf531f3",
+      "blockNumber": "153030174",
+      "runtimeCodeHash": "0x690a96b65139a03f5c6ec88718c25578731bea06200be5e3aa9549ca2e2ed00d"
+    },
+    "deployerPKBlob": {
+      "address": "0xF441616c79232B97caef1653d1639a2d0a4916AC",
+      "transactionHash": "0xf78cba572e076181a0d724d70d22f74f5467a318a27e381897432e04bbce404d",
+      "blockNumber": "153030186",
+      "runtimeCodeHash": "0x7b22ad73e5a40cf9008b59a54cafae8325c0943f524ac3e85ed958dfab56077c"
+    },
+    "botPKBlob": {
+      "address": "0x5713307fC614d4b1fa388c8C83f43B7628dC6497",
+      "transactionHash": "0x5dbf4264d1a0ffc007af1c2b4ffeccb523b2950bb23c827d0e2e955d6c5e0fd9",
+      "blockNumber": "153030201",
+      "runtimeCodeHash": "0x656537f0ed228aaa5b9e394493bc2c7e0ee4a55590054b9cb40acb0ba9bb9535"
+    }
+  },
+  "wiring": {
+    "factoryHookDeployerSet": {
+      "transactionHash": "0x5c10eacfc33869ec8492e6cc77ba9c37976d973821606237e8a2f2aa0c8e5c91",
+      "blockNumber": "153030175"
+    },
+    "registryWiredAndSealed": {
+      "transactionHash": "0x5fac5f46c644a4fafb03bcd3b6fa029989736c5af2796752933bc2419653b4fd",
+      "blockNumber": "153030178"
+    },
+    "pqKeyRegistrySealed": {
+      "transactionHash": "0x7bd76fce22fa97209fb899b4d390b1052ad4ec1cfaaeb003561db9dc4cf0158c",
+      "blockNumber": "153030211"
+    },
+    "testUsdGFaucet": {
+      "transactionHash": "0x9d982f4703d241819e3927983bb051370188840b2bb51aa7adba4c60eb95f261",
+      "blockNumber": "153030219",
+      "amount": "10000000000"
+    }
+  },
+  "lastCheckedBlock": "153030108",
+  "addresses": {
+    "PoolManager": "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+    "PositionManager": "0x58daec3116aae6d93017baaea7749052e8a04fa7",
+    "Quoter": "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
+    "TestUSDG": "0x1052cd3975a91780B49F52BD6e06429A99baa24b",
+    "F1600Helper": "0xad99431d36E220F86f9E1B06F438a39baE7392A5",
+    "MLDSA44Verifier": "0x9D04B60810c81fc90ad23dF7605C0eaA095899c9",
+    "MarketRegistry": "0x2c489f32A68ED779e1BD0ccd2112Be1F246EA293",
+    "PQKeyRegistry": "0x5823a4A78181BB7a4ccC48592ce590B1b10c839f",
+    "MarketFactory": "0xEE68bF18B834F85cF4a6F4A8c41227f6b2111CC5",
+    "ResolutionAdapter": "0x1D7210Fa3766088A510FBc788DDcf7103C96FD13",
+    "TimelineHookDeployer": "0xd8DAC328E0B9929B2e51ED9DEDc736ECe6cb32e2",
+    "TimelineRouter": "0x0C84B5720941E0291f6659da3a1E9aA58Ba7F9fd",
+    "QTLVoting": "0x6dE10fCeeb2edF8789Fb58cbDDE5650b370094f0"
+  },
+  "resolverSigner": "0x246c6274f583EB1f1C58427F992A61586fa4421f",
+  "shortTestnetMode": true,
+  "testnetKeys": {
+    "deployer": {
+      "signer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+      "pkBlob": "0xF441616c79232B97caef1653d1639a2d0a4916AC",
+      "codeHash": "0x7b22ad73e5a40cf9008b59a54cafae8325c0943f524ac3e85ed958dfab56077c",
+      "publicKeyFingerprint": "0x383a4970a872da763dfa5d61e3dcac460847ea5b2a380eae29fce2001bf14f0c",
+      "nonDegeneracyFloorCount": 998,
+      "transactionHash": "0xe573f8517608f5b9485e1ef1a2823e0d18d74a7cbd6d667d3d95cfe0ceb47a7f",
+      "blockNumber": "153030194"
+    },
+    "bot": {
+      "signer": "0x246c6274f583EB1f1C58427F992A61586fa4421f",
+      "pkBlob": "0x5713307fC614d4b1fa388c8C83f43B7628dC6497",
+      "codeHash": "0x656537f0ed228aaa5b9e394493bc2c7e0ee4a55590054b9cb40acb0ba9bb9535",
+      "publicKeyFingerprint": "0xb66863ce329b37e865a3b1174928071470515e8e4828ec38773356484859cb22",
+      "nonDegeneracyFloorCount": 1003,
+      "transactionHash": "0x2d54d91f5887ea529ea4d895504fe31157833e8acc7a3f7028decd984008531c",
+      "blockNumber": "153030208"
+    }
+  },
+  "pqKeyRegistrySealed": true,
+  "smokeMarket": {
+    "marketId": "0x3b6dd4322819ef6e97397a833f95f20f610c25e591ab2680dd22e4f75a2c058e",
+    "configHash": "0xbe1caf02b26ee06085cd467f7f5cc9bbea3a13f4831462dff041cb65294d4b90",
+    "opensAt": "1794626890",
+    "cutoffAt": "1794627190",
+    "releaseAt": "1794627200",
+    "deadline": "1794627320",
+    "hook": "0x0d323b06fc10CaA8DB11Ec7c8f01e6c10712A880",
+    "createTransactionHash": "0x47116e6070b348f093a220782e4da227a619cc0d1df3e501c8c9b9f3aa458ebc",
+    "createBlockNumber": "153030230",
+    "poolsInitialized": true,
+    "initializeTransactionHash": "0xd139e6c55acca85a5bd1b5e29c7914fadf4c940e0028a7ff4253cecd6e0ee050",
+    "initializeBlockNumber": "153030232",
+    "vault": "0x29907fc0Bf0cCFBa849b39f1F7B7C5739c02f81f",
+    "status": "Final YES",
+    "activated": true,
+    "collateralRoundTrip": {
+      "nativeAmount": "1000000000000000",
+      "usdgAmount": "100000000",
+      "accountedEth": "0",
+      "accountedUsdg": "0",
+      "transactions": {
+        "draft ETH split": "0x2285c9719cbe43b089614e976828bec77b32a03fd50846053022653f23881f51",
+        "draft ETH merge": "0x21149c87d6e8dc55cd0f6259b9ee05c1b29797f18797fc1495be3841d69f6980",
+        "USDG approval": "0xad2a2067e018dc8c8f764da62cc7e2946c34e454a823c5f959f16c352e1685b3",
+        "draft USDG split": "0x216e28ceca2448aee3173c7e5df69ac19122985dd0ebda684d2337f65d79da52",
+        "draft USDG merge": "0x82b95129c706d0f0a37a463da2c2b7df7a62b42cf17d1790ef044bd167cc41cf"
+      }
+    },
+    "liquiditySeed": {
+      "ethCollateral": "1000000000",
+      "usdgCollateral": "200000000",
+      "liquidity": "100000000",
+      "tickLower": -60000,
+      "tickUpper": 60000,
+      "positionIds": [
+        "1068964",
+        "1068965",
+        "1068966"
+      ],
+      "positionLiquidity": [
+        "100000000",
+        "100000000",
+        "100000000"
+      ],
+      "poolIds": [
+        "0x71f443c3989e3d109e8302bc3434e4e0736bd9aa288d6fac6b46470185ef0058",
+        "0x169a47b8bb441142847f27a51f87737acf8094ed919eddf20898029d75a956cf",
+        "0x213391abc223f983305a008f581d4d9ba5ec88241354b4374cdf6d1ab3e61e17"
+      ],
+      "transactions": {
+        "nativeSplit": "0xf42fe67b1a0490886e2d3876a0c81272177808cfe0066a7caae800553f4e631e",
+        "usdgSplit": "0xbd1c5d194f98390763055e646e1f0ac2ae5733a4c15d35e54e7b6e364cb79bfd",
+        "approvals": [
+          "0x0ec0ae59133fa975a557562a3440190e89c8502705594da331bf7240cccda341",
+          "0xf6c91e4111bb7503db68c0bdfe7e2f6f7ab6c040ce311b566a9c3634599c9570",
+          "0xf46f2e4fbaa605e75397080866fa3e4899468732b182f018c3e4b2ede659556c",
+          "0xc52e816531e352a97cbf8fec2b290cb2e2f08fbed31394a118ce72af97e68ff0",
+          "0xa9e61873b13125e781efa81c7d072d9e17ba7dbaba9a007cca2003e4160ba7b5",
+          "0x3acd1e241f4bfc4764561b6a5585508c8a1ab1270595751dceae9c6fdd30b4e8",
+          "0xc2994ca8b95d4392e4da8a673757cce34efa0a7add91370574ee295c9d975014",
+          "0xb6fe2d04439d20dfa871a76035aaed6d2f95cf1c5839702c29da5a31ca27cfe8"
+        ],
+        "positions": [
+          "0xb4e15cb2ec7fc4709120714376a1099528287cf934ad6b93e279fc18cafb143e",
+          "0x32fb31a7716deec576999ef057af0d8d24993088c7bb8823bdf5db33143d094d",
+          "0xe88c42bd9cc61bb427a79a4bc8bd650c1354114f7a585ad48933fef343b898e9"
+        ],
+        "activation": "0x185da89e1c0d8f08413a8a3eb4959552e0691551c5d81b77f3c6303929be5eb1"
+      }
+    },
+    "testnetTrade": {
+      "transactions": {
+        "syncTime": "0x480c100bdb4f5b8c32a9b1269236ef2e2f358a62b293a71d52234e7bd071101a",
+        "approveProbabilityBuy": "0x711f8c61f824dd24637e260bf3edb92f18798ba32e5e554f7644285c6d675b41",
+        "probabilityBuy": "0x7d975b106412174ee5aecef44c0df8422996dc98e94bff499130eb867f75856e",
+        "approveEthAssetBuy": "0x3520e3b3939e7337f5b4ef564ef1d182b9e11f1c594f6c452e905addcbd85bd8",
+        "ethAssetBuy": "0xf88cec23563e13f5cd23efea323aac86a6a7d77122a45fbecd77537b35780514",
+        "approveEthAssetSell": "0x48f1a4b7fad8f2d1e1e4a66dc3984638388784a3421c7d62907c10f584e1b0b2",
+        "approveEthAssetMergePair": "0x5a1c6504e2e4527275f4409fe235dbe64c05e5e66045939630f3525d14f72503",
+        "ethAssetSell": "0x3203dfbc74b7bd87212e3d95947b55b6ed8ac6220232e88f722d71a2fe812803",
+        "approveProbabilitySellCollateral": "0x14bd02f73c1c5ec5ebf6759119d736589c8bd2f53d689e329fd2c24291d919dc",
+        "probabilitySellCollateral": "0x692aeea58d8640441cac81e227277b598ac6ea77a13c3f1b2f745fa2cf30dcf5",
+        "approveProbabilityBuyNo": "0x0dc65d96f5d603c89fbcb71aa171df7b1f38926d177710251c7ac6597c72dc73",
+        "probabilityBuyNo": "0x1fff3abad02eff34017f63b34095569e23eedc1fa8025a1b528c93461a7760af",
+        "probabilitySellNoCollateral": "0x81bc65379a37865fd40f3ce79056ae4c68ea91d8aac954f9fcceae46645bd60a",
+        "approveEthAssetBuyNo": "0xbc8e0f55c6216ee83b405048cfd3ea0881d6ebb57cc4b68daa7180bbf345a40e",
+        "ethAssetBuyNo": "0xd74f32f2f833c34d76803345ad2eca06758408096ec57138b57935d7f1a75ff6",
+        "approveEthAssetSellNo": "0xc0282cf2172ef4e2b0543d5a69dbd427fe41daaf86c2fa5ea9e45e41f7080f17",
+        "approveEthAssetMergePairNo": "0x822393bc791cd00b0dfc4fc5e29f3ef4485f7322064e5cc748f7a348b1d43135",
+        "ethAssetSellNo": "0x11b73089a56ee52c40be0b5c5e456449e12568ef66b9a1c78545fd9604152808"
+      },
+      "ethYesBalanceBeforeBuy": "904979453",
+      "probabilitySellCollateral": {
+        "totalAmount": "1000000",
+        "swapAmount": "497039",
+        "swapOut": "502960",
+        "collateralOut": "502960"
+      },
+      "probabilitySellNoCollateral": {
+        "totalAmount": "1000000",
+        "swapAmount": "499480",
+        "swapOut": "500520",
+        "collateralOut": "500520"
+      },
+      "ethNoBalanceBeforeBuy": "904979453",
+      "complete": true
+    },
+    "resolutionPrep": {
+      "splitTransactions": [
+        "0x8fa28c1bc53ac41824ad0d5b612b3c0824cebb1b124df70e807aa6ee6afa3256",
+        "0xe7c5d8bfee43b0438d7818e4cd5b85eeb8cc0bd22c9c0f8cd58822fc2d8431db",
+        "0xd28715310d1f4cb93bebe0f4465e1e75494f3d59591b1965ff66e84fe1831b08"
+      ]
+    },
+    "resolution": {
+      "status": "Final YES",
+      "valueBps": 31,
+      "evidenceHash": "0xfe2b98984f856cd36b7bfe0d2f6ea9c5c2fe4bbd1af5e13aabed6e1e1dba6df3",
+      "reportTransaction": "0x21864f16df8e01a5d220a8273629d2d5322e20f67d83a61a0d5a5c2db49fbe0d",
+      "blockNumber": "153032160",
+      "redemptions": [],
+      "testnetOnly": true,
+      "redemptionsSkipped": true
+    }
+  },
+  "marketCreated": true,
+  "marketActivated": true,
+  "testUsdGBalance": "10000000000",
+  "note": "Testnet-only smoke market smokeMarket is activated (Open); chain time and cutoff control trading.",
+  "testnetVoting": {
+    "candidateA": "0xabdc8c27e91cc652834b2c796c007351dcb5bb9fccdd2c03a77cb0de2c5258b7",
+    "candidateB": "0xb79864d5a89e152755c69997cac3346e0a06043f0cee89f1bce14ae5fc2f0812",
+    "transactions": {
+      "deployToken": "0x95aa77f980cadc481510fd0eb74f962a7a315adeabcd343e210a7a349dff7eec",
+      "bindToken": "0x7543e6f697bba4b2fc3022a56b05fde4740f66f3fce5742ce35079c8a7805961",
+      "mintTestQtl": "0xf4272c9895298f97b10f8eb220ee9679f66efa4d4c81b8deec199a28f22008e3",
+      "configureElection": "0xdff599de1b58ecfbf209effc4183f9f036e040f1ebd23413ca8481204636ee42",
+      "approveVoting": "0x16b15b6a5c314bdbecbd98ce005fe580a97db146537998e55d825a5356e3f923",
+      "deposit": "0x8b1de76fa6535f06df3ed0e2f2622077f2a1b835af660d29060cb925b1bb9e69",
+      "voteA": "0xb11bea7d2867b8c732783ec7e82ba9e4ece7e15f070768be89eaca5bcca6bf86",
+      "finalizeElection": "0x663762a6829e846d6341a750e01d49ff1fc9bd1e35ed6afa0260db86e1252cb6",
+      "withdraw": "0x7c5c2329be8e3b79ebb09a978e238911c1f40a8c056c90cf0a12fa3ba4b16676"
+    },
+    "token": "0x7C68c19ec750b24eF2dC3e39E47a8589947eb408",
+    "tokenSymbol": "QTL",
+    "times": {
+      "depositStart": "1794627020",
+      "voteStart": "1794627065",
+      "voteEnd": "1794627095",
+      "withdrawAfter": "1794627095"
+    },
+    "electionId": "0",
+    "complete": true
+  }
+}

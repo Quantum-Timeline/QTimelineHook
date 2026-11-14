@@ -1,0 +1,3 @@
+[submodule "contracts/lib/evm-ml-dsa-verifier"]
+	path = contracts/lib/evm-ml-dsa-verifier
+	url = https://github.com/fireblocks-labs/evm-ml-dsa-verifier.git

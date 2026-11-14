@@ -1,0 +1,57 @@
+{
+  "name": "qtimeline",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "pnpm --filter @qtimeline/web build",
+    "dev": "pnpm --filter @qtimeline/web dev",
+    "typecheck": "pnpm --filter @qtimeline/web typecheck",
+    "test:e2e:testnet": "playwright test --config=playwright.config.ts",
+    "test:e2e:testnet:prod": "playwright test --config=playwright.prod.config.ts",
+    "contracts:build": "node contracts/scripts/compile.mjs && pnpm exec forge build --root contracts",
+    "contracts:test": "pnpm exec forge test --root contracts",
+    "contracts:test:release": "node --test contracts/scripts/test/*.test.mjs",
+    "hooks:mine": "node scripts/deploy/mine-hook-salt.mjs",
+    "deploy:preflight": "node contracts/scripts/deploy-mainnet.mjs --preflight",
+    "keys:mainnet:prepare": "node contracts/scripts/prepare-mainnet-signers.mjs",
+    "deploy:mainnet": "node contracts/scripts/deploy-mainnet.mjs",
+    "deploy:mainnet:preflight": "node contracts/scripts/deploy-mainnet.mjs --preflight",
+    "web:mainnet:configure": "node contracts/scripts/configure-mainnet-web.mjs",
+    "web:mainnet:build": "node apps/web/scripts/build-mainnet.mjs",
+    "contracts:test:mainnet-fork": "node contracts/scripts/mainnet-fork-check.mjs",
+    "deploy:testnet": "node contracts/scripts/deploy-testnet.mjs --broadcast",
+    "seed:testnet": "node contracts/scripts/seed-testnet-liquidity.mjs",
+    "trade:testnet": "node contracts/scripts/trade-testnet-smoke.mjs",
+    "deploy:short-testnet": "node contracts/scripts/deploy-testnet.mjs --broadcast --short-testnet",
+    "seed:short-testnet": "node contracts/scripts/seed-testnet-liquidity.mjs --short-testnet",
+    "trade:short-testnet": "node contracts/scripts/trade-testnet-smoke.mjs --short-testnet",
+    "vote:testnet": "node contracts/scripts/vote-testnet-smoke.mjs",
+    "upgrade:router:testnet": "node contracts/scripts/upgrade-testnet-router.mjs",
+    "cancel:short-testnet": "node contracts/scripts/cancel-testnet-smoke.mjs",
+    "resolve:short-testnet": "node contracts/scripts/resolve-testnet-smoke.mjs",
+    "vote:short-testnet": "node contracts/scripts/vote-testnet-smoke.mjs",
+    "withdraw:testnet": "node contracts/scripts/withdraw-testnet-liquidity.mjs",
+    "cutoff:testnet": "node contracts/scripts/cutoff-testnet-smoke.mjs",
+    "resolve-negative:testnet": "node contracts/scripts/resolver-negative-testnet-smoke.mjs",
+    "split-cutoff:testnet": "node contracts/scripts/split-cutoff-testnet-smoke.mjs"
+  },
+  "devDependencies": {
+    "@foundry-rs/forge-win32-amd64": "1.7.1",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "solc": "0.8.30",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.4.0",
+    "@openzeppelin/uniswap-hooks": "1.1.1",
+    "@uniswap/v4-core": "1.0.2",
+    "@uniswap/v4-periphery": "1.0.3"
+  }
+}

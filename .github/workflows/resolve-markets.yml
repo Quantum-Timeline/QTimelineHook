@@ -1,0 +1,43 @@
+name: Resolve BEA testnet market
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest_path:
+        description: Path to an activated Robinhood testnet market manifest whose period matches the fixture.
+        required: true
+        type: string
+      period:
+        description: BEA monthly period encoded in the selected testnet market.
+        required: true
+        default: 2026-07
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-testnet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      QT_BROADCAST: "1"
+      QTIMELINE_TESTNET_MANIFEST: ${{ inputs.manifest_path }}
+      BEA_PERIOD_ID: ${{ inputs.period }}
+      QT_TESTNET_RPC: ${{ secrets.QT_TESTNET_RPC }}
+      QT_TESTNET_RELAYER_PRIVATE_KEY: ${{ secrets.QT_TESTNET_RELAYER_PRIVATE_KEY }}
+      QT_TESTNET_RESOLVER_ECDSA_PRIVATE_KEY: ${{ secrets.QT_TESTNET_RESOLVER_ECDSA_PRIVATE_KEY }}
+      QT_TESTNET_RESOLVER_MLDSA_PRIVATE_KEY_PEM: ${{ secrets.QT_TESTNET_RESOLVER_MLDSA_PRIVATE_KEY_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @qtimeline/resolver test
+      - name: Parse, sign, submit, and verify on Robinhood testnet
+        run: pnpm --filter @qtimeline/resolver resolve:testnet:fixture

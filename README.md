@@ -1,0 +1,64 @@
+﻿# QTimeline
+
+QTimeline is a conditional-market application for Uniswap v4 on Robinhood Chain. Its implementation decisions are in [QTimeline-Implementation-Plan.md](./QTimeline-Implementation-Plan.md); the earlier product brief is retained as background.
+
+## Workspace
+
+- `apps/web` â€” statically exported Next.js site (`/`, `/market/`, `/positions/`, `/vote/`, `/rules/`).
+- `contracts` â€” Solidity market registry, collateral vault, outcome tokens and hybrid-resolution adapter.
+- `packages/chain` â€” Robinhood Chain config and shared registry ABI.
+- `ops/resolver` â€” BEA first-release parser and evidence preparation.
+
+## Local commands
+
+After cloning, initialize the Solidity verifier dependency with `git submodule update --init --recursive`.
+
+```sh
+pnpm install
+pnpm dev
+pnpm build
+pnpm --filter @qtimeline/resolver test
+cd contracts && forge build && forge test
+```
+
+For a read-only Robinhood Chain Mainnet release check after filling `contracts/.env`, run `pnpm deploy:mainnet:preflight` (or the compatibility alias `pnpm deploy:preflight`). It checks chain ID, official v4 and token bytecode, USDG/WETH metadata, deployer key/address pairing, resolver identity and funding, and seed-bound ML-DSA-44 keys. It never signs or sends a transaction. `pnpm contracts:test:mainnet-fork` runs the constructor and wiring fork checks using the RPC in the ignored env file.
+
+## Mainnet release preparation
+
+The Mainnet contract deployer is Robinhood Chain ID `4663`; gas is paid in ETH. First run `pnpm contracts:build`, then `pnpm keys:mainnet:prepare`, then `pnpm deploy:mainnet:preflight`. Key preparation generates the resolver ECDSA key, distinct ML-DSA-44 seeds, and prepared verifier blobs under ignored `contracts/.secrets/`. Make and verify an encrypted offline backup before registering either key on-chain. Never copy those files into `apps/web` or a public build.
+
+When ready to send the contract deployment transactions, fund the configured deployer address with enough ETH and run `pnpm deploy:mainnet -- --broadcast`. The script refuses any chain other than 4663, rechecks all signer keys and official contract addresses, validates every build artifact before its first transaction, records each confirmed transaction in `deployments/robinhood-mainnet.json`, registers and seals both PQ keys, wires and seals the market registry, and checks the final wiring by reading it back from chain. It is resumable from that manifest after an interrupted deployment. It does not create a market, initialize pools, seed liquidity, or activate trading.
+
+The resolver signer is a separate wallet and also needs ETH for future signed reports and cancellation workflow. Its address is printed by `pnpm keys:mainnet:prepare`; the deployer cannot spend from that wallet. Market launch still needs a current BEA schedule and evidence URL, quote-tested ETH/USDG seed budget, funded treasury, resolver dry run, gas measurements, independent security audit and cryptographic review, and legal/hosting review. QTL voting stays unavailable until the real Pons token address is verified and bound. The current fork test checks official core code, token metadata, protocol constructors, and registry/factory wiring; it does not exercise the real ML-DSA verifier, market creation, swaps, or LP seeding on the fork. The release checklist is in §9 of [the implementation plan](./QTimeline-Implementation-Plan.md); no Mainnet market or public funds should be enabled before those gates pass.
+
+After the Mainnet contracts are deployed and the wiring readback is verified, set `QTIMELINE_PUBLIC_MAINNET_RPC` to an HTTPS browser-safe RPC endpoint and run `pnpm web:mainnet:configure`; this writes ignored `apps/web/.env.mainnet.local` from the deployment manifest without touching the testnet `.env.local`. Then run `pnpm web:mainnet:build` to create the static Mainnet export. The generated site intentionally has no active market or election ID until those are created and configured.
+
+The current testnet deployment is recorded in `deployments/robinhood-testnet-v2.json`. `pnpm deploy:testnet` is restricted to chain ID `46630`; it reuses that deployment, uses the QTimeline USDG faucet token, and provisions test-only ML-DSA keys. Generated test signing keys stay under ignored `contracts/.secrets/`.
+
+Testnet lifecycle checks were run on Robinhood Chain Testnet (chain ID 46630) with the synthetic event configured in apps/web/.env.local. The short-market timing is five minutes of trading, ten seconds from cutoff to release, and a two-minute resolution window. No Mainnet deployment or transaction was used.
+
+The test manifests record separate runs: robinhood-testnet-short.json covers probability and ETH conditional trading plus expiry cancellation and 50/50 redemption; robinhood-testnet-fixed-vault.json covers both-sided trading, a signed synthetic Final YES report, winning payout, and zero-payout losing-claim burn; robinhood-testnet-final-no.json covers a signed synthetic Final NO report and the inverse redemption results. The ConditionalVault fix is deployed in the fixed-vault and final-no stacks. Foundry tests cover both final outcomes, partial claims, cap enforcement, invalid collateral, and short-market lifecycle behavior.
+
+LP exit was also exercised against the resolved Final YES stack: all three treasury v4 positions were fully removed after cutoff/finality, each PositionManager liquidity read back as zero, and all four resulting ETH/USDG YES/NO claims were redeemed. The receipt and per-outcome amounts are recorded in `smokeMarket.liquidityWithdrawal` in `deployments/robinhood-testnet-fixed-vault.json`. Repeat with `QTIMELINE_TESTNET_MANIFEST=deployments/<manifest>.json pnpm withdraw:testnet`; the script refuses non-testnet chains, non-final markets, or positions not owned by the manifest deployer.
+
+`deployments/robinhood-testnet-cutoff.json` is an isolated fresh-stack run. Its normal trade smoke passed, then after cutoff the v4 Quoter's callback to `PoolManager.swap` was rejected by `TimelineHook` with the decoded `MarketNotTradable` error (bypassing TimelineRouter). Treasury liquidity was withdrawn while the market was AwaitingResult, all three positions read back as zero, and after the resolver deadline the market was cancelled with half payout for all four ETH/USDG outcomes. The cutoff and cancellation transactions and receipts are recorded in that manifest. The cutoff check can be repeated with `QTIMELINE_TESTNET_MANIFEST=deployments/<manifest>.json pnpm cutoff:testnet`.
+
+The resolver parser is tested against archived official BEA HTML fixtures for July 2026 (20 bps) and September 2026 (30 bps); fixture source URLs and SHA-256 values are in `ops/resolver/test/fixtures/README.md`.
+
+`deployments/robinhood-testnet-resolver-negative.json` records an additional short run: wrong ECDSA signer, wrong ML-DSA digest, wrong EIP-712 chain domain, wrong report period, evidence-hash mismatch, expired signature, valid hybrid Final YES report, and duplicate report rejection. All three LP positions were withdrawn after finality and the resulting YES/NO ETH/USDG claims were redeemed.
+
+`deployments/robinhood-testnet-stale-status.json` records a fresh stack using the cutoff guard in the current `ConditionalVault`: after the market's cutoff timestamp, while its registry status remained stale `Open`, `simulateContract` rejected both native ETH and USDG `split` calls with `InvalidState`. The same stack then passed the six negative resolver checks and a valid synthetic Final YES report; all three LP positions were withdrawn to zero and all four ETH/USDG YES/NO claims were redeemed, with winning payouts and zero-payout losing-claim burns recorded in the manifest.
+
+That same isolated stack also records a test QTL token binding and the complete short voting path: deposit 1 QTL, vote for candidate A, finalize, and withdraw the full escrow.
+
+Current local verification: 21 Foundry tests pass (the Mainnet fork suite is skipped in the local unit run); 7 release and withdrawal Node tests pass; 2 Mainnet fork checks pass; the Solidity build, Next.js production export, and TypeScript typecheck pass. The cancellation rounding test records the specified per-claim floor: two odd 5-wei claims return 2 wei each, leaving 1 wei of collateral accounting dust.
+
+For another isolated short run, set QTIMELINE_TESTNET_MANIFEST to a new manifest path, then use pnpm deploy:short-testnet and pnpm seed:short-testnet. Run pnpm trade:short-testnet while the market is open. Run pnpm resolve:short-testnet after releaseAt; set QTIMELINE_TEST_RESULT=NO for a synthetic Final NO report. Run pnpm cancel:short-testnet only after deadline. Governance uses a separate QTL voting token and short election; the fixed-vault stack records deposit, vote, finalize, and withdraw receipts.
+
+The active local web environment targets `deployments/robinhood-testnet-current-vault.json`. The static site displays the synthetic event labels and reads lifecycle status and quotes from Robinhood Chain.
+
+The testnet manifests record synthetic short-market lifecycle tests only; their 1:1 raw-unit pool prices do not represent economic prices. The Mainnet deployment path is prepared and fork-checked, but no Mainnet contracts or market have been deployed. Mainnet market activation remains gated on audit, independent cryptographic review, current quote and gas evidence, resolver operations, and legal/hosting review.
+
+Copy `.env.example` to local environment configuration only when needed. Browser RPC values are public and are embedded in static assets. Signing keys belong only in the isolated resolver environment and must never enter the frontend build. Candidate labels in the voting UI are shown only when their configured bytes32 IDs match the on-chain election.
+
+
