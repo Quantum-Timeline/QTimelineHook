@@ -31,6 +31,15 @@ export function WorldLane({ yes, label }: { yes: boolean; label: string }) {
         <div><dt>If {yes ? "NO" : "YES"} resolves</dt><dd>{yes ? "YES" : "NO"} claims pay nothing</dd></div>
         <div><dt>If cancelled</dt><dd>50% per claim</dd></div>
       </dl>
+      <div className="world__example">
+        <span className="world__example-title">Example: $10 of {yes ? "YES" : "NO"} claims</span>
+        <ul>
+          <li><span>If {yes ? "YES" : "NO"} wins</span><b>$10</b></li>
+          <li><span>If {yes ? "NO" : "YES"} wins</span><b>$0</b></li>
+          <li><span>If cancelled</span><b>$5</b></li>
+        </ul>
+        <p>Claims are tokens. Sell them before the cutoff, or hold them and redeem after the result.</p>
+      </div>
       <button type="button" className="world__cta" onClick={choose}>
         <ClaimIcon asset="ETH" yes={yes} size={22} />
         Trade the {yes ? "YES" : "NO"} world

@@ -108,8 +108,17 @@
 /* A legacy rule hid the wallet button on phones, leaving no way to connect. */
 @media (max-width: 700px) { .product-shell .wallet { display: inline-flex; align-items: center; padding: 9px 16px; font-size: 0.82rem; } }
 
-/* Side lanes keep their natural height and stay in view while the long trade ticket scrolls. */
+/* Side lanes fill one screen and stay in view while the long trade ticket scrolls. */
+.world__example { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 16px; background: rgba(243, 242, 236, 0.04); border: 1px solid var(--glass-line); }
+.world__example-title { font-weight: 600; font-size: 0.92rem; }
+.world__example ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.world__example li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--glass-line); font-size: 0.88rem; }
+.world__example li:last-child { border-bottom: 0; }
+.world__example li span { color: var(--muted); }
+.world__example p { margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
 @media (min-width: 1101px) {
   .worlds { align-items: start; }
-  .worlds > .world { position: sticky; top: 96px; }
+  .worlds > .world { position: sticky; top: 96px; display: flex; flex-direction: column; min-height: calc(100vh - 156px); }
+  .worlds > .world .world__example { flex: 1; justify-content: center; }
+  .worlds > .world .world__cta { margin-top: auto; align-self: flex-start; }
 }
