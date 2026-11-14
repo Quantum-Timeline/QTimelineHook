@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "system": "anthropic-ipo-pricing",
+  "chainId": 4663,
+  "network": "Robinhood Chain",
+  "deployer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+  "resolverSigner": "0xB1eeCD3799E929c01aA0aeCbb6CaDEC6d5a30801",
+  "deployments": {
+    "F1600Helper": {
+      "address": "0x0438deB1f25BA0D88D257acfe89191B3EB3de75F",
+      "transactionHash": "0x3658fa8a5913536e4be6164a3dd730cfb9ff3a7362cc4f06f95eaf95e5330307",
+      "blockNumber": "114257972",
+      "gasUsed": "4856543",
+      "runtimeCodeHash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b"
+    },
+    "MLDSA44Verifier": {
+      "address": "0x668Fe10f9b424349FDD41F7E6C5DF2cC21Bf3214",
+      "transactionHash": "0xc365da5c5cf918768469e19298e2fc378129bdbe4fdec3d93002698d583a7f80",
+      "blockNumber": "114257982",
+      "gasUsed": "5452446",
+      "runtimeCodeHash": "0xfc90fc2784fd3dbd2f62d4d700db677b0fd37e2027928000bc7f10398e460fe1"
+    },
+    "IpoMarketRegistryImpl": {
+      "address": "0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE",
+      "transactionHash": "0x7d4849f4db4794a16fac320bfe7bf2debfe68d44e7fd121c9040b5ca5cda650e",
+      "blockNumber": "114257988",
+      "gasUsed": "1470534",
+      "runtimeCodeHash": "0x0a6bb0b3dbd7b6997ca16640d09ebf9456c50a3d15fc104f17d9679106c719ff"
+    },
+    "IpoPQKeyRegistryImpl": {
+      "address": "0x5B0f7981EC187C0e95977693C9418387aF4d5897",
+      "transactionHash": "0x2323d10f200d4d563fd0f9b131ad10f6ee36320c194ec7fadccbf387b6df866b",
+      "blockNumber": "114258053",
+      "gasUsed": "1169365",
+      "runtimeCodeHash": "0x06ea3775649b1a8f4f1b8f37fb39c0da7919e9b4718e7f10eabee044c05c4e4f"
+    },
+    "IpoMarketFactoryImpl": {
+      "address": "0x68E6e6689502c7ff4D05F0569c6c72066AdFD164",
+      "transactionHash": "0xd6d5d5dab9a1bf5cb95c4139b6296204de417bd626069cd73d1fa668fe6b16f8",
+      "blockNumber": "114258081",
+      "gasUsed": "3318373",
+      "runtimeCodeHash": "0xfa96de84919a1a17bd85dfcf5e5a70c03b5eeb96f1bfdeeb1e604d0e6107d665"
+    },
+    "IpoResolutionAdapterImpl": {
+      "address": "0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A",
+      "transactionHash": "0xa9cd17689556245775e5fc944ed51646a7a3a6e286f0cda861bf7be09817a778",
+      "blockNumber": "114258101",
+      "gasUsed": "1521552",
+      "runtimeCodeHash": "0xfa2e46c84de858d0c86b89addc7adc5babaed31ed96bf0b71576dafda94a6765"
+    },
+    "IpoTimelineRouterImpl": {
+      "address": "0x74E9B2F75a0BACeA0974D63806DBbfA95BA221F1",
+      "transactionHash": "0x018fd5d630582f5ff7bd4ca09f9462d093908d5b34aaf1a7c2abb2c4892df300",
+      "blockNumber": "114258112",
+      "gasUsed": "4500168",
+      "runtimeCodeHash": "0x1e42f1f39efbe2eae44bf79df345f4bbdd13c6753857eaa1b89d147b546e9e05"
+    },
+    "IpoConditionalVaultImpl": {
+      "address": "0x6B690Cc6e05de26A617ea530bA068B556489E889",
+      "transactionHash": "0x97b6e70b921b7e6e35e031bb74f4bb450927ddb7138d2f546abeead6faf08d02",
+      "blockNumber": "114258118",
+      "gasUsed": "1853138",
+      "runtimeCodeHash": "0xe65d59d20918347d26e449cd148d1fee6ea7d4144bdb51b4f26feae302488ff7"
+    },
+    "IpoOutcomeTokenImpl": {
+      "address": "0xa8801A0cf08D21752331BA241198ed6e6De35584",
+      "transactionHash": "0x3072e92dc5afeefced47fe413f3b7108abc56846d76e5a5455b2714a0f21dc13",
+      "blockNumber": "114258124",
+      "gasUsed": "1363454",
+      "runtimeCodeHash": "0xb0a7f9491c5bc1f9ff96a0880bd7c76c252c787a74e782a0f26c4e0a5fedd3b2"
+    },
+    "IpoHookDeployer": {
+      "address": "0xaAa28FA6a7DB709129879c1daF13Bc90B843064f",
+      "transactionHash": "0xbd6615ae08f8338dcdffd8995ad5d529f99886a43e27e198559116aae5eb7daa",
+      "blockNumber": "114258133",
+      "gasUsed": "2404446",
+      "runtimeCodeHash": "0x67716a4000d95bde36a648186038c01546eeffdb15fff8bfd9716147b1fd3e3f"
+    },
+    "IpoTimelineHookImpl": {
+      "address": "0xc79062f4a0A67142c84F042b4aE85952A4A0A880",
+      "transactionHash": "0xce2e52e2fc32581de04037d4f257fb5835fd14faf3860b87c47c1e666eeeeddd",
+      "blockNumber": "114258140",
+      "gasUsed": "1186557",
+      "runtimeCodeHash": "0x8a510ada91994fce9668983fa4fd8eca8f88a5345d4b2d487de74359ec1aade9"
+    },
+    "IpoOutcomeTokenBeacon": {
+      "address": "0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214",
+      "transactionHash": "0x06999a4284ce0e31faec58d860c9a4a1928e5f86eec7eab7925d871d4b6f17dc",
+      "blockNumber": "114258146",
+      "gasUsed": "341917",
+      "runtimeCodeHash": "0xdbd2060bfa4c31edbb024c65f73119b85041a3f3c4b70b1b133b0c5fc0123f2e"
+    },
+    "IpoConditionalVaultBeacon": {
+      "address": "0x326be2C0e8883dd7b24d3afD17d9f37B3D512329",
+      "transactionHash": "0xdbcc69c97495633c30ffdfe6b6ec42d1b49cef60a90b3c9f8c85697547bc648a",
+      "blockNumber": "114258151",
+      "gasUsed": "341971",
+      "runtimeCodeHash": "0xdbd2060bfa4c31edbb024c65f73119b85041a3f3c4b70b1b133b0c5fc0123f2e"
+    },
+    "IpoTimelineHookBeacon": {
+      "address": "0xa9928908754d2876613787E362bc35DA559C97FE",
+      "transactionHash": "0x3d599f7f847c30465a6f3cbd0b9c939b42e24b6ee3c044fee9e28263c70d2ff8",
+      "blockNumber": "114258156",
+      "gasUsed": "341547",
+      "runtimeCodeHash": "0xdbd2060bfa4c31edbb024c65f73119b85041a3f3c4b70b1b133b0c5fc0123f2e"
+    },
+    "IpoMarketRegistry": {
+      "address": "0x5444CF6E91462938C975668266c9E24b6233BD37",
+      "transactionHash": "0x82a1efcc2701c4a8ef224342a676f26fc665c3afc5d4e929963ae86ecf6b962a",
+      "blockNumber": "114258161",
+      "gasUsed": "854635",
+      "runtimeCodeHash": "0x2a42079bc01015475d7c7ce8c1511dc6fb7bdeed0bac01a2f5a0e07829ad7666"
+    },
+    "PQKeyRegistry": {
+      "address": "0x78F42d96AD69Ed3D696875CF59eFF8A447Cd80A8",
+      "transactionHash": "0x2ea0a66be9ed4417d7f3596af21c1634d970245fd6bdf8c4576913a22fe4d00d",
+      "blockNumber": "114258167",
+      "gasUsed": "856208",
+      "runtimeCodeHash": "0xdfd650dca2f04dfc21a29e8fe4af522fde8eeede524f0de1e1e0504f22e2ac0b"
+    },
+    "IpoMarketFactory": {
+      "address": "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
+      "transactionHash": "0xf10a3286449cf64cb760d046b4a0a4984127739d233d936b54da4ee68e2564d7",
+      "blockNumber": "114258173",
+      "gasUsed": "1030371",
+      "runtimeCodeHash": "0xef6421cbaba621f026b6af6a24d8b11b4782f4ab2fc6b4b53a347ed5cd6392aa"
+    },
+    "IpoResolutionAdapter": {
+      "address": "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
+      "transactionHash": "0x4b88f383be1349171cfa0a93d0b20855f9bd7d9854ca23776cbc5ada03fdb60c",
+      "blockNumber": "114258179",
+      "gasUsed": "902547",
+      "runtimeCodeHash": "0xc9ce0e6b15ef8dd59de3d4d8aecb7d7712c517798b24e19234f3a59996e851d5"
+    },
+    "TimelineRouter": {
+      "address": "0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45",
+      "transactionHash": "0x56604600307493178888933e3f9bd483b8fba1afa93cd6abe6b33ba6cbe8aa66",
+      "blockNumber": "114258185",
+      "gasUsed": "859996",
+      "runtimeCodeHash": "0xe3c49a860c88b03596e06a80502393348054773d0292b718d9f226c32e0b1849"
+    },
+    "deployerPKBlob": {
+      "address": "0xB69a36a02921655efF5B08fCfCa7b8e0dC9FBB92",
+      "transactionHash": "0xf597e49fc33c9da86126a03dec104f17eb17a1576acc08cc8d122c1db002ebeb",
+      "blockNumber": "114258195",
+      "gasUsed": "5075715",
+      "runtimeCodeHash": "0x0497d89e4318c42f57b6a99a949a26b84cdc0488f67fbbfc8a5ccd7263c06508"
+    },
+    "botPKBlob": {
+      "address": "0x5c7e95405f8C4c1DDF5Ef17976828fBD0D18A24f",
+      "transactionHash": "0x3650ad7841efcc0067b62ed20758961c14cf691e0383d960e5731fa6e6c53e98",
+      "blockNumber": "114269046",
+      "gasUsed": "4527675",
+      "runtimeCodeHash": "0x29d782e93b6594531fb88d0ff528fe1a465c3a709a9ae450f67397fb4e25ef74"
+    },
+    "PoolManager": {
+      "address": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "runtimeCodeHash": "0xbd3881180b547f5fe817545743cfb4343e96b1bc6640dcd70c106b0066e95626"
+    },
+    "PositionManager": {
+      "address": "0x58daec3116aae6D93017bAAea7749052E8a04fA7",
+      "runtimeCodeHash": "0xc873e135dc9aaec88489cfbad146b4cb49d6a32e0d80326377784b7ba17670b2"
+    },
+    "Quoter": {
+      "address": "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94",
+      "runtimeCodeHash": "0xd707b1da8cb165e5ea35a3b4450d971eb562ec171e23492aa117036b78a868f6"
+    },
+    "WETH": {
+      "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+      "runtimeCodeHash": "0x5706be52f64875fee65a2cec0d80e47a23d8793cbe85d214b48445e2d05f5353"
+    },
+    "USDG": {
+      "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "runtimeCodeHash": "0x864cc9ad53b338b82da1f7cab85ab0b3d5c8861acb422b6fec63cf36234f36a6"
+    }
+  },
+  "wiring": {
+    "deployerKeyRegistered": {
+      "hash": "0xec6a0c1498c40a342932178ddbea63a11e22f410fb7159112838bbc6d917f8ab",
+      "blockNumber": "114258202",
+      "gasUsed": "1476881"
+    },
+    "botKeyRegistered": {
+      "hash": "0xf6341162d82a690a08ea4eb1a36f64ddc6ed9b2fc6481d90a932acbb063b349e",
+      "blockNumber": "114269053",
+      "gasUsed": "1370097"
+    },
+    "pqKeyRegistrySealed": {
+      "hash": "0xebbad5164d9699edd013a703d8abf4dded2692267b214911a53037c817839085",
+      "blockNumber": "114269058",
+      "gasUsed": "36883"
+    },
+    "hookDeployerConfigured": {
+      "hash": "0x1ca822cab5eefaf75cbb9253aeb0cb8df1731251e7ef8c911c2917e16383bce8",
+      "blockNumber": "114269064",
+      "gasUsed": "76511"
+    },
+    "factoryHookDeployerSet": {
+      "hash": "0x17af0cddc0c69af3019e31473b91d3448f578c31d8a2d2a4097d74c5165dbc8c",
+      "blockNumber": "114269070",
+      "gasUsed": "57536"
+    },
+    "registryWiredAndSealed": {
+      "hash": "0x8a25d92ee3914795fa1c6ae702f8178a30b1c1a95bcc7329ad740940aac4a249",
+      "blockNumber": "114269080",
+      "gasUsed": "75918"
+    },
+    "verified": true
+  },
+  "addresses": {
+    "PoolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+    "PositionManager": "0x58daec3116aae6D93017bAAea7749052E8a04fA7",
+    "Quoter": "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94",
+    "WETH": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
+    "USDG": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "F1600Helper": "0x0438deB1f25BA0D88D257acfe89191B3EB3de75F",
+    "MLDSA44Verifier": "0x668Fe10f9b424349FDD41F7E6C5DF2cC21Bf3214",
+    "IpoMarketRegistry": "0x5444CF6E91462938C975668266c9E24b6233BD37",
+    "PQKeyRegistry": "0x78F42d96AD69Ed3D696875CF59eFF8A447Cd80A8",
+    "IpoMarketFactory": "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
+    "IpoResolutionAdapter": "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
+    "IpoHookDeployer": "0xaAa28FA6a7DB709129879c1daF13Bc90B843064f",
+    "TimelineRouter": "0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45"
+  },
+  "implementations": {
+    "IpoMarketRegistry": "0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE",
+    "IpoPQKeyRegistry": "0x5B0f7981EC187C0e95977693C9418387aF4d5897",
+    "IpoMarketFactory": "0x68E6e6689502c7ff4D05F0569c6c72066AdFD164",
+    "IpoResolutionAdapter": "0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A",
+    "IpoTimelineRouter": "0x74E9B2F75a0BACeA0974D63806DBbfA95BA221F1",
+    "IpoConditionalVault": "0x6B690Cc6e05de26A617ea530bA068B556489E889",
+    "IpoOutcomeToken": "0xa8801A0cf08D21752331BA241198ed6e6De35584",
+    "IpoTimelineHook": "0xc79062f4a0A67142c84F042b4aE85952A4A0A880"
+  },
+  "beacons": {
+    "outcomeToken": "0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214",
+    "vault": "0x326be2C0e8883dd7b24d3afD17d9f37B3D512329",
+    "hook": "0xa9928908754d2876613787E362bc35DA559C97FE"
+  },
+  "schedule": {
+    "releaseDelaySeconds": "64800",
+    "resolutionWindowSeconds": "172800",
+    "minimumTradingWindowSeconds": "43200"
+  },
+  "keyValidation": {
+    "deployer": {
+      "signer": "0x3B06A7c6839dF369d62961DcA54ea56185332828",
+      "pkBlob": "0xB69a36a02921655efF5B08fCfCa7b8e0dC9FBB92",
+      "keygenSeedBound": true,
+      "publicKeyFingerprint": "0x5bac92283ff57272b0f37b68041bfe42d5ee481b352883d91733cd8ba2a20457",
+      "preparedBlobCodeHash": "0x0497d89e4318c42f57b6a99a949a26b84cdc0488f67fbbfc8a5ccd7263c06508",
+      "nonDegeneracyFloorCount": 1010
+    },
+    "bot": {
+      "signer": "0xB1eeCD3799E929c01aA0aeCbb6CaDEC6d5a30801",
+      "pkBlob": "0x5c7e95405f8C4c1DDF5Ef17976828fBD0D18A24f",
+      "keygenSeedBound": true,
+      "publicKeyFingerprint": "0x303ba01c68bd8cc8383e20fcacded96313cfff9ab14c15e6e5215e0e7c54ab40",
+      "preparedBlobCodeHash": "0x29d782e93b6594531fb88d0ff528fe1a465c3a709a9ae450f67397fb4e25ef74",
+      "nonDegeneracyFloorCount": 1003
+    }
+  },
+  "upgradeControl": {
+    "proxies": {
+      "IpoMarketRegistry": {
+        "proxy": "0x5444CF6E91462938C975668266c9E24b6233BD37",
+        "implementation": "0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE",
+        "proxyAdmin": "0x7fBED094F93a3271BBe9C2690d6aEC08c0222884",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "PQKeyRegistry": {
+        "proxy": "0x78F42d96AD69Ed3D696875CF59eFF8A447Cd80A8",
+        "implementation": "0x5B0f7981EC187C0e95977693C9418387aF4d5897",
+        "proxyAdmin": "0xF34fA1A629bf0b64837D2D1F1bCF25435976a8ed",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "IpoMarketFactory": {
+        "proxy": "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
+        "implementation": "0x68E6e6689502c7ff4D05F0569c6c72066AdFD164",
+        "proxyAdmin": "0x9Dd2B081D1ace94Dc7941ACaaE2aF165F080e425",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "IpoResolutionAdapter": {
+        "proxy": "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
+        "implementation": "0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A",
+        "proxyAdmin": "0x69e5862108969673dc040b9A0978DD466b8A52AF",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "TimelineRouter": {
+        "proxy": "0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45",
+        "implementation": "0x74E9B2F75a0BACeA0974D63806DBbfA95BA221F1",
+        "proxyAdmin": "0x3678B4fa57917Ebd1E354EfD162C21EB9832cc9D",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      }
+    },
+    "beacons": {
+      "outcomeToken": {
+        "beacon": "0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214",
+        "implementation": "0xa8801A0cf08D21752331BA241198ed6e6De35584",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "vault": {
+        "beacon": "0x326be2C0e8883dd7b24d3afD17d9f37B3D512329",
+        "implementation": "0x6B690Cc6e05de26A617ea530bA068B556489E889",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      },
+      "hook": {
+        "beacon": "0xa9928908754d2876613787E362bc35DA559C97FE",
+        "implementation": "0xc79062f4a0A67142c84F042b4aE85952A4A0A880",
+        "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
+      }
+    }
+  },
+  "deployedAndSealed": true,
+  "deploymentBlock": "114269075"
+}
