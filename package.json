@@ -45,6 +45,7 @@
     "deploy:ipo:preflight": "node contracts/scripts/deploy-mainnet-ipo.mjs --preflight",
     "deploy:ipo": "node contracts/scripts/deploy-mainnet-ipo.mjs",
     "upgrade:ipo": "node contracts/scripts/upgrade-mainnet-ipo.mjs",
+    "withdraw:ipo": "node contracts/scripts/withdraw-mainnet-ipo-liquidity.mjs",
     "market:ipo:plan": "node contracts/scripts/create-mainnet-ipo-market.mjs --plan",
     "market:ipo:create": "node contracts/scripts/create-mainnet-ipo-market.mjs --broadcast",
     "market:ipo:quote": "node contracts/scripts/create-mainnet-ipo-market.mjs --quote",
