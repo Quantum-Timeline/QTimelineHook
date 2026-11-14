@@ -5,7 +5,7 @@ import { createPublicClient, createWalletClient, custom, formatUnits, http, isAd
 import { robinhoodChain, registryAbi } from "@qtimeline/chain";
 import { useMarketId } from "@/lib/use-market-id";
 import { AnimatedNumber } from "@/lib/motion";
-import { useWallet } from "@/lib/wallet";
+import { getActiveProvider, useWallet } from "@/lib/wallet";
 import { friendlyError } from "@/lib/errors";
 import { ClaimIcon } from "@/components/TokenLogo";
 
@@ -64,7 +64,7 @@ export function PositionsPanel() {
     if (!account || !registry || !marketId) return;
     setBusy(true); setMessage(""); setTx(undefined);
     try {
-      const provider = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
+      const provider = getActiveProvider() as Parameters<typeof custom>[0] | undefined;
       if (!provider) throw new Error("Wallet provider disconnected.");
       const wallet = createWalletClient({ account, chain: robinhoodChain, transport: custom(provider) });
       if (await wallet.getChainId() !== robinhoodChain.id) await wallet.switchChain({ id: robinhoodChain.id });

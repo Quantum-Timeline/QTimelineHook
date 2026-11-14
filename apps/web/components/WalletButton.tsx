@@ -4,7 +4,7 @@ import { robinhoodChain } from "@qtimeline/chain";
 import { shortAddress, useWallet } from "@/lib/wallet";
 
 export function WalletButton() {
-  const { account, connect, connecting, disconnect, wrongChain, switchChain } = useWallet();
+  const { account, connect, connecting, disconnect, wrongChain, switchChain, activeWallet } = useWallet();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -28,11 +28,11 @@ export function WalletButton() {
   return (
     <div className="wallet-menu" ref={box}>
       <button className="wallet wallet--on" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        <i aria-hidden="true" />{shortAddress(account)}
+        {activeWallet?.icon ? <img src={activeWallet.icon} alt="" width={18} height={18} /> : <i aria-hidden="true" />}{shortAddress(account)}
       </button>
       {open && (
         <div className="wallet-menu__panel" role="menu">
-          <p>Connected to {robinhoodChain.name}</p>
+          <p>{activeWallet ? `${activeWallet.name} · ` : ""}{robinhoodChain.name}</p>
           <button role="menuitem" onClick={() => { void navigator.clipboard?.writeText(account); setCopied(true); window.setTimeout(() => setCopied(false), 1400); }}>{copied ? "Copied ✓" : "Copy address"}</button>
           <a role="menuitem" href={`${robinhoodChain.blockExplorers.default.url}/address/${account}`} target="_blank" rel="noreferrer">View on explorer ↗</a>
           <button role="menuitem" onClick={() => { disconnect(); setOpen(false); }}>Disconnect</button>

@@ -7,7 +7,7 @@ import { useMarketId } from "@/lib/use-market-id";
 import { canTradeAt } from "@/lib/market-lifecycle";
 import { findBestProbabilitySell } from "@/lib/probability-sell.mjs";
 import { AnimatedNumber } from "@/lib/motion";
-import { useWallet } from "@/lib/wallet";
+import { getActiveProvider, useWallet } from "@/lib/wallet";
 import { friendlyError } from "@/lib/errors";
 import { TradeProgress, type TradeStep } from "@/components/TradeProgress";
 import { ClaimIcon } from "@/components/TokenLogo";
@@ -143,7 +143,7 @@ export function MarketTradePanel() {
     if (!marketId || !registry || !factory || !router || !quoter || !account) return;
     setBusy(true); setMessage(""); setTx(undefined); setStep(0); setFailed(false); setDone(false);
     try {
-      const wallet = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
+      const wallet = getActiveProvider() as Parameters<typeof custom>[0] | undefined;
       if (!wallet) throw new Error("Install an injected wallet first.");
       const walletClient = createWalletClient({ account, chain: robinhoodChain, transport: custom(wallet) });
       if (await walletClient.getChainId() !== robinhoodChain.id) await walletClient.switchChain({ id: robinhoodChain.id });
