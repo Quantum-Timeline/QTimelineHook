@@ -32,7 +32,7 @@
 
 /* ── Header ── */
 .product-shell .topbar { transition: height 0.3s var(--ease-out), background-color 0.3s var(--ease), backdrop-filter 0.3s var(--ease); position: sticky; top: 0; z-index: 30; }
-.product-shell .topbar--scrolled { height: 64px; background: rgba(8, 10, 9, 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.product-shell .topbar--scrolled { height: 64px; background: rgba(8, 10, 9, 0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 
 .product-shell .topbar__nav { position: relative; }
 .product-shell .topbar__nav a { position: relative; z-index: 1; }
@@ -211,7 +211,7 @@
 
 /* ── Flow diagram ── */
 .flow { margin: 0 0 24px; padding: 20px; border: 1px solid var(--line); background: var(--bg-2); overflow-x: auto; }
-.flow svg { width: 100%; min-width: 640px; height: auto; display: block; }
+.flow svg { width: 100%; min-width: 640px; max-height: 400px; height: auto; display: block; margin: 0 auto; }
 .flow__wire { fill: none; stroke: var(--line-strong); stroke-width: 1.5; stroke-dasharray: 6 6; animation: flow-dash 1.2s linear infinite; }
 .flow__wire--yes { stroke: rgba(207, 239, 140, 0.6); } .flow__wire--no { stroke: rgba(240, 165, 143, 0.6); }
 @keyframes flow-dash { to { stroke-dashoffset: -12; } }

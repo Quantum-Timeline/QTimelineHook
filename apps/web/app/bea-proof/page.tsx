@@ -14,6 +14,12 @@ export default function BeaProofPage() {
         tag="TESTNET · BEA FIXTURE"
         title="BEA fixture, on chain."
         body="A read-only view of the parsed archive, signed report outcome, and evidence hash recorded by the Robinhood Chain testnet registry."
+        facts={[
+          { label: "SOURCE", wide: true, value: <span>BEA · Core PCE</span>, sub: "Archived HTML fixture, not a live result" },
+          { label: "ROW", value: "Core PCE", sub: "Monthly change, first release" },
+          { label: "SIGNED BY", value: "ECDSA + ML-DSA", sub: "Verified on-chain" },
+          { label: "NETWORK", value: "Testnet", sub: "Robinhood Chain 46630" },
+        ]}
       />
       <div className="callout">Archived BEA HTML fixture · mock run, not a live result.</div>
       {configured ? <MarketSnapshot registryOverride={registry} marketIdOverride={marketId} fixtureEvidence /> : (

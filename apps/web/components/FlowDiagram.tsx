@@ -2,7 +2,7 @@
 export function FlowDiagram() {
   return (
     <figure className="flow" aria-label="How a market flows from deposit to payout">
-      <svg viewBox="0 0 860 300" role="img" aria-labelledby="flow-title flow-desc">
+      <svg viewBox="10 36 840 228" role="img" aria-labelledby="flow-title flow-desc">
         <title id="flow-title">Deposit, split, trade, resolve, redeem</title>
         <desc id="flow-desc">One deposit splits into YES and NO claims. Each timeline trades in its own Uniswap v4 pool. A hybrid-signed BEA report decides which side redeems one to one.</desc>
 

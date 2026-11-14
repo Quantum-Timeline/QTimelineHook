@@ -13,7 +13,7 @@ const links = [
   ["Rules", "/rules/"],
 ] as const;
 
-export function Frame({ children }: { children: React.ReactNode }) {
+export function Frame({ children }: { children: React.ReactNode; wide?: boolean }) {
   const pathname = usePathname() || "";
   const isTestnet = robinhoodChain.id === 46630;
   const navRef = useRef<HTMLElement>(null);
@@ -38,7 +38,7 @@ export function Frame({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <main className="shell qt-erestyra product-shell">
+    <main className="shell qt-erestyra product-shell product-shell--wide">
       <header className={`topbar ${scrolled ? "topbar--scrolled" : ""}`}>
         <Link className="brand" href="/">
           <svg
@@ -100,14 +100,28 @@ export function Frame({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PageHeading({ tag, title, body }: { tag: string; title: string; body: string }) {
+export type HeadingFact = { label: string; value: React.ReactNode; sub?: string; wide?: boolean };
+
+/** Page hero: tag, title and intro on the left, an at-a-glance fact grid on the right (when given). */
+export function PageHeading({ tag, title, body, facts }: { tag: string; title: string; body: string; facts?: HeadingFact[] }) {
   return (
-    <section className="hero subhero">
-      <p className="eyebrow">
-        <span>[{tag}]</span>
-      </p>
-      <h1>{title}</h1>
-      <p className="intro">{body}</p>
+    <section className={`market-hero${facts ? "" : " market-hero--solo"}`}>
+      <div className="market-hero__copy">
+        <p className="market-hero__tag">{tag}</p>
+        <h1>{title}</h1>
+        <p className="market-hero__intro">{body}</p>
+      </div>
+      {facts && (
+        <aside className="market-hero__facts" aria-label="At a glance">
+          {facts.map((fact) => (
+            <div key={fact.label} className={`fact${fact.wide ? " fact--assets" : ""}`}>
+              <span className="fact__label">{fact.label}</span>
+              {fact.wide ? <div className="fact__assets">{fact.value}</div> : <strong>{fact.value}</strong>}
+              {fact.sub && <small>{fact.sub}</small>}
+            </div>
+          ))}
+        </aside>
+      )}
     </section>
   );
 }

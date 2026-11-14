@@ -7,6 +7,7 @@ import { canTradeAt } from "@/lib/market-lifecycle";
 import { findBestProbabilitySell } from "@/lib/probability-sell.mjs";
 import { AnimatedNumber } from "@/lib/motion";
 import { TradeProgress, type TradeStep } from "@/components/TradeProgress";
+import { ClaimIcon } from "@/components/TokenLogo";
 
 const factoryAbi = parseAbi([
   "function tokens(bytes32) view returns (address[4])",
@@ -219,6 +220,8 @@ export function MarketTradePanel() {
       return formatUnits(gross * 9900n / 10000n, outputDecimals);
     } catch { return undefined; }
   })();
+  const inputAsset: "ETH" | "USDG" = direction === "buy" || instrument === "probability" ? "USDG" : "ETH";
+  const outputAsset: "ETH" | "USDG" = instrument === "eth" && direction === "buy" ? "ETH" : "USDG";
   const showProgress = busy || done || failed;
   const quoteLoading = validConfig && quote === undefined && /^(?:\d+)(?:\.\d{1,18})?$/.test(amount) && !message;
 
@@ -241,13 +244,13 @@ export function MarketTradePanel() {
         <button className={!outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(false)}>{NO_LABEL}</button>
       </div>
       <label className="amount-label">{direction === "buy" ? "USDG input" : instrument === "eth" ? "ETH claim input" : "USDG claim input"}
-        <div><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /><span>{inputUnit}</span></div>
+        <div><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /><span className="amount-unit"><ClaimIcon asset={inputAsset} yes={outcomeYes} size={26} />{inputUnit}</span></div>
       </label>
       <div className="chips" role="group" aria-label="Quick amounts">
         {chips.map((chip) => <button key={chip} type="button" className={amount === chip ? "is-on" : ""} onClick={() => setAmount(chip)}>{chip}</button>)}
       </div>
       <div className="quote-box" data-loading={quoteLoading}>
-        <div className="quote-row"><span>Estimated output</span><strong key={flash}>{quote === undefined ? <span className="shimmer-text">{quoteLoading ? "quoting…" : "—"}</span> : <><AnimatedNumber value={shownQuote} /> {outputUnit}</>}</strong></div>
+        <div className="quote-row"><span>Estimated output</span><strong key={flash}>{quote === undefined ? <span className="shimmer-text">{quoteLoading ? "quoting…" : "—"}</span> : <span className="quote-out"><AnimatedNumber value={shownQuote} /><ClaimIcon asset={outputAsset} yes={instrument === "probability" && direction === "buy" ? outcomeYes : outcomeYes} size={20} />{outputUnit}</span>}</strong></div>
         <div className="quote-row quote-row--sub"><span>Minimum after 1% slippage</span><strong>{minReceived ?? "—"}</strong></div>
       </div>
       <p className="trade-note">{instrument === "eth" ? direction === "buy" ? "The split also returns the opposite claim on your input collateral." : "Selling swaps your existing ETH claim. Matching opposite USDG claims merge to collateral; unpaired output stays conditional." : direction === "buy" ? "Collateral is split, then the opposite side is exchanged in the YES/NO pool." : "Your existing outcome claim is sold; matching opposite claims merge to collateral."} Minimum swap output uses a 1% slippage bound.</p>
