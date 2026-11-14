@@ -110,7 +110,7 @@ const VERT_PARTICLES = `
     vGlow = exp(-d * d);
     vFly = 1.0 - e;
     gl_PointSize = uSize * uPR * (1.0 + vGlow * 1.4 + vFly * 1.3) * (6.0 / -mv.z);
-    vAlpha = smoothstep(0.0, 0.25, t + 0.06) * (1.0 - uDissolve) * mix(1.0, uDim, e);
+    vAlpha = smoothstep(0.0, 0.15, t + 0.18) * (1.0 - uDissolve) * mix(1.0, uDim, e);
   }
 `;
 
@@ -163,9 +163,14 @@ const FRAG_SCAN = `
   }
 `;
 
-async function createLoaderScene(canvas: HTMLCanvasElement, svgEl: SVGSVGElement) {
+async function createLoaderScene(
+  canvas: HTMLCanvasElement,
+  svgEl: SVGSVGElement,
+  isAlive: () => boolean
+) {
   const isSmall = window.innerWidth < 720;
   const { pts, aspect, cols } = await sampleSvgParticles(svgEl, isSmall ? 300 : 380, 2);
+  if (!isAlive()) return null;
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: false,
@@ -224,7 +229,7 @@ async function createLoaderScene(canvas: HTMLCanvasElement, svgEl: SVGSVGElement
     uDissolve: { value: 0 },
     uScan: { value: 99 },
     uDim: { value: 1 },
-    uSize: { value: Math.max(1.6, 1.9 * ptScale) },
+    uSize: { value: Math.max(3.2, 2.8 * ptScale) },
     uPR: { value: pr },
     uColor: { value: new THREE.Color("#f3f2ec") },
     uAccent: { value: accentColor },
@@ -339,9 +344,6 @@ async function createLoaderScene(canvas: HTMLCanvasElement, svgEl: SVGSVGElement
 }
 
 const triggerIntroStart = () => {
-  try {
-    sessionStorage.setItem("qt-intro", "1");
-  } catch {}
   document.documentElement.classList.add("intro-go");
   window.dispatchEvent(new Event("s3de:intro"));
 };
@@ -410,21 +412,10 @@ export function Loader() {
   const hashRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   const [done, setDone] = useState(false);
+  const [modeClass, setModeClass] = useState<"" | "is-particles" | "is-fallback">("");
+  const [formed, setFormed] = useState(false);
 
   useEffect(() => {
-    let seenBefore = false;
-    try {
-      seenBefore = sessionStorage.getItem("qt-intro") === "1";
-    } catch {}
-
-    if (seenBefore || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const id = requestAnimationFrame(() => {
-        setDone(true);
-        triggerIntroStart();
-      });
-      return () => cancelAnimationFrame(id);
-    }
-
     const root = rootRef.current;
     if (!root) return;
     const svgLogo = root.querySelector(".loader__logo") as SVGSVGElement | null;
@@ -444,6 +435,7 @@ export function Loader() {
     let finishTime = 0;
     let lastHashTime = 0;
     let disposeTimeout = 0;
+    let formedSet = false;
 
     const animate = (now: number) => {
       const elapsed = Math.max(0, (now - startTime) / 1000);
@@ -468,7 +460,10 @@ export function Loader() {
       }
 
       if (elapsed >= 2.2) {
-        root.classList.add("is-formed");
+        if (!formedSet) {
+          formedSet = true;
+          setFormed(true);
+        }
         if (labelRef.current) labelRef.current.textContent = labels[1];
       } else if (hashRef.current && now - lastHashTime > 55) {
         lastHashTime = now;
@@ -496,24 +491,27 @@ export function Loader() {
     const startLoop = () => {
       if (alive) {
         startTime = performance.now();
-        rafId = requestAnimationFrame(animate);
+        animate(startTime);
       }
     };
 
     if (svgLogo && canvasRef.current) {
-      createLoaderScene(canvasRef.current, svgLogo)
+      createLoaderScene(canvasRef.current, svgLogo, () => alive)
         .then((sc) => {
-          if (!alive) return sc.dispose();
+          if (!sc || !alive) {
+            sc?.dispose();
+            return;
+          }
           glScene = sc;
-          root.classList.add("is-particles");
+          setModeClass("is-particles");
           startLoop();
         })
         .catch(() => {
-          root.classList.add("is-fallback");
+          setModeClass("is-fallback");
           startLoop();
         });
     } else {
-      root.classList.add("is-fallback");
+      setModeClass("is-fallback");
       startLoop();
     }
 
@@ -526,8 +524,17 @@ export function Loader() {
     };
   }, []);
 
+  const loaderClasses = [
+    "loader",
+    modeClass,
+    formed ? "is-formed" : "",
+    done ? "is-done" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div ref={rootRef} className={`loader${done ? " is-done" : ""}`} aria-hidden="true">
+    <div ref={rootRef} className={loaderClasses} aria-hidden="true">
       <canvas ref={canvasRef} className="loader__gl" />
       <QTimelineStackedMark className="loader__logo" />
       <span className="loader__meta mono">

@@ -7,6 +7,9 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    const shell = document.querySelector(".qt-erestyra");
+    shell?.classList.toggle("menu-open", open);
+    document.body.style.overflow = open ? "hidden" : "";
     if (open) {
       window.__lenis?.stop();
     } else {
@@ -16,10 +19,28 @@ export default function Header() {
       if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      shell?.classList.remove("menu-open");
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const closeMenu = () => setOpen(false);
+
+  const navigateSection = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    setOpen(false);
+    document.body.style.overflow = "";
+    window.setTimeout(() => {
+      window.__lenis?.start();
+      if (window.__lenis) {
+        window.__lenis.scrollTo(targetId, { force: true, duration: 1.0 });
+      } else {
+        document.querySelector(targetId)?.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 60);
+  };
 
   return (
     <>
@@ -47,10 +68,24 @@ export default function Header() {
             <span aria-hidden="true">/</span>
             <Link href="/#how-it-works">4663</Link>
           </div>
-          <Link href="/market/" className="hdr__app-btn" data-cursor onClick={closeMenu}>
-            <span>Open App</span>
-            <span aria-hidden="true">↗</span>
-          </Link>
+          <div className="hdr__actions">
+            <a
+              href="https://x.com/QTimelineHook"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hdr__x"
+              aria-label="QTimeline on X"
+              data-cursor
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+            <Link href="/market/" className="hdr__app-btn" data-cursor onClick={closeMenu}>
+              <span>Open App</span>
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
           <button
             type="button"
             className={`burger${open ? " is-open" : ""}`}
@@ -68,7 +103,14 @@ export default function Header() {
         </nav>
       </header>
 
-      <div id="qt-menu" className={`menu${open ? " is-open" : ""}`} aria-hidden={!open}>
+      <div
+        id="qt-menu"
+        className={`menu${open ? " is-open" : ""}`}
+        aria-hidden={!open}
+        data-lenis-prevent
+        data-lenis-prevent-wheel
+        data-lenis-prevent-touch
+      >
         <div className="menu__grid">
           <div className="menu__col">
             <p className="eyebrow">Application</p>
@@ -99,21 +141,54 @@ export default function Header() {
           <div className="menu__col">
             <p className="eyebrow">Architecture</p>
             <ul className="menu__list">
-              <li><a href="#architecture" onClick={closeMenu}>VAULT / Bifurcated Outcome Vault</a></li>
-              <li><a href="#pools" onClick={closeMenu}>POOLS / Three Uniswap v4 Pools</a></li>
-              <li><a href="#how-it-works" onClick={closeMenu}>HOOK / 13:25 UTC Hard Cutoff</a></li>
-              <li><a href="#transparency" onClick={closeMenu}>ORACLE / ML-DSA-44 Verification</a></li>
-              <li><a href="#telemetry" onClick={closeMenu}>SPECS / Mainnet Specifications</a></li>
+              <li>
+                <a href="#architecture" onClick={(e) => navigateSection(e, "#architecture")}>
+                  <span>VAULT</span>
+                  <span>Bifurcated Outcome Vault</span>
+                </a>
+              </li>
+              <li>
+                <a href="#pools" onClick={(e) => navigateSection(e, "#pools")}>
+                  <span>POOLS</span>
+                  <span>Three Uniswap v4 Pools</span>
+                </a>
+              </li>
+              <li>
+                <a href="#how-it-works" onClick={(e) => navigateSection(e, "#how-it-works")}>
+                  <span>HOOK</span>
+                  <span>13:25 UTC Hard Cutoff</span>
+                </a>
+              </li>
+              <li>
+                <a href="#transparency" onClick={(e) => navigateSection(e, "#transparency")}>
+                  <span>ORACLE</span>
+                  <span>ML-DSA-44 Verification</span>
+                </a>
+              </li>
+              <li>
+                <a href="#telemetry" onClick={(e) => navigateSection(e, "#telemetry")}>
+                  <span>SPECS</span>
+                  <span>Mainnet Specifications</span>
+                </a>
+              </li>
             </ul>
-          </div>
 
-          <div className="menu__col">
-            <p className="eyebrow">Genesis Event</p>
-            <p className="lead" style={{ fontSize: "15px" }}>
-              BEA Core PCE · October 2026 (≥ 0.30% MoM). Trading halts automatically at 13:25 UTC,
-              5 minutes before the 13:30 UTC release.
-            </p>
+            <div className="menu__genesis">
+              <p className="eyebrow">Genesis Event</p>
+              <p className="menu__genesis-copy">
+                BEA Core PCE · October 2026 (≥ 0.30% MoM). Trading halts automatically at 13:25 UTC,
+                5 minutes before the 13:30 UTC release.
+              </p>
+            </div>
           </div>
+        </div>
+
+        <div className="menu__foot">
+          <span>Robinhood Chain · 4663</span>
+          <a href="https://x.com/QTimelineHook" target="_blank" rel="noopener noreferrer">
+            X (@QTimelineHook) ↗
+          </a>
+          <span>ML-DSA-44 Verified</span>
         </div>
       </div>
     </>

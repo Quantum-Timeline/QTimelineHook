@@ -656,6 +656,11 @@ export default function HomePage() {
                 <li>
                   <Link href="/vote/">$QTL Governance</Link>
                 </li>
+                <li>
+                  <a href="https://x.com/QTimelineHook" target="_blank" rel="noopener noreferrer">
+                    X (@QTimelineHook) ↗
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -669,6 +674,9 @@ export default function HomePage() {
             <Link href="/market/">Conditional Market</Link>
             <Link href="/positions/">Positions</Link>
             <Link href="/rules/">ML-DSA-44 Specs</Link>
+            <a href="https://x.com/QTimelineHook" target="_blank" rel="noopener noreferrer">
+              X ↗
+            </a>
           </nav>
         </div>
       </footer>

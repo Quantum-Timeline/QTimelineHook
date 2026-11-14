@@ -101,8 +101,19 @@ function FrameInner({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="topbar__actions">
+          <a
+            href="https://x.com/QTimelineHook"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topbar__x"
+            aria-label="QTimeline on X"
+            title="QTimeline on X"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
           <span className="net-pill" title={robinhoodChain.name}>
-            <i aria-hidden="true" />
             <span>{isTestnet ? "TESTNET · 46630" : "ROBINHOOD · 4663"}</span>
           </span>
           <WalletButton />
@@ -123,6 +134,9 @@ function FrameInner({ children }: { children: React.ReactNode }) {
           <Link href="/positions/">Positions</Link>
           <Link href="/vote/">Vote</Link>
           <Link href="/rules/">Rules &amp; Risk ↗</Link>
+          <a href="https://x.com/QTimelineHook" target="_blank" rel="noopener noreferrer">
+            X ↗
+          </a>
         </div>
       </footer>
     </main>
@@ -136,7 +150,7 @@ export function PageHeading({ tag, title, body, facts, note }: { tag: string; ti
   return (
     <section className={`phero${facts ? "" : " phero--solo"}`}>
       <div className="phero__copy">
-        <p className="phero__tag"><i aria-hidden="true" />{tag}</p>
+        <p className="phero__tag">{tag}</p>
         <h1>{title}</h1>
         <p className="phero__intro">{body}</p>
         {note && <p className="phero__note">{note}</p>}
