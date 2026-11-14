@@ -3,7 +3,7 @@ import { eventProfile } from "@/lib/event-profile";
 import Link from "next/link";
 import Scene from "@/components/landing/Scene";
 import SmoothScroll from "@/components/landing/SmoothScroll";
-import { Cursor, Loader, QTimelineStackedMark } from "@/components/landing/LoaderAndCursor";
+import { Cursor, Loader } from "@/components/landing/LoaderAndCursor";
 import Header from "@/components/landing/Header";
 import "@/app/landing.css";
 
@@ -613,7 +613,14 @@ export default function HomePage() {
       <footer className="ftr" data-dim="true">
         <div className="ftr__top">
           <Link href="/" className="ftr__logo" aria-label="QTimeline Protocol">
-            <QTimelineStackedMark />
+            <img
+              src="/brand/qtimeline-logo.png"
+              alt=""
+              width={88}
+              height={88}
+              style={{ width: "88px", height: "88px", objectFit: "contain", display: "block" }}
+            />
+            <span className="ftr__wordmark">QTIMELINE</span>
           </Link>
           <div className="ftr__cols">
             <div>

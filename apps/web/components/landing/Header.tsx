@@ -47,17 +47,13 @@ export default function Header() {
     <>
       <header className="hdr">
         <Link href="/" className="hdr__logo" aria-label="QTimeline" onClick={closeMenu} data-cursor>
-          <svg
-            width="16"
-            height="14"
-            viewBox="0 0 16 14"
-            fill="none"
-            aria-hidden="true"
-            style={{ width: "16px", height: "14px", flexShrink: 0 }}
-          >
-            <path d="M1 7H6.5L13.5 2" stroke="#CFEF8C" strokeWidth="1.6" strokeLinecap="square" />
-            <path d="M6.5 7L13.5 12" stroke="#F3F2EC" strokeWidth="1.6" strokeLinecap="square" />
-          </svg>
+          <img
+            src="/brand/qtimeline-logo.png"
+            alt=""
+            width={24}
+            height={24}
+            style={{ width: "24px", height: "24px", objectFit: "contain", flexShrink: 0 }}
+          />
           <span>QTIMELINE</span>
         </Link>
 

@@ -15,11 +15,14 @@ export function QTimelineStackedMark({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Architectural Bifurcation Emblem (pure vector paths for crisp WebGL particle sampling) */}
+      {/* Sculptural Ribbon Q Emblem (pure vector paths for crisp WebGL particle sampling) */}
       <g fill="currentColor">
-        <path d="M102 8 L146 33 V83 L102 108 L58 83 V33 L102 8 Z M102 17 L66 38 V78 L102 99 L138 78 V38 L102 17 Z" />
-        <path d="M72 58 H94 L106 40 H128 V47 H110 L100 62 L110 77 H128 V84 H106 L94 65 H72 V58 Z" />
-        <circle cx="95" cy="61.5" r="5" />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M102 10 C75.5 10 54 31.5 54 58 C54 84.5 75.5 106 102 106 H134 L117.5 89.5 C130.5 83.2 139.5 70.6 139.5 56 C139.5 30.6 122.7 10 102 10 Z M102 27 C118.6 27 131 39.8 131 56 C131 72.2 118.6 85 102 85 C85.4 85 73 72.2 73 56 C73 39.8 85.4 27 102 27 Z"
+        />
+        <path d="M84 54 C84 72 98 87 116 90 L134 106 H104 C82 106 66 88 66 64 C66 56 68.5 48 73 41 C77 46 81 50 84 54 Z" />
       </g>
       {/* Pure Vector Block Wordmark: QTIMELINE */}
       <g fill="currentColor">
