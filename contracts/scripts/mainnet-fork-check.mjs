@@ -23,7 +23,7 @@ try {
   const forge = process.platform === "win32"
     ? resolve(root, "node_modules/@foundry-rs/forge-win32-amd64/bin/forge.exe")
     : resolve(root, "node_modules/.bin/forge");
-  const result = spawnSync(forge, ["test", "--root", "contracts", "--match-path", "test/MainnetFork.t.sol", "--fork-url", "robinhood", "-vv"], {
+  const result = spawnSync(forge, ["test", "--root", "contracts", "--match-path", "test/MainnetFork*.t.sol", "--fork-url", "robinhood", "-vv"], {
     cwd: root,
     env: { ...process.env, RH_MAINNET_RPC: env.RH_MAINNET_RPC },
     stdio: "inherit",
