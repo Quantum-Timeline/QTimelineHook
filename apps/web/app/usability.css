@@ -118,7 +118,7 @@
 .world__example p { margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
 @media (min-width: 1101px) {
   .worlds { align-items: start; }
-  .worlds > .world { position: sticky; top: 96px; display: flex; flex-direction: column; min-height: calc(100vh - 156px); }
+  .worlds > .world { gap: 10px; position: sticky; top: 100px; display: flex; flex-direction: column; min-height: min(calc(100svh - 210px), 700px); }
   .worlds > .world .world__example { flex: 1; justify-content: center; }
   .worlds > .world .world__cta { margin-top: auto; align-self: flex-start; }
 }
