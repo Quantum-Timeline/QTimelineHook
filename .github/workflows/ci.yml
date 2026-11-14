@@ -26,11 +26,16 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1
         with:
           version: v1.7.1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @qtimeline/resolver test
       - run: pnpm typecheck
       - run: node contracts/scripts/compile.mjs
       - run: forge build --root contracts
       - run: forge test --root contracts
+      - run: python -m venv contracts/.secrets/pythonref-venv
+      - run: contracts/.secrets/pythonref-venv/bin/python -m pip install -r contracts/lib/evm-ml-dsa-verifier/pythonref/requirements.txt
       - run: pnpm contracts:test:release
       - run: pnpm build
