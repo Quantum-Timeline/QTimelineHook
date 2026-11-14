@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { robinhoodChain } from "@qtimeline/chain";
 import { WalletButton } from "@/components/WalletButton";
+import { WalletProvider, useWallet } from "@/lib/wallet";
 
 const links = [
   ["Market", "/market/"],
@@ -13,7 +14,34 @@ const links = [
   ["Rules", "/rules/"],
 ] as const;
 
+/** Tells the visitor, in plain words, what is blocking them: no wallet, wrong network, or a failed connection. */
+function WalletNotices() {
+  const { wrongChain, switchChain, error, clearError, account } = useWallet();
+  if (wrongChain) {
+    return (
+      <div className="notice notice--warn" role="alert">
+        <span>Your wallet is on the wrong network. This app runs on {robinhoodChain.name}.</span>
+        <button onClick={() => void switchChain()}>Switch network</button>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="notice notice--error" role="alert">
+        <span>{error}</span>
+        {!account && /No wallet found/.test(error) && <a href="https://metamask.io/download/" target="_blank" rel="noreferrer">Get MetaMask ↗</a>}
+        <button onClick={clearError} aria-label="Dismiss">✕</button>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function Frame({ children }: { children: React.ReactNode; wide?: boolean }) {
+  return <WalletProvider><FrameInner>{children}</FrameInner></WalletProvider>;
+}
+
+function FrameInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "";
   const isTestnet = robinhoodChain.id === 46630;
   const navRef = useRef<HTMLElement>(null);
@@ -81,6 +109,7 @@ export function Frame({ children }: { children: React.ReactNode; wide?: boolean 
         </div>
       </header>
 
+      <WalletNotices />
       <div className="product-body" key={pathname}>{children}</div>
 
       <footer className="product-footer">

@@ -1,0 +1,54 @@
+/* Usability layer: wallet menu, notices, balance and Max, closed banner, receipt, how-to strip. */
+
+/* ── Wallet button states ── */
+.wallet-menu { position: relative; }
+.product-shell .wallet--on { display: inline-flex; align-items: center; gap: 9px; background: rgba(243, 242, 236, 0.1); color: var(--paper); box-shadow: inset 0 0 0 1px var(--glass-line-hi); }
+.product-shell .wallet--on:hover:not(:disabled) { background: rgba(243, 242, 236, 0.16); color: var(--paper); }
+.wallet--on i { width: 8px; height: 8px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+.product-shell .wallet--warn { background: var(--no); color: #0b0e0c; }
+.wallet-menu__panel { position: absolute; right: 0; top: calc(100% + 10px); min-width: 230px; padding: 8px; border-radius: 18px; background: rgba(16, 20, 18, 0.97); border: 1px solid var(--glass-line-hi); box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.9); display: grid; gap: 2px; z-index: 40; animation: lift-in 0.25s var(--ease-out) both; }
+.wallet-menu__panel p { margin: 0; padding: 8px 12px 10px; color: var(--muted); font-size: 0.78rem; }
+.wallet-menu__panel button, .wallet-menu__panel a { display: block; text-align: left; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--paper); font: 500 0.88rem Archivo, sans-serif; text-decoration: none; cursor: pointer; }
+.wallet-menu__panel button:hover, .wallet-menu__panel a:hover { background: rgba(243, 242, 236, 0.09); }
+
+/* ── Notices: wrong network, no wallet ── */
+.notice { display: flex; align-items: center; gap: 14px; margin: 14px 0 0; padding: 12px 16px; border-radius: 16px; font-size: 0.9rem; line-height: 1.45; animation: lift-in 0.35s var(--ease-out) both; }
+.notice span { flex: 1; }
+.notice--warn { background: rgba(240, 165, 143, 0.12); border: 1px solid rgba(240, 165, 143, 0.4); }
+.notice--error { background: rgba(240, 165, 143, 0.08); border: 1px solid rgba(240, 165, 143, 0.3); }
+.notice button, .notice a { border: 0; border-radius: 999px; padding: 8px 16px; background: var(--paper); color: #0b0e0c; font: 600 0.84rem Archivo, sans-serif; cursor: pointer; text-decoration: none; }
+.notice--error button[aria-label] { background: transparent; color: var(--paper); padding: 6px 10px; }
+
+/* ── Trade panel helpers ── */
+.balance-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -4px 2px 0; color: var(--muted); font-size: 0.82rem; }
+.balance-row button { border: 0; border-radius: 999px; padding: 4px 12px; background: rgba(243, 242, 236, 0.1); color: var(--paper); font: 600 0.78rem Archivo, sans-serif; cursor: pointer; transition: background-color 0.2s var(--ease); }
+.balance-row button:hover { background: var(--paper); color: #0b0e0c; }
+
+.closed-banner { display: grid; gap: 4px; padding: 14px 16px; border-radius: var(--r-md, 16px); background: rgba(243, 242, 236, 0.07); border: 1px solid var(--glass-line-hi); }
+.closed-banner b { font-size: 1rem; letter-spacing: -0.01em; }
+.closed-banner span { color: var(--muted); font-size: 0.86rem; }
+.closed-banner a { margin-top: 4px; justify-self: start; color: var(--lime); font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+.closed-banner a:hover { text-decoration: underline; }
+
+.receipt { list-style: none; margin: 0; padding: 12px 16px; display: grid; gap: 6px; border-radius: var(--r-md, 16px); background: rgba(207, 239, 140, 0.06); border: 1px solid rgba(207, 239, 140, 0.18); font-size: 0.86rem; line-height: 1.5; color: #c2cbbd; }
+.trade-panel[data-outcome="no"] .receipt { background: rgba(240, 165, 143, 0.06); border-color: rgba(240, 165, 143, 0.2); }
+.receipt b { color: var(--paper); font-weight: 600; }
+.product-shell .primary:disabled { opacity: 1; background: rgba(243, 242, 236, 0.1); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+
+/* ── How to trade ── */
+.howto { display: flex; align-items: center; gap: 18px 28px; flex-wrap: wrap; margin: 0 0 16px; padding: 14px 20px; border-radius: var(--r-lg, 24px); border: 1px solid var(--glass-line); background: var(--glass); }
+.howto ol { list-style: none; margin: 0; padding: 0; flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 24px; }
+.howto li { display: flex; gap: 12px; align-items: flex-start; }
+.howto__n { flex: none; width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; background: var(--paper); color: #0b0e0c; font: 700 0.82rem Archivo, sans-serif; }
+.howto strong { display: block; font-size: 0.92rem; }
+.howto p { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; line-height: 1.45; }
+.howto__link { color: var(--paper); font-weight: 600; font-size: 0.86rem; text-decoration: none; white-space: nowrap; opacity: 0.8; }
+.howto__link:hover { opacity: 1; text-decoration: underline; }
+@media (max-width: 900px) { .howto ol { grid-template-columns: 1fr; } .notice { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .wallet-menu__panel, .notice { animation: none !important; } }
+
+/* closed market: keep the form readable but clearly inactive */
+.trade-panel[data-closed="true"] .segmented, .trade-panel[data-closed="true"] .amount-label, .trade-panel[data-closed="true"] .balance-row,
+.trade-panel[data-closed="true"] .chips, .trade-panel[data-closed="true"] .quote-box, .trade-panel[data-closed="true"] .trade-note { opacity: 0.4; pointer-events: none; }
+.empty-hint { margin: 14px 0 0; padding: 14px 18px; border-radius: 16px; background: rgba(243, 242, 236, 0.05); border: 1px dashed var(--glass-line-hi); color: #b7c0b2; font-size: 0.9rem; line-height: 1.5; }
+.empty-hint a { color: var(--lime); font-weight: 600; }

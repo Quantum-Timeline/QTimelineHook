@@ -1,4 +1,5 @@
 import { Frame, PageHeading } from "@/components/Frame";
+import { HowToTrade } from "@/components/HowToTrade";
 import { MarketSnapshot } from "@/components/MarketSnapshot";
 import { MarketTradePanel } from "@/components/MarketTradePanel";
 import { PoolStrip } from "@/components/PoolStrip";
@@ -31,6 +32,8 @@ export default function MarketPage() {
           { label: "Payout", value: "Winner 1 : 1", sub: "Cancelled pays 50%" },
         ]}
       />
+
+      <HowToTrade />
 
       <section className="question">
         <span className="question__label">The question</span>

@@ -1,9 +1,12 @@
 "use client";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPublicClient, createWalletClient, custom, formatUnits, http, isAddress, isHex, parseAbi, type Address, type Hex } from "viem";
 import { robinhoodChain, registryAbi } from "@qtimeline/chain";
 import { useMarketId } from "@/lib/use-market-id";
 import { AnimatedNumber } from "@/lib/motion";
+import { useWallet } from "@/lib/wallet";
+import { friendlyError } from "@/lib/errors";
 import { ClaimIcon } from "@/components/TokenLogo";
 
 const factoryAbi = parseAbi(["function tokens(bytes32) view returns (address[4])"]);
@@ -14,7 +17,7 @@ type Claim = { asset: Address; label: string; yes: boolean; address: Address; ba
 const statusNames = ["Draft","Scheduled","Open","Awaiting result","Final YES","Final NO","Cancelled","Discarded"];
 
 export function PositionsPanel() {
-  const [account, setAccount] = useState<Address>();
+  const { account, connect: connectWallet, wrongChain } = useWallet();
   const [claims, setClaims] = useState<Claim[]>([]);
   const [status, setStatus] = useState<number>();
   const [message, setMessage] = useState("Connect a wallet to read on-chain claims.");
@@ -52,17 +55,10 @@ export function PositionsPanel() {
         next.push({ asset: row.asset, label: row.label, yes: true, address: yesAddress, balance: yesBalance, decimals: row.decimals }, { asset: row.asset, label: row.label, yes: false, address: noAddress, balance: noBalance, decimals: row.decimals });
       }
       setClaims(next); setStatus(market.status); setMessage("");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Could not read positions from chain."); }
+    } catch (error) { setMessage(friendlyError(error, "Could not read positions from chain.")); }
   }, [account, client, configured, factory, marketId, registry]);
 
   useEffect(() => { void refresh(); }, [refresh]);
-
-  async function connect() {
-    const provider = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
-    if (!provider) { setMessage("Install an injected wallet to view and manage claims."); return; }
-    const wallet = createWalletClient({ chain: robinhoodChain, transport: custom(provider) });
-    const [address] = await wallet.requestAddresses(); setAccount(address);
-  }
 
   async function act(kind: "merge" | "redeem", asset: Address, yes?: boolean) {
     if (!account || !registry || !marketId) return;
@@ -87,13 +83,14 @@ export function PositionsPanel() {
       const receipt = await client.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Transaction reverted.");
       setMessage(kind === "merge" ? "Claims merged into collateral." : "Claim redeemed."); await refresh();
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Transaction failed."); }
+    } catch (error) { setMessage(friendlyError(error, "Transaction failed.")); }
     finally { setBusy(false); }
   }
 
-  return <section className="chain-panel"><div className="panel-head"><div><small>On-chain claims</small><h2>{status === undefined ? "Your conditional balances" : `Market · ${statusNames[status] ?? "Unknown"}`}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connect()}>{account ? "Refresh balances" : "Connect wallet"}</button></div>
+  return <section className="chain-panel"><div className="panel-head"><div><small>On-chain claims</small><h2>{status === undefined ? "Your conditional balances" : `Market · ${statusNames[status] ?? "Unknown"}`}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connectWallet()}>{account ? "Refresh balances" : "Connect wallet"}</button></div>
     {!configured ? <div className="callout">No contract manifest is configured yet. Balances will appear here after the verified market addresses are published.</div> : !account ? <div className="empty-claims"><p>{message}</p></div> : <>
       <div className="claim-grid">{claims.map(claim => <article className={`claim-card claim-card--${claim.yes ? "yes" : "no"} ${claim.balance > 0n ? "has-balance" : ""}`} key={`${claim.label}-${claim.yes ? "yes" : "no"}`} style={{ ["--n" as string]: claims.indexOf(claim) }}><div><span className="claim-id"><ClaimIcon asset={claim.label === "ETH" ? "ETH" : "USDG"} yes={claim.yes} size={30} />{claim.label} · {claim.yes ? "YES" : "NO"}</span><b>{claim.yes ? "↗" : "↘"}</b></div><strong><AnimatedNumber value={formatUnits(claim.balance, claim.decimals)} /></strong><small>conditional claim</small></article>)}</div>
+      {claims.length > 0 && claims.every((claim) => claim.balance === 0n) && <div className="empty-hint">You do not hold any claims for this market yet. Buy YES or NO on the <Link href="/market/">Market page</Link> and they will show up here.</div>}
       <div className="position-actions"><div><strong>Before resolution</strong><span>Merge matching YES + NO claims back into ETH or USDG.</span></div><div className="action-group">{[ZERO, claims.find(x => x.label === "USDG")?.asset].filter((x): x is Address => !!x).map(asset => <button className="action-button" key={asset} disabled={busy || !claims.some(x => x.asset === asset && x.balance > 0n)} onClick={() => void act("merge", asset)}>Merge {asset === ZERO ? "ETH" : "USDG"}</button>)}</div></div>
       {status !== undefined && [4,5,6].includes(status) && <div className="position-actions"><div><strong>Redeem resolved claims</strong><span>Winning claims pay 1:1; cancelled claims pay half of face value.</span></div><div className="action-group">{claims.filter(x => x.balance > 0n).map(claim => <button className="action-button" key={claim.address} disabled={busy} onClick={() => void act("redeem", claim.asset, claim.yes)}>Redeem {claim.label} {claim.yes ? "YES" : "NO"}</button>)}</div></div>}
     </>}

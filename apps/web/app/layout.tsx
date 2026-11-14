@@ -6,6 +6,7 @@ import "./brand-theme.css";
 import "./motion.css";
 import "./market.css";
 import "./timeline.css";
+import "./usability.css";
 
 export const metadata: Metadata = {
   title: "QTimeline — Every pool, two timelines",

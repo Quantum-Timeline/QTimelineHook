@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPublicClient, createWalletClient, custom, formatUnits, http, isAddress, parseAbi, parseUnits, type Address, type Hex } from "viem";
 import { robinhoodChain } from "@qtimeline/chain";
 import { AnimatedNumber, formatCountdown } from "@/lib/motion";
+import { useWallet } from "@/lib/wallet";
+import { friendlyError } from "@/lib/errors";
 
 const votingAbi = parseAbi([
   "function tokenBound() view returns (bool)","function qtl() view returns (address)","function nextElectionId() view returns (uint256)",
@@ -15,7 +17,7 @@ type Election = { candidateA: Hex; candidateB: Hex; depositStart: bigint; voteSt
 const fmt = (time: bigint) => new Date(Number(time) * 1000).toLocaleString();
 
 export function VotingPanel() {
-  const [account, setAccount] = useState<Address>();
+  const { account, connect: connectWallet } = useWallet();
   const [election, setElection] = useState<Election>();
   const [electionId, setElectionId] = useState<bigint>();
   const [balance, setBalance] = useState(0n);
@@ -60,17 +62,10 @@ export function VotingPanel() {
         setBalance(locked); setVoted(didVote);
       } else { setBalance(0n); setVoted(false); }
       const block = await client.getBlock(); setNow(block.timestamp); setMessage("");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Could not read election from chain."); }
+    } catch (error) { setMessage(friendlyError(error, "Could not read election from chain.")); }
   }, [account, client, configured, voting]);
 
   useEffect(() => { void refresh(); }, [refresh]);
-
-  async function connect() {
-    const provider = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
-    if (!provider) { setMessage("Install an injected wallet to participate."); return; }
-    const wallet = createWalletClient({ chain: robinhoodChain, transport: custom(provider) });
-    const [address] = await wallet.requestAddresses(); setAccount(address);
-  }
 
   async function send(action: "deposit" | "withdraw" | "voteA" | "voteB" | "finalize") {
     if (!account || !voting || electionId === undefined || !election) return;
@@ -104,7 +99,7 @@ export function VotingPanel() {
       const receipt = await client.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Transaction reverted.");
       setMessage("Transaction confirmed."); await refresh();
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Voting transaction failed."); }
+    } catch (error) { setMessage(friendlyError(error, "Voting transaction failed.")); }
     finally { setBusy(false); }
   }
 
@@ -113,7 +108,7 @@ export function VotingPanel() {
   const canVote = !!election && now >= election.voteStart && now < election.voteEnd && balance > 0n && !voted;
   const canWithdraw = !!election && (now < election.voteStart || now >= election.voteEnd) && balance > 0n;
   const canFinalize = !!election && !election.finalized && now >= election.voteEnd;
-  return <section className="chain-panel"><div className="panel-head"><div><small>QTL escrow voting · Robinhood Chain</small><h2>{election ? `Election #${electionId}` : "Next market"}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connect()}>{account ? "Refresh election" : "Connect wallet"}</button></div>
+  return <section className="chain-panel"><div className="panel-head"><div><small>QTL escrow voting · Robinhood Chain</small><h2>{election ? `Election #${electionId}` : "Next market"}</h2></div><button className="action-button" onClick={account ? () => void refresh() : () => void connectWallet()}>{account ? "Refresh election" : "Connect wallet"}</button></div>
     {election && <>{(() => {
         const total = election.votesA + election.votesB;
         const shareA = total === 0n ? 50 : Number((election.votesA * 10000n) / total) / 100;

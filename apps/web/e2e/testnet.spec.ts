@@ -33,7 +33,7 @@ test("market page reads the active synthetic event and a real Uniswap v4 quote",
   await expect(page.locator(".chain-snapshot strong").first()).toHaveText("Open");
 
   await page.getByRole("button", { name: "Connect wallet to trade" }).click();
-  await expect(page.locator(".quote-row strong")).not.toHaveText("—", { timeout: 30_000 });
+  await expect(page.locator(".quote-row strong").first()).not.toHaveText("—", { timeout: 30_000 });
   await expect(page.locator(".trade-message")).toBeEmpty();
 });
 

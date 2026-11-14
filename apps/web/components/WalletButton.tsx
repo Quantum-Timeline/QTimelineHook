@@ -1,35 +1,43 @@
 "use client";
-import { useEffect, useState } from "react";
-import { createWalletClient, custom, type Address } from "viem";
+import { useEffect, useRef, useState } from "react";
 import { robinhoodChain } from "@qtimeline/chain";
+import { shortAddress, useWallet } from "@/lib/wallet";
 
 export function WalletButton() {
-  const [address, setAddress] = useState<Address>();
-  const [chainId, setChainId] = useState<number>();
-  const [busy, setBusy] = useState(false);
+  const { account, connect, connecting, disconnect, wrongChain, switchChain } = useWallet();
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const eth = (window as Window & { ethereum?: { on?: (name: string, cb: (...a: unknown[]) => void) => void; removeListener?: (name: string, cb: (...a: unknown[]) => void) => void } }).ethereum;
-    const accountsChanged = (items: unknown) => setAddress(Array.isArray(items) && typeof items[0] === "string" ? items[0] as Address : undefined);
-    const chainChanged = (id: unknown) => setChainId(typeof id === "string" ? Number(id) : undefined);
-    eth?.on?.("accountsChanged", accountsChanged);
-    eth?.on?.("chainChanged", chainChanged);
-    return () => { eth?.removeListener?.("accountsChanged", accountsChanged); eth?.removeListener?.("chainChanged", chainChanged); };
-  }, []);
-  async function connect() {
-    const eth = (window as Window & { ethereum?: Parameters<typeof custom>[0] }).ethereum;
-    if (!eth) { window.open("https://metamask.io/download/", "_blank", "noopener,noreferrer"); return; }
-    setBusy(true);
-    try {
-      const client = createWalletClient({ chain: robinhoodChain, transport: custom(eth) });
-      const [account] = await client.requestAddresses();
-      setAddress(account);
-      const actualChain = await client.getChainId();
-      setChainId(actualChain);
-      if (actualChain !== robinhoodChain.id) await client.switchChain({ id: robinhoodChain.id });
-      setChainId(robinhoodChain.id);
-    } finally { setBusy(false); }
+    if (!open) return;
+    const close = (event: MouseEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !box.current?.contains(event.target as Node)) setOpen(false);
+    };
+    window.addEventListener("mousedown", close);
+    window.addEventListener("keydown", close);
+    return () => { window.removeEventListener("mousedown", close); window.removeEventListener("keydown", close); };
+  }, [open]);
+
+  if (!account) {
+    return <button className="wallet" onClick={() => void connect()} disabled={connecting}>{connecting ? "Check your wallet…" : "Connect wallet"}</button>;
   }
-  if (address && chainId && chainId !== robinhoodChain.id) return <button className="wallet" onClick={connect} disabled={busy}>Switch to Robinhood</button>;
-  if (address) return <button className="wallet" onClick={() => setAddress(undefined)} title="Disconnect this app">{address.slice(0, 6)}…{address.slice(-4)} · Disconnect</button>;
-  return <button className="wallet" onClick={connect} disabled={busy}>{busy ? "Connecting…" : "Connect wallet"}</button>;
+  if (wrongChain) {
+    return <button className="wallet wallet--warn" onClick={() => void switchChain()}>Switch to {robinhoodChain.name}</button>;
+  }
+  return (
+    <div className="wallet-menu" ref={box}>
+      <button className="wallet wallet--on" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <i aria-hidden="true" />{shortAddress(account)}
+      </button>
+      {open && (
+        <div className="wallet-menu__panel" role="menu">
+          <p>Connected to {robinhoodChain.name}</p>
+          <button role="menuitem" onClick={() => { void navigator.clipboard?.writeText(account); setCopied(true); window.setTimeout(() => setCopied(false), 1400); }}>{copied ? "Copied ✓" : "Copy address"}</button>
+          <a role="menuitem" href={`${robinhoodChain.blockExplorers.default.url}/address/${account}`} target="_blank" rel="noreferrer">View on explorer ↗</a>
+          <button role="menuitem" onClick={() => { disconnect(); setOpen(false); }}>Disconnect</button>
+        </div>
+      )}
+    </div>
+  );
 }
