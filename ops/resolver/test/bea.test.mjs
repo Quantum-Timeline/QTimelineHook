@@ -24,7 +24,7 @@ test('compares the printed percentage as integer basis points without float roun
 
 test('evidence hash input has stable canonical field ordering', () => {
   const item = makeEvidence({ url: 'https://www.bea.gov/news/2026/example', periodId: '2026-10', printedValue: '0.3%', html: release, fetchedAt: '2026-11-25T13:31:00.000Z' });
-  assert.match(item.canonicalJson, /^\{"fetchedAt":/);
+  assert.match(item.canonicalJson, /^\{"period":/);
   assert.equal(JSON.parse(item.canonicalJson).responseSha256.length, 64);
 });
 
@@ -42,4 +42,23 @@ test('production parser reads an official historical release below the threshold
 test('production parser reads an official historical release at the threshold', async () => {
   const html = await readFile(new URL('./fixtures/bea-pio-2026-09.html', import.meta.url), 'utf8');
   assert.deepEqual(parseCorePce(html, '2026-09'), { printed: '0.3%', valueBps: 30 });
+});
+
+test('builds the canonical official BEA PIO URL for a monthly period', async () => {
+  const { officialReleaseUrl } = await import('../src/bea.mjs');
+  assert.equal(officialReleaseUrl('2026-10'), 'https://www.bea.gov/news/2026/personal-income-and-outlays-october-2026');
+});
+
+test('treats only an unpublished official release as a pending poll', async () => {
+  const { fetchOfficialRelease } = await import('../src/bea.mjs');
+  const pending = await fetchOfficialRelease('https://www.bea.gov/news/2026/personal-income-and-outlays-october-2026', async () => new Response('not published', { status: 404 }));
+  assert.deepEqual(pending, { published: false, status: 404 });
+  await assert.rejects(() => fetchOfficialRelease('https://example.com/release', async () => new Response('no')), /Only official www\.bea\.gov HTTPS/);
+});
+
+test('canonical BEA evidence hash does not change with retrieval timestamp', () => {
+  const first = makeEvidence({ url: 'https://www.bea.gov/news/2026/example', periodId: '2026-10', printedValue: '0.3%', html: release, fetchedAt: '2026-11-25T13:31:00.000Z' });
+  const retry = makeEvidence({ url: 'https://www.bea.gov/news/2026/example', periodId: '2026-10', printedValue: '0.3%', html: release, fetchedAt: '2026-11-25T13:46:00.000Z' });
+  assert.equal(retry.evidenceHash, first.evidenceHash);
+  assert.notEqual(retry.evidence.fetchedAt, first.evidence.fetchedAt);
 });

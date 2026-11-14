@@ -4,6 +4,35 @@ import { keccak256, stringToHex } from 'viem';
 
 export const SOURCE_ID = 'bea:core-pce:mom:first-release';
 
+/** Builds the BEA article URL for Personal Income and Outlays by data period. */
+export function officialReleaseUrl(periodId) {
+  const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(periodId);
+  if (!match) throw new Error('Expected period must be YYYY-MM');
+  const month = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1))
+    .toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }).toLowerCase();
+  return `https://www.bea.gov/news/${match[1]}/personal-income-and-outlays-${month}-${match[1]}`;
+}
+
+/** Fetches a published page only from BEA; a missing page is a normal poll result. */
+export async function fetchOfficialRelease(url, fetchImpl = fetch) {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== 'https:' || parsedUrl.hostname !== 'www.bea.gov') {
+    throw new Error('Only official www.bea.gov HTTPS releases are accepted');
+  }
+  const response = await fetchImpl(parsedUrl, {
+    redirect: 'follow',
+    headers: { 'user-agent': 'QTimeline-BEA-resolver/0.1' },
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (response.status === 404 || response.status === 410) return { published: false, status: response.status };
+  if (!response.ok) throw new Error(`BEA returned HTTP ${response.status}`);
+  const finalUrl = new URL(response.url || parsedUrl.href);
+  if (finalUrl.protocol !== 'https:' || finalUrl.hostname !== 'www.bea.gov') {
+    throw new Error('BEA redirect left the official host');
+  }
+  return { published: true, status: response.status, url: finalUrl.href, html: await response.text() };
+}
+
 /** Extracts the printed monthly core PCE percentage from a BEA release page. */
 export function parseCorePce(html, expectedPeriod) {
   const $ = load(html);
@@ -52,6 +81,10 @@ export function makeEvidence({ url, periodId, printedValue, html, fetchedAt, fix
     fetchedAt,
   };
   if (fixtureMode) evidence.fixtureMode = true;
-  const canonicalJson = JSON.stringify(Object.fromEntries(Object.entries(evidence).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)));
+  const canonicalJson = JSON.stringify(Object.fromEntries(
+    Object.entries(evidence)
+      .filter(([key]) => key !== 'fetchedAt')
+      .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0),
+  ));
   return { evidence, canonicalJson, evidenceHash: keccak256(stringToHex(canonicalJson)) };
 }

@@ -20,3 +20,12 @@ test("mainnet deployment refuses to broadcast without an explicit flag", () => {
   assert.throws(() => requireMainnetBroadcast(["node", "deploy-mainnet.mjs"]), /--broadcast/);
   assert.equal(requireMainnetBroadcast(["node", "deploy-mainnet.mjs", "--broadcast"]), true);
 });
+
+test('testnet market schedule supports an exact BEA release timestamp without changing factory windows', async () => {
+  let scheduleModule;
+  try { scheduleModule = await import('../lib/testnet-market-schedule.mjs'); } catch { scheduleModule = {}; }
+  assert.equal(typeof scheduleModule.testnetMarketSchedule, 'function');
+  const planned = scheduleModule.testnetMarketSchedule({ now: 1_795_000_000n, shortTestnet: false, releaseAtOverride: '1795613400' });
+  assert.deepEqual(planned, { opensAt: 1_795_003_600n, cutoffAt: 1_795_613_100n, releaseAt: 1_795_613_400n, deadline: 1_795_786_200n });
+  assert.throws(() => scheduleModule.testnetMarketSchedule({ now: 1_795_000_000n, shortTestnet: false, releaseAtOverride: '1795004000' }), /market schedule window/);
+});

@@ -6,6 +6,7 @@ import { Resolver } from "node:dns/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { testnetMarketSchedule } from "./lib/testnet-market-schedule.mjs";
 
 const require = createRequire(resolve(dirname(fileURLToPath(import.meta.url)), "../../apps/web/package.json"));
 const {
@@ -364,10 +365,7 @@ async function createSmokeMarket({ deployerKey, factory, registry, keyRegistry, 
   const chainBlock = await publicClient.getBlock();
   const now = chainBlock.timestamp;
   const nonce = await publicClient.readContract({ address: factory, abi: factoryArtifact.abi, functionName: "nonces", args: [account.address] });
-  const opensAt = now + (shortTestnet ? 60n : 3600n);
-  const cutoffAt = shortTestnet ? opensAt + 300n : now + 172500n;
-  const releaseAt = cutoffAt + (shortTestnet ? 10n : 300n);
-  const deadline = releaseAt + (shortTestnet ? 120n : 172800n);
+  const { opensAt, cutoffAt, releaseAt, deadline } = testnetMarketSchedule({ now, shortTestnet, releaseAtOverride: process.env.QTIMELINE_TESTNET_RELEASE_AT });
   const signatureExpiry = now + (shortTestnet ? 30n : 1800n);
   const testnetPeriod = process.env.QTIMELINE_TESTNET_PERIOD || `qtimeline-testnet-smoke-${chainBlock.number}`;
   const periodId = keccak256(toBytes(testnetPeriod));
