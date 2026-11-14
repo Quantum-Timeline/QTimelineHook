@@ -21,7 +21,17 @@ export function Frame({ children }: { children: React.ReactNode }) {
     <main className="shell qt-erestyra product-shell">
       <header className="topbar">
         <Link className="brand" href="/">
-          <span className="brand__dot" aria-hidden="true" />
+          <svg
+            width="16"
+            height="14"
+            viewBox="0 0 16 14"
+            fill="none"
+            aria-hidden="true"
+            style={{ width: "16px", height: "14px", flexShrink: 0 }}
+          >
+            <path d="M1 7H6.5L13.5 2" stroke="#CFEF8C" strokeWidth="1.6" strokeLinecap="square" />
+            <path d="M6.5 7L13.5 12" stroke="#F3F2EC" strokeWidth="1.6" strokeLinecap="square" />
+          </svg>
           <span>QTIMELINE</span>
         </Link>
 
@@ -73,8 +83,7 @@ export function PageHeading({ tag, title, body }: { tag: string; title: string; 
   return (
     <section className="hero subhero">
       <p className="eyebrow">
-        <i aria-hidden="true" />
-        <span>{tag}</span>
+        <span>[{tag}]</span>
       </p>
       <h1>{title}</h1>
       <p className="intro">{body}</p>

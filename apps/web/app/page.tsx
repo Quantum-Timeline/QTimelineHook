@@ -37,7 +37,7 @@ const MARQUEE_PHRASE = "One Event · Two Timelines";
 const ARCHITECTURE_ITEMS = [
   {
     slug: "vault",
-    index: "01",
+    index: "VLT",
     kindLabel: "Custody",
     icon: "custodia-de-criptoactivos",
     name: "OutcomeVault",
@@ -46,7 +46,7 @@ const ARCHITECTURE_ITEMS = [
   },
   {
     slug: "pools",
-    index: "02",
+    index: "V4",
     kindLabel: "Liquidity",
     icon: "redes-blockchain",
     name: "Three v4 Pools",
@@ -55,7 +55,7 @@ const ARCHITECTURE_ITEMS = [
   },
   {
     slug: "hook",
-    index: "03",
+    index: "HOOK",
     kindLabel: "Cutoff",
     icon: "soluciones-blockchain",
     name: "TimelineHook",
@@ -64,7 +64,7 @@ const ARCHITECTURE_ITEMS = [
   },
   {
     slug: "oracle",
-    index: "04",
+    index: "PQ",
     kindLabel: "Security",
     icon: "consultoria-blockchain",
     name: "ML-DSA-44 Oracle",
@@ -73,7 +73,7 @@ const ARCHITECTURE_ITEMS = [
   },
   {
     slug: "qtl",
-    index: "05",
+    index: "QTL",
     kindLabel: "Governance",
     icon: "tokenizacion-de-activos",
     name: "$QTL Voting",
@@ -84,7 +84,7 @@ const ARCHITECTURE_ITEMS = [
 
 const POOL_MODULES = [
   {
-    index: "01",
+    index: "ETH·Y",
     prefix: "ETH — ",
     bold: "YES",
     label: "Conditional ETH price discovery if BEA Core PCE Oct 2026 prints ≥ 0.30% MoM.",
@@ -92,7 +92,7 @@ const POOL_MODULES = [
     href: "/market/",
   },
   {
-    index: "02",
+    index: "ETH·N",
     prefix: "ETH — ",
     bold: "NO",
     label: "Parallel ETH price discovery if BEA Core PCE Oct 2026 prints < 0.30% MoM.",
@@ -100,7 +100,7 @@ const POOL_MODULES = [
     href: "/market/",
   },
   {
-    index: "03",
+    index: "Y/N",
     prefix: "YES / ",
     bold: "NO",
     label: "Direct implied probability curve in USDG claims across a 35%–65% active seed band.",
@@ -108,7 +108,7 @@ const POOL_MODULES = [
     href: "/market/",
   },
   {
-    index: "04",
+    index: "1:1",
     prefix: "Outcome",
     bold: "Vault",
     label: "Atomic split, binary-searched exit + merge, and 1:1 post-settlement redemption.",
@@ -126,31 +126,31 @@ const FIGURES_ITEMS = [
 
 const LIFECYCLE_ROWS = [
   {
-    n: "01",
-    kicker: "Split",
+    n: "SPLIT",
+    kicker: "Collateral",
     title: "Mint YES & NO claims",
     text: "Deposit USDG into OutcomeVault via TimelineRouter to receive equal quantities of conditional YES and NO claims.",
   },
   {
-    n: "02",
+    n: "SWAP",
     kicker: "Discovery",
     title: "Trade parallel worlds",
     text: "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to express correlated macro and ETH directional views.",
   },
   {
-    n: "03",
+    n: "LOCK",
     kicker: "13:25 UTC",
     title: "Deterministic cutoff",
     text: "TimelineHook enforces beforeSwap on every pool, locking swaps 5 minutes before the 13:30 UTC BEA Core PCE release.",
   },
   {
-    n: "04",
+    n: "SIGN",
     kicker: "Attestation",
     title: "Dual ECDSA + ML-DSA-44",
     text: "PostQuantumResolver requires both a classical ECDSA signature and a FIPS 204 ML-DSA-44 lattice signature.",
   },
   {
-    n: "05",
+    n: "CLAIM",
     kicker: "Settlement",
     title: "1:1 claim or 50/50 fallback",
     text: "Winning claims redeem 1 USDG each. If no valid report lands within 48h, cancelExpired unlocks 50% per claim.",
@@ -159,21 +159,21 @@ const LIFECYCLE_ROWS = [
 
 const OPERATOR_CARDS = [
   {
-    index: "01",
+    index: "TRD",
     kind: "Traders",
     icon: "tokenizacion-de-activos",
     name: "Macro Traders",
     label: "Express joint views on US Core PCE inflation and ETH price without liquidation risk.",
   },
   {
-    index: "02",
+    index: "LP",
     kind: "Liquidity",
     icon: "soluciones-blockchain",
     name: "v4 Liquidity Providers",
     label: "Earn 0.30% LP fees across concentrated [0.80×, 1.25×] ETH and 35%–65% probability ranges.",
   },
   {
-    index: "03",
+    index: "GOV",
     kind: "Governors",
     icon: "redes-blockchain",
     name: "$QTL Holders",
@@ -183,25 +183,25 @@ const OPERATOR_CARDS = [
 
 const TRANSPARENCY_ROWS = [
   {
-    n: "01",
+    n: "FEE",
     kicker: "Fee Split",
     title: "0.30% LP · 0% protocol fee",
     text: "Every swap fee stays 100% with Uniswap v4 liquidity providers at tickSpacing 60. QTimeline extracts zero protocol fee.",
   },
   {
-    n: "02",
+    n: "CAP",
     kicker: "Beta Caps",
     title: "0.10 ETH & 500 USDG limits",
     text: "Open-beta transaction and position caps protect early liquidity calibrated around the ~$173 reference seed model.",
   },
   {
-    n: "03",
+    n: "BEA",
     kicker: "First Release",
     title: "Zero revision ambiguity",
     text: "Resolves strictly from the first-release BEA Personal Income and Outlays MoM Core PCE table—never revised prints.",
   },
   {
-    n: "04",
+    n: "EXP",
     kicker: "Cancel Safety",
     title: "Permissionless 48h expiry",
     text: "If the oracle stalls past 27 Nov 13:30 UTC, any address can call cancelExpired(marketId) for 50/50 redemption.",
@@ -252,7 +252,7 @@ export default function HomePage() {
       <section className="hero">
         <div className="wrap hero__inner">
           <p className="eyebrow hero__eyebrow" data-reveal data-delay="0.15">
-            <span className="eyebrow__n">®</span> QTimeline — Robinhood Chain 4663 · Core PCE Oct 2026
+            <span className="eyebrow__n">RH·4663</span> QTimeline — Robinhood Chain 4663 · Core PCE Oct 2026
           </p>
           <h1 className="hero__title" aria-label="One macro event, two timelines">
             <span className="hero__line" aria-hidden="true">
@@ -281,7 +281,7 @@ export default function HomePage() {
       <section className="section manifesto" id="about">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">00</span>Thesis
+            <span className="eyebrow__n">THESIS</span>Core thesis
           </p>
           <p className="manifesto__text" data-words aria-label={MANIFESTO_TEXT}>
             {manifestoWords.map((word, idx) => (
@@ -299,7 +299,7 @@ export default function HomePage() {
           <div className="rail__track" data-track>
             <div className="rail__intro">
               <p className="eyebrow" data-reveal>
-                <span className="eyebrow__n">05</span>Architecture
+                <span className="eyebrow__n">STACK</span>Architecture
               </p>
               <SplitHeading text="Architecture" className="split display" />
               <p className="lead" data-reveal>
@@ -356,7 +356,7 @@ export default function HomePage() {
       <section className="section products" id="pools" data-dim="0.5">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">04</span>Pools &amp; Vault
+            <span className="eyebrow__n">POOLS</span>Pools &amp; Vault
           </p>
           <div className="products__head">
             <SplitHeading text="Three v4 Pools" className="split display" />
@@ -412,7 +412,7 @@ export default function HomePage() {
       <section className="section features" id="how-it-works" data-dim="0.5">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">05</span>Execution Lifecycle
+            <span className="eyebrow__n">FLOW</span>Execution Lifecycle
           </p>
           <div className="products__head">
             <SplitHeading text="How it works" className="split display-md" />
@@ -440,7 +440,7 @@ export default function HomePage() {
       <section className="section" id="operators" data-dim="0.5">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">03</span>Operators
+            <span className="eyebrow__n">ROLES</span>Operators
           </p>
           <div className="products__head">
             <SplitHeading text="Built for every participant" className="split display-md" />
@@ -486,7 +486,7 @@ export default function HomePage() {
         <div className="wrap partners__grid">
           <article className="partner">
             <p className="eyebrow" data-reveal>
-              <span className="eyebrow__n">01</span>Execution layer
+              <span className="eyebrow__n">V4</span>Execution layer
             </p>
             <div className="partner__mark" data-reveal>
               QTIMELINE · 4663
@@ -507,7 +507,7 @@ export default function HomePage() {
 
           <article className="partner">
             <p className="eyebrow" data-reveal>
-              <span className="eyebrow__n">02</span>Post-quantum oracle
+              <span className="eyebrow__n">FIPS·204</span>Post-quantum oracle
             </p>
             <div className="partner__mark partner__mark--btc" data-reveal aria-hidden="true">
               ML-DSA-44<sup>®</sup>
@@ -532,7 +532,7 @@ export default function HomePage() {
       <section className="section features" id="transparency" data-dim="0.5">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">04</span>Guarantees &amp; Disclosures
+            <span className="eyebrow__n">SPEC</span>Guarantees &amp; Disclosures
           </p>
           <div className="products__head">
             <SplitHeading text="What is enforced on-chain" className="split display-md" />
@@ -560,7 +560,7 @@ export default function HomePage() {
       <section className="section press" id="telemetry" data-dim="0.6">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">◆</span>Protocol Telemetry
+            <span className="eyebrow__n">LIVE</span>Protocol Telemetry
           </p>
           <SplitHeading text="Verified specifications..." className="split display-md" />
           <ul className="press__list">
@@ -599,7 +599,7 @@ export default function HomePage() {
       <section className="cta" id="genesis">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">→</span>Genesis Market
+            <span className="eyebrow__n">LAUNCH</span>Genesis Market
           </p>
           <SplitHeading text="Ready to trade parallel timelines?" className="split display" />
           <Link href="/market/" className="cta__btn" data-cursor data-reveal>

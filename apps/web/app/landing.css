@@ -215,14 +215,22 @@ main {
 }
 
  .qt-erestyra .eyebrow__n {
-  border: 1px solid var(--line-strong);
-  min-width: 2.1em;
-  height: 2.1em;
-  color: var(--fg);
-  border-radius: 999px;
-  place-items: center;
-  padding: 0 .5em;
-  display: inline-grid;
+  color: var(--accent);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+ .qt-erestyra .eyebrow__n::before {
+  content: "[";
+  opacity: .42;
+  margin-right: .32em;
+}
+
+ .qt-erestyra .eyebrow__n::after {
+  content: "]";
+  opacity: .42;
+  margin-left: .32em;
 }
 
  .qt-erestyra .split .w {

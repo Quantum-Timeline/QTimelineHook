@@ -25,7 +25,17 @@ export default function Header() {
     <>
       <header className="hdr">
         <Link href="/" className="hdr__logo" aria-label="QTimeline" onClick={closeMenu} data-cursor>
-          <span className="hdr__logo-dot" aria-hidden="true" />
+          <svg
+            width="16"
+            height="14"
+            viewBox="0 0 16 14"
+            fill="none"
+            aria-hidden="true"
+            style={{ width: "16px", height: "14px", flexShrink: 0 }}
+          >
+            <path d="M1 7H6.5L13.5 2" stroke="#CFEF8C" strokeWidth="1.6" strokeLinecap="square" />
+            <path d="M6.5 7L13.5 12" stroke="#F3F2EC" strokeWidth="1.6" strokeLinecap="square" />
+          </svg>
           <span>QTIMELINE</span>
         </Link>
 
@@ -89,11 +99,11 @@ export default function Header() {
           <div className="menu__col">
             <p className="eyebrow">Architecture</p>
             <ul className="menu__list">
-              <li><a href="#architecture" onClick={closeMenu}>01 / Bifurcated Outcome Vault</a></li>
-              <li><a href="#pools" onClick={closeMenu}>02 / Three Uniswap v4 Pools</a></li>
-              <li><a href="#how-it-works" onClick={closeMenu}>03 / 13:25 UTC Hard Cutoff</a></li>
-              <li><a href="#transparency" onClick={closeMenu}>04 / ML-DSA-44 Verification</a></li>
-              <li><a href="#telemetry" onClick={closeMenu}>05 / Mainnet Specifications</a></li>
+              <li><a href="#architecture" onClick={closeMenu}>VAULT / Bifurcated Outcome Vault</a></li>
+              <li><a href="#pools" onClick={closeMenu}>POOLS / Three Uniswap v4 Pools</a></li>
+              <li><a href="#how-it-works" onClick={closeMenu}>HOOK / 13:25 UTC Hard Cutoff</a></li>
+              <li><a href="#transparency" onClick={closeMenu}>ORACLE / ML-DSA-44 Verification</a></li>
+              <li><a href="#telemetry" onClick={closeMenu}>SPECS / Mainnet Specifications</a></li>
             </ul>
           </div>
 
