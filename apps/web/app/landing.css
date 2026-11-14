@@ -2130,3 +2130,24 @@ html.is-warping {
   box-shadow: 0 0 10px rgba(207, 239, 140, 0.55);
 }
 .qt-erestyra .card { transform-style: preserve-3d; will-change: transform; }
+
+
+/* ── Menu overlay: fill the whole screen. Rows stretch evenly so no band of empty space is left. ── */
+ .qt-erestyra .menu__grid { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+ .qt-erestyra .menu__col { display: flex; flex-direction: column; min-height: 0; }
+ .qt-erestyra .menu__col > .eyebrow { flex: none; }
+ .qt-erestyra .menu__big { flex: 1 1 auto; grid-auto-rows: 1fr; align-content: stretch; gap: 0; padding-top: 0; min-height: 0; }
+ .qt-erestyra .menu__big li { display: flex; align-items: center; border-bottom: 1px solid #0b0b0b26; min-height: 56px; }
+ .qt-erestyra .menu__big a { font-size: clamp(1.6rem, min(2.9vw, 6.4vh), 3.4rem); }
+ .qt-erestyra .menu__list { flex: 1 1 auto; display: grid; grid-auto-rows: 1fr; margin: 0 0 18px; min-height: 0; }
+ .qt-erestyra .menu__list li { display: flex; min-height: 44px; }
+ .qt-erestyra .menu__list a { flex: 1; align-items: center; padding: 0; font-size: clamp(1rem, min(1.55vw, 3.2vh), 1.4rem); }
+ .qt-erestyra .menu__list a:hover { padding-left: 12px; }
+ .qt-erestyra .menu__genesis { flex: none; }
+ .qt-erestyra .menu__foot { flex: none; }
+@media (max-width: 820px) {
+ .qt-erestyra .menu__col { min-height: auto; }
+ .qt-erestyra .menu__big, .qt-erestyra .menu__list { flex: none; }
+ .qt-erestyra .menu__big li { min-height: 54px; }
+ .qt-erestyra .menu__list li { min-height: 42px; }
+}
