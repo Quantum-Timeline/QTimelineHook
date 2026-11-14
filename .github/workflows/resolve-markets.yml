@@ -76,7 +76,7 @@ jobs:
       - if: steps.market.outputs.ready == 'true'
         run: pnpm --filter @qtimeline/resolver test
       - if: steps.market.outputs.ready == 'true'
-        run: pnpm contracts:build
+        run: forge build --root contracts
       - name: Verify testnet secrets and active BEA market
         if: steps.market.outputs.ready == 'true'
         env:
