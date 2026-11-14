@@ -69,6 +69,14 @@ jobs:
         run: pnpm install --frozen-lockfile
       - if: steps.market.outputs.ready == 'true'
         run: pnpm --filter @qtimeline/resolver test
+      - name: Verify testnet secrets and active BEA market
+        if: steps.market.outputs.ready == 'true'
+        env:
+          QT_TESTNET_RPC: ${{ secrets.QT_TESTNET_RPC }}
+          QT_TESTNET_RELAYER_PRIVATE_KEY: ${{ secrets.QT_TESTNET_RELAYER_PRIVATE_KEY }}
+          QT_TESTNET_RESOLVER_ECDSA_PRIVATE_KEY: ${{ secrets.QT_TESTNET_RESOLVER_ECDSA_PRIVATE_KEY }}
+          QT_TESTNET_RESOLVER_MLDSA_PRIVATE_KEY_PEM: ${{ secrets.QT_TESTNET_RESOLVER_MLDSA_PRIVATE_KEY_PEM }}
+        run: pnpm --filter @qtimeline/resolver validate:testnet-config
       - name: Parse, sign, submit, and verify official BEA report on testnet
         if: steps.market.outputs.ready == 'true'
         env:
