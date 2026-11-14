@@ -1,0 +1,34 @@
+/* One type system for every product page.
+   UI and display text: Archivo (variable: weight and width axes).  Data only (hashes, code): JetBrains Mono.
+   Loaded last so it settles any older rule that still names another family. */
+
+:root {
+  --font-ui: Archivo, "Helvetica Neue", Arial, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, monospace;
+  --wdth-body: 100;
+  --wdth-display: 108;
+}
+
+html, body { font-family: var(--font-ui); font-variation-settings: "wdth" var(--wdth-body); }
+
+/* Everything in the product shell speaks Archivo, SVG text included. */
+.product-shell,
+.product-shell *:not(code):not(kbd):not(.data) { font-family: var(--font-ui); }
+.product-shell code, .product-shell kbd, .product-shell .data { font-family: var(--font-data); }
+.product-shell svg text { font-family: var(--font-ui); letter-spacing: 0.02em; }
+
+/* Display text shares one width so headings, big numbers and the wordmark look cut from the same face. */
+.product-shell :is(h1, h2, h3, .brand, .world__odds, .numbers__item b, .mtl__clock, .amount-label input, .trade-title h2, .detail-question h2, .fact__assets) {
+  font-variation-settings: "wdth" var(--wdth-display);
+}
+.product-shell :not(h1):not(h2):not(h3):not(.brand):not(.world__odds):not(b):not(.mtl__clock):not(input):not(.fact__assets) { font-variation-settings: "wdth" var(--wdth-body); }
+
+/* One scale for labels and captions: no tiny mono caps, no uppercase tracking. */
+.product-shell small { font-size: 0.8rem; letter-spacing: 0; text-transform: none; }
+.product-shell :is(.net-pill, .fee-label, .pool-card__tag, .detail-card__pill, .tprog__label, .mtl__legend span, .world__note) { letter-spacing: 0; text-transform: none; }
+.product-shell .detail-row span { font-size: 0.8rem; letter-spacing: 0; text-transform: none; color: var(--muted); }
+.product-shell .product-footer :is(small, a) { font-size: 0.86rem; letter-spacing: 0; text-transform: none; }
+.product-shell .product-footer__brand span { letter-spacing: 0.1em; font-weight: 700; }
+
+/* Numbers line up in columns wherever they change. */
+.product-shell :is(.quote-row strong, .balance-row, .mtl__clock, .tally__clock, .tally__legend, .world__odds, .claim-card > strong, .numbers__item b, .chain-snapshot strong) { font-variant-numeric: tabular-nums; }
