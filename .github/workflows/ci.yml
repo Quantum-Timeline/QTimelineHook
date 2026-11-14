@@ -31,6 +31,6 @@ jobs:
       - run: pnpm typecheck
       - run: node contracts/scripts/compile.mjs
       - run: forge build --root contracts
-      - run: pnpm contracts:test
+      - run: forge test --root contracts
       - run: pnpm contracts:test:release
       - run: pnpm build
