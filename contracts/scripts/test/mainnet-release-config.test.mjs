@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MAINNET_CHAIN_ID, MAINNET_CORE, requireMainnetBroadcast, validateMainnetSigners } from "../lib/mainnet-release-config.mjs";
+import { MAINNET_CHAIN_ID, MAINNET_CORE, mainnetRpcUrl, requireMainnetBroadcast, validateMainnetSigners } from "../lib/mainnet-release-config.mjs";
 
 test("release config pins Robinhood mainnet core addresses and chain id", () => {
   assert.equal(MAINNET_CHAIN_ID, 4663);
@@ -19,6 +19,12 @@ test("mainnet deployment refuses to broadcast without an explicit flag", () => {
   assert.equal(requireMainnetBroadcast(["node", "deploy-mainnet.mjs", "--preflight"]), false);
   assert.throws(() => requireMainnetBroadcast(["node", "deploy-mainnet.mjs"]), /--broadcast/);
   assert.equal(requireMainnetBroadcast(["node", "deploy-mainnet.mjs", "--broadcast"]), true);
+});
+
+test("mainnet deployment accepts a process RPC override for an isolated fork rehearsal", () => {
+  assert.equal(mainnetRpcUrl({ override: "http://127.0.0.1:8545", configured: "https://rpc.mainnet.chain.robinhood.com" }), "http://127.0.0.1:8545");
+  assert.equal(mainnetRpcUrl({ configured: "https://rpc.mainnet.chain.robinhood.com" }), "https://rpc.mainnet.chain.robinhood.com");
+  assert.throws(() => mainnetRpcUrl({}), /RH_MAINNET_RPC/);
 });
 
 test('testnet market schedule supports an exact BEA release timestamp without changing factory windows', async () => {

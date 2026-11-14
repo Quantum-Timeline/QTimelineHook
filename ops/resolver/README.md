@@ -1,6 +1,26 @@
 # BEA resolver bot
 
-The GitHub Actions workflow polls the official BEA Personal Income and Outlays article and can report Core PCE to **Robinhood Chain Testnet (46630) only**. It does not use Mainnet RPCs or Mainnet keys.
+The resolver has isolated Robinhood Chain Testnet and Mainnet entry points. Both parse the official BEA Personal Income and Outlays article, sign the same EIP-712 report with ECDSA and ML-DSA-44, simulate before sending, and verify the final chain state.
+
+## Mainnet runner
+
+`pnpm --filter @qtimeline/resolver validate:mainnet-config` performs read-only chain, manifest, resolver, relayer, and registered ML-DSA-key checks. `pnpm --filter @qtimeline/resolver resolve:mainnet` defaults to simulation; set `QT_BROADCAST=1` only after the activated market, release schedule, deployer, relayer, and release gates are confirmed. An unpublished 404/410 is a no-op. The script requires a Mainnet manifest with sealed wiring, a market ID, and the matching BEA period; it refuses early, expired, wrong-period, or already-mismatched reports.
+
+The Mainnet workflow is `.github/workflows/resolve-mainnet.yml`. It uses a separate `robinhood-mainnet` GitHub Environment and requires these secrets:
+
+- `QT_MAINNET_RPC`
+- `QT_MAINNET_RELAYER_ADDRESS`
+- `QT_MAINNET_RELAYER_PRIVATE_KEY` (use a dedicated low-balance report relayer; it does not need admin privileges)
+- `QT_MAINNET_RESOLVER_ECDSA_PRIVATE_KEY`
+- `QT_MAINNET_RESOLVER_MLDSA_SEED_HEX` (the 32-byte `mainnet-bot-mldsa44.seed`, hex encoded)
+
+After deployment, commit the public `deployments/robinhood-mainnet.json` manifest (it contains contract addresses and transaction evidence, not signer keys). After market activation, set `QTIMELINE_MAINNET_MANIFEST`, `QT_MAINNET_MARKET_ID`, `BEA_PERIOD_ID`, and `BEA_RELEASE_URL` in the `robinhood-mainnet` Environment. The scheduled job stays disabled until the repository variable `QTIMELINE_MAINNET_ENABLED=true`. A manual run defaults to simulation; its `broadcast` input must be explicitly enabled to submit. Do not put signer values in the repository, Vercel, or a public build. Keep an encrypted offline backup of `contracts/.secrets/` before registering keys.
+
+The release workflow is configured for the October 2026 PIO article on November 25, 2026 at 13:30 UTC. If deployment or activation misses the release window, select a later BEA period and change the workflow schedule and environment variables together. Market activation still requires the audit, quote, gas, resolver, and hosting/legal release gates in the implementation plan.
+
+## Testnet runner
+
+The GitHub Actions workflow polls the official BEA Personal Income and Outlays article and reports Core PCE to Robinhood Chain Testnet (`46630`) only. It does not use Mainnet RPCs or Mainnet keys.
 
 ## GitHub Actions setup
 

@@ -1,10 +1,11 @@
-import { createPrivateKey, createPublicKey, sign as signMlDsa, verify as verifyMlDsa } from "node:crypto";
+import { sign as signMlDsa, verify as verifyMlDsa } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inspectMainnetMlDsaKey } from "./lib/mainnet-ml-dsa-key-validation.mjs";
-import { MAINNET_CHAIN_ID, MAINNET_CORE, requireMainnetBroadcast, validateMainnetSigners } from "./lib/mainnet-release-config.mjs";
+import { deriveMainnetMlDsaKeyPair } from "./lib/mainnet-ml-dsa-keypair.mjs";
+import { MAINNET_CHAIN_ID, MAINNET_CORE, mainnetRpcUrl, requireMainnetBroadcast, validateMainnetSigners } from "./lib/mainnet-release-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const require = createRequire(resolve(root, "apps/web/package.json"));
@@ -81,12 +82,11 @@ async function checkKeys({ deployer, resolver, pythonPath }) {
   const keys = {};
   for (const role of ["deployer", "bot"]) {
     const seed = await readFile(resolve(secretDir, `mainnet-${role}-mldsa44.seed`));
-    const privateKey = createPrivateKey({ key: seed, format: "raw-seed", asymmetricKeyType: "ml-dsa-44" });
-    const publicKey = createPublicKey(privateKey).export({ format: "raw-public" });
-    const inspected = inspectMainnetMlDsaKey({ seed, publicKey, pythonPath });
+    const keyPair = deriveMainnetMlDsaKeyPair(seed);
+    const inspected = inspectMainnetMlDsaKey({ seed, publicKey: keyPair.publicKeyBytes, pythonPath });
     const blobHex = (await readFile(resolve(secretDir, `mainnet-${role}-mldsa44-blob.hex`), "utf8")).trim();
     if (blobHex.toLowerCase() !== inspected.preparedBlob.toString("hex")) throw new Error(`${role} ML-DSA prepared blob does not match the validated seed`);
-    keys[role] = { privateKey, publicKey, ...inspected };
+    keys[role] = { ...keyPair, ...inspected };
   }
   return keys;
 }
@@ -102,7 +102,7 @@ async function checkMainnet({ client, deployer, resolver, pythonPath, requireFun
     { type: "function", name: "symbol", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
     { type: "function", name: "decimals", stateMutability: "view", inputs: [], outputs: [{ type: "uint8" }] },
   ];
-  const [[usdgSymbol, usdgDecimals], [wethSymbol, wethDecimals], deployerBalance, resolverBalance, keys] = await Promise.all([
+  const [[usdgSymbol, usdgDecimals], [wethSymbol, wethDecimals], deployerBalance, keys] = await Promise.all([
     Promise.all([
       client.readContract({ address: getAddress(MAINNET_CORE.USDG), abi: tokenAbi, functionName: "symbol" }),
       client.readContract({ address: getAddress(MAINNET_CORE.USDG), abi: tokenAbi, functionName: "decimals" }),
@@ -112,13 +112,12 @@ async function checkMainnet({ client, deployer, resolver, pythonPath, requireFun
       client.readContract({ address: getAddress(MAINNET_CORE.WETH), abi: tokenAbi, functionName: "decimals" }),
     ]),
     client.getBalance({ address: deployer.address }),
-    client.getBalance({ address: resolver.address }),
     checkKeys({ deployer, resolver, pythonPath }),
   ]);
   if (usdgSymbol !== "USDG" || usdgDecimals !== 6) throw new Error(`Official USDG metadata mismatch: ${usdgSymbol}/${usdgDecimals}`);
   if (wethSymbol !== "WETH" || wethDecimals !== 18) throw new Error(`Official WETH metadata mismatch: ${wethSymbol}/${wethDecimals}`);
   if (requireFunding && deployerBalance === 0n) throw new Error("Deployer has no Mainnet ETH for deployment gas");
-  return { chainId, blockNumber, code, usdgSymbol, usdgDecimals, wethSymbol, wethDecimals, deployerBalance, resolverBalance, keys };
+  return { chainId, blockNumber, code, usdgSymbol, usdgDecimals, wethSymbol, wethDecimals, deployerBalance, keys };
 }
 
 async function deployContract({ name, args = [], client, wallet, account, manifest }) {
@@ -234,9 +233,8 @@ async function runPreflight({ client, report, manifest }) {
     officialCore: Object.fromEntries(Object.entries(MAINNET_CORE).map(([name, address]) => [name, { address, codeBytes: (report.code[name].length - 2) / 2, codeHash: keccak256(report.code[name]) }])),
     assets: { USDG: `${report.usdgSymbol}/${report.usdgDecimals}`, WETH: `${report.wethSymbol}/${report.wethDecimals}` },
     signerKeys: Object.fromEntries(Object.entries(report.keys).map(([role, key]) => [role, { seedBound: key.seedBound, nonDegeneracyFloorCount: key.nonDegeneracyFloorCount, publicKeyFingerprint: key.publicKeyFingerprint, preparedBlobCodeHash: key.preparedBlobCodeHash }])),
-    balances: { deployer: formatEther(report.deployerBalance), resolver: formatEther(report.resolverBalance) },
+    balances: { deployer: formatEther(report.deployerBalance) },
     deployerGasReady: report.deployerBalance > 0n,
-    resolverGasReady: report.resolverBalance > 0n,
     noTransactionSent: true,
   }, null, 2));
 }
@@ -244,8 +242,7 @@ async function runPreflight({ client, report, manifest }) {
 async function main() {
   const shouldBroadcast = requireMainnetBroadcast(process.argv.slice(2));
   const env = parseEnv(await readFile(envPath, "utf8"));
-  const rpcUrl = env.RH_MAINNET_RPC;
-  if (!rpcUrl) throw new Error("Set RH_MAINNET_RPC in contracts/.env");
+  const rpcUrl = mainnetRpcUrl({ override: process.env.QT_MAINNET_RPC, configured: env.RH_MAINNET_RPC });
   if (!env.RH_MAINNET_DEPLOYER_PRIVATE_KEY || !/^0x[0-9a-fA-F]{64}$/.test(env.RH_MAINNET_DEPLOYER_PRIVATE_KEY)) throw new Error("Set a valid RH_MAINNET_DEPLOYER_PRIVATE_KEY in contracts/.env");
   const deployer = privateKeyToAccount(env.RH_MAINNET_DEPLOYER_PRIVATE_KEY);
   if (!env.RH_MAINNET_DEPLOYER_ADDRESS || getAddress(env.RH_MAINNET_DEPLOYER_ADDRESS) !== getAddress(deployer.address)) throw new Error("RH_MAINNET_DEPLOYER_ADDRESS does not match the configured deployer key");
@@ -343,6 +340,6 @@ async function main() {
 try {
   await main();
 } catch (error) {
-  console.error(error instanceof Error ? error.message : error);
+  console.error(process.env.QT_DEBUG_STACK === "1" && error instanceof Error ? error.stack : error instanceof Error ? error.message : error);
   process.exitCode = 1;
 }

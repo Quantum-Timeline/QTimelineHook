@@ -1,5 +1,11 @@
 export const MAINNET_CHAIN_ID = 4663;
 
+export function mainnetRpcUrl({ override, configured }) {
+  const rpcUrl = override || configured;
+  if (!rpcUrl) throw new Error("Set RH_MAINNET_RPC in contracts/.env or QT_MAINNET_RPC in the process environment");
+  return rpcUrl;
+}
+
 export const MAINNET_CORE = Object.freeze({
   PoolManager: "0x8366a39cc670b4001a1121b8f6a443a643e40951",
   PositionManager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
