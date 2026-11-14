@@ -2167,3 +2167,147 @@ html.is-warping {
  .qt-erestyra .menu__big li { min-height: 54px; }
  .qt-erestyra .menu__list li { min-height: 42px; }
 }
+
+/* Mainnet Contracts Registry */
+ .qt-erestyra .contracts__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 24px 40px;
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+
+ .qt-erestyra .contracts__meta {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+ .qt-erestyra .contracts__status {
+  color: var(--accent);
+}
+
+ .qt-erestyra .contracts__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+ .qt-erestyra .contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  background: rgba(16, 20, 22, 0.72);
+  transition: border-color 0.3s var(--ease), transform 0.35s var(--ease), background 0.3s var(--ease);
+}
+
+ .qt-erestyra .contract-card:hover {
+  border-color: rgba(207, 239, 140, 0.42);
+  background: rgba(20, 26, 28, 0.9);
+  transform: translateY(-2px);
+}
+
+ .qt-erestyra .contract-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+ .qt-erestyra .contract-card__kind {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  border: 1px solid rgba(207, 239, 140, 0.28);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+ .qt-erestyra .contract-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+ .qt-erestyra .contract-card__copy,
+ .qt-erestyra .contract-card__ext {
+  color: var(--dim);
+  transition: color 0.25s ease;
+}
+
+ .qt-erestyra .contract-card__copy:hover,
+ .qt-erestyra .contract-card__ext:hover,
+ .qt-erestyra .contract-card__copy.is-copied {
+  color: var(--fg);
+}
+
+ .qt-erestyra .contract-card__copy.is-copied {
+  color: var(--accent);
+}
+
+ .qt-erestyra .contract-card__name {
+  margin: 4px 0 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+ .qt-erestyra .contract-card__role {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--dim);
+  flex: 1;
+}
+
+ .qt-erestyra .contract-card__addr {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(243, 242, 236, 0.78);
+  word-break: break-all;
+}
+
+ .qt-erestyra .contract-card__full {
+  display: none;
+}
+
+ .qt-erestyra .contract-card:hover .contract-card__addr > span:first-child {
+  display: none;
+}
+
+ .qt-erestyra .contract-card:hover .contract-card__full {
+  display: inline;
+}
+
+@media (max-width: 1080px) {
+ .qt-erestyra .contracts__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+ .qt-erestyra .contracts__grid {
+    grid-template-columns: 1fr;
+  }
+ .qt-erestyra .contracts__meta {
+    width: 100%;
+  }
+}

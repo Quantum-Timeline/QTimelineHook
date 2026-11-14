@@ -168,6 +168,12 @@ export default function Header() {
                   <span>Mainnet Specifications</span>
                 </a>
               </li>
+              <li>
+                <a href="#contracts" onClick={(e) => navigateSection(e, "#contracts")}>
+                  <span>CONTRACTS</span>
+                  <span>Mainnet Registry (4663)</span>
+                </a>
+              </li>
             </ul>
 
             <div className="menu__genesis">

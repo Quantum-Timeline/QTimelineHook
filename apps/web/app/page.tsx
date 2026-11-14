@@ -5,6 +5,7 @@ import Scene from "@/components/landing/Scene";
 import SmoothScroll from "@/components/landing/SmoothScroll";
 import { Cursor, Loader } from "@/components/landing/LoaderAndCursor";
 import Header from "@/components/landing/Header";
+import ContractsSection from "@/components/landing/ContractsSection";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -575,7 +576,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 12 · 3D PORTAL */}
+      {/* 12 · MAINNET CONTRACTS */}
+      <ContractsSection />
+
+      {/* 13 · 3D PORTAL */}
       <section className="section" data-dim="0.5">
         <div className="wrap">
           <Link href="/market/" className="portal__link" data-cursor data-reveal>
