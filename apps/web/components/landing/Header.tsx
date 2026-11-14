@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { eventProfile } from "@/lib/event-profile";
 import Link from "next/link";
 
 export default function Header() {
@@ -156,7 +157,7 @@ export default function Header() {
               <li>
                 <a href="#how-it-works" onClick={(e) => navigateSection(e, "#how-it-works")}>
                   <span>HOOK</span>
-                  <span>13:25 UTC Hard Cutoff</span>
+                  <span>{eventProfile.copy.menuLock}</span>
                 </a>
               </li>
               <li>
@@ -176,8 +177,7 @@ export default function Header() {
             <div className="menu__genesis">
               <p className="eyebrow">Genesis Event</p>
               <p className="menu__genesis-copy">
-                BEA Core PCE · October 2026 (≥ 0.30% MoM). Trading halts automatically at 13:25 UTC,
-                5 minutes before the 13:30 UTC release.
+                {eventProfile.copy.genesis}
               </p>
             </div>
           </div>

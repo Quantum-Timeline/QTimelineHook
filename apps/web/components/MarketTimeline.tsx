@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCountdown, useChainNow } from "@/lib/motion";
+import { eventProfile } from "@/lib/event-profile";
 
 type Props = {
   status: number;
@@ -29,7 +30,7 @@ export function MarketTimeline({ status, activated, opensAt, cutoffAt, releaseAt
   else if (activated) {
     if (now < opensAt) { headline = "Trading opens in"; target = opensAt; }
     else if (now < cutoffAt) { headline = "Trading closes in"; target = cutoffAt; }
-    else if (now < releaseAt) { headline = "BEA release in"; target = releaseAt; }
+    else if (now < releaseAt) { headline = eventProfile.copy.releaseHeadline; target = releaseAt; }
     else if (now < deadline) { headline = "Report deadline in"; target = deadline; }
     else headline = "Awaiting cancellation";
   }

@@ -1,10 +1,11 @@
+import { eventProfile } from "@/lib/event-profile";
 /** Static-export-safe SVG: one deposit forks into two timelines and resolves through the hybrid-signed report. */
 export function FlowDiagram() {
   return (
     <figure className="flow" aria-label="How a market flows from deposit to payout">
       <svg viewBox="10 36 840 228" role="img" aria-labelledby="flow-title flow-desc">
         <title id="flow-title">Deposit, split, trade, resolve, redeem</title>
-        <desc id="flow-desc">One deposit splits into YES and NO claims. Each timeline trades in its own Uniswap v4 pool. A hybrid-signed BEA report decides which side redeems one to one.</desc>
+        <desc id="flow-desc">One deposit splits into YES and NO claims. Each timeline trades in its own Uniswap v4 pool. A hybrid-signed {eventProfile.copy.sourceKey} report decides which side redeems one to one.</desc>
 
         <path className="flow__wire flow__wire--base" d="M150 150 H250" />
         <path className="flow__wire flow__wire--yes" d="M330 150 C 380 150, 380 80, 430 80 H 560" />
@@ -40,7 +41,7 @@ export function FlowDiagram() {
         </g>
         <g className="flow__node flow__node--core">
           <rect x="740" y="112" width="100" height="76" />
-          <text x="790" y="140">BEA</text>
+          <text x="790" y="140">{eventProfile.copy.sourceKey}</text>
           <text x="790" y="158" className="flow__sub">ECDSA + ML-DSA</text>
           <text x="790" y="174" className="flow__sub">winner 1:1</text>
         </g>

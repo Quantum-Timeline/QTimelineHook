@@ -1,4 +1,5 @@
 import { Frame, PageHeading } from "@/components/Frame";
+import { eventProfile } from "@/lib/event-profile";
 import { GuideCard } from "@/components/GuideCard";
 import { QtlMark } from "@/components/TokenLogo";
 import { VotingPanel } from "@/components/VotingPanel";
@@ -24,7 +25,7 @@ export default function VotePage() {
           title="From deposit to the next market"
           steps={[
             { icon: <QtlMark size={34} />, title: "Deposit QTL", body: "Escrow the amount you want counted before voting opens. Moving tokens between wallets later adds no weight." },
-            { icon: <QtlMark size={34} />, title: "Vote once", body: "Pick one of two fixed thresholds for the next Core PCE release. Each wallet votes a single time." },
+            { icon: <QtlMark size={34} />, title: "Vote once", body: eventProfile.copy.voteNext },
             { icon: <QtlMark size={34} />, title: "Anyone finalizes", body: "After the window closes anyone can finalize. The most votes win; a tie or zero votes picks candidate B." },
             { icon: <QtlMark size={34} />, title: "Withdraw your escrow", body: "Your tokens come back once voting ends, or before it starts. The winner binds the second market's configuration." },
           ]}

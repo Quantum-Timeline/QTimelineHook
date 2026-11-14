@@ -1,4 +1,5 @@
 import React from "react";
+import { eventProfile } from "@/lib/event-profile";
 import Link from "next/link";
 import Scene from "@/components/landing/Scene";
 import SmoothScroll from "@/components/landing/SmoothScroll";
@@ -30,7 +31,7 @@ function SplitHeading({
 }
 
 const MANIFESTO_TEXT =
-  "We split one macroeconomic trigger into two live Uniswap v4 timelines on Robinhood Chain. Trade conditional ETH exposure and settle under hybrid ECDSA plus NIST FIPS 204 post-quantum proofs.";
+  eventProfile.copy.manifesto;
 
 const MARQUEE_PHRASE = "One Event · Two Timelines";
 
@@ -59,7 +60,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Cutoff",
     icon: "soluciones-blockchain",
     name: "TimelineHook",
-    label: "On-chain beforeSwap guard halts all three pools at 13:25 UTC—five minutes before release.",
+    label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC—five minutes before release.",
     href: "/rules/",
   },
   {
@@ -68,7 +69,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Security",
     icon: "consultoria-blockchain",
     name: "ML-DSA-44 Oracle",
-    label: "Dual ECDSA + NIST FIPS 204 module-lattice attestation verifies BEA Core PCE finality on-chain.",
+    label: eventProfile.copy.oracleCard,
     href: "/rules/",
   },
   {
@@ -87,7 +88,7 @@ const POOL_MODULES = [
     index: "ETH·Y",
     prefix: "ETH — ",
     bold: "YES",
-    label: "Conditional ETH price discovery if BEA Core PCE Oct 2026 prints ≥ 0.30% MoM.",
+    label: eventProfile.copy.ethYes,
     cta: "Trade Pool",
     href: "/market/",
   },
@@ -95,7 +96,7 @@ const POOL_MODULES = [
     index: "ETH·N",
     prefix: "ETH — ",
     bold: "NO",
-    label: "Parallel ETH price discovery if BEA Core PCE Oct 2026 prints < 0.30% MoM.",
+    label: eventProfile.copy.ethNo,
     cta: "Trade Pool",
     href: "/market/",
   },
@@ -120,7 +121,7 @@ const POOL_MODULES = [
 const FIGURES_ITEMS = [
   { count: 4663, symbol: null, unit: "CHAIN", caption: "Robinhood Chain L2 network deployment" },
   { count: 3, symbol: null, unit: "POOLS", caption: "Coupled Uniswap v4 pools per market" },
-  { count: 300, symbol: null, unit: "SEC", caption: "Pre-release swap lock at 13:25 UTC" },
+  { count: 300, symbol: null, unit: "SEC", caption: eventProfile.copy.lockCaption },
   { count: 48, symbol: null, unit: "HRS", caption: "Reporting deadline before 50/50 cancel" },
 ];
 
@@ -139,9 +140,9 @@ const LIFECYCLE_ROWS = [
   },
   {
     n: "LOCK",
-    kicker: "13:25 UTC",
+    kicker: eventProfile.copy.lockKicker,
     title: "Deterministic cutoff",
-    text: "TimelineHook enforces beforeSwap on every pool, locking swaps 5 minutes before the 13:30 UTC BEA Core PCE release.",
+    text: eventProfile.copy.lockText,
   },
   {
     n: "SIGN",
@@ -163,7 +164,7 @@ const OPERATOR_CARDS = [
     kind: "Traders",
     icon: "tokenizacion-de-activos",
     name: "Macro Traders",
-    label: "Express joint views on US Core PCE inflation and ETH price without liquidation risk.",
+    label: eventProfile.copy.traderCard,
   },
   {
     index: "LP",
@@ -195,35 +196,35 @@ const TRANSPARENCY_ROWS = [
     text: "Open-beta transaction and position caps protect early liquidity calibrated around the ~$173 reference seed model.",
   },
   {
-    n: "BEA",
+    n: eventProfile.copy.sourceKey,
     kicker: "First Release",
-    title: "Zero revision ambiguity",
-    text: "Resolves strictly from the first-release BEA Personal Income and Outlays MoM Core PCE table—never revised prints.",
+    title: eventProfile.copy.sourceTitle,
+    text: eventProfile.copy.sourceText,
   },
   {
     n: "EXP",
     kicker: "Cancel Safety",
     title: "Permissionless 48h expiry",
-    text: "If the oracle stalls past 27 Nov 13:30 UTC, any address can call cancelExpired(marketId) for 50/50 redemption.",
+    text: eventProfile.copy.expiryText,
   },
 ];
 
 const TELEMETRY_ITEMS = [
   {
     outlet: "BENCHMARK",
-    quote: "BEA Core PCE Oct 2026 (MoM) ≥ 0.30% — first-release table, scheduled 25 Nov 13:30 UTC.",
+    quote: eventProfile.copy.benchmark,
     action: "Read Rules",
     href: "/rules/",
   },
   {
     outlet: "UNISWAP V4",
-    quote: "ETH-YES, ETH-NO, and YES/NO pools (~$173 seed model) locked at 13:25 UTC by TimelineHook.",
+    quote: eventProfile.copy.lockQuote,
     action: "Open Market",
     href: "/market/",
   },
   {
     outlet: "POST-QUANTUM",
-    quote: "Dual ECDSA + NIST FIPS 204 ML-DSA-44 attestation, or 50/50 expiry after 27 Nov 13:30 UTC.",
+    quote: eventProfile.copy.attestQuote,
     action: "View Positions",
     href: "/positions/",
   },
@@ -252,23 +253,22 @@ export default function HomePage() {
       <section className="hero">
         <div className="wrap hero__inner">
           <p className="eyebrow hero__eyebrow" data-reveal data-delay="0.15">
-            <span className="eyebrow__n">RH·4663</span> QTimeline — Robinhood Chain 4663 · Core PCE Oct 2026
+            <span className="eyebrow__n">RH·4663</span> QTimeline — Robinhood Chain 4663 · {eventProfile.copy.heroEyebrow}
           </p>
-          <h1 className="hero__title" aria-label="One macro event, two timelines">
+          <h1 className="hero__title" aria-label={`${eventProfile.copy.heroA}, ${eventProfile.copy.heroB}`}>
             <span className="hero__line" aria-hidden="true">
               <span data-scramble data-delay="0.3">
-                One macro event
+                {eventProfile.copy.heroA}
               </span>
             </span>
             <span className="hero__line hero__line--out" aria-hidden="true">
               <span data-scramble data-delay="0.55">
-                two timelines
+                {eventProfile.copy.heroB}
               </span>
             </span>
           </h1>
           <p className="hero__lead lead" data-reveal data-delay="0.75">
-            BEA Core PCE ≥ 0.30% MoM. Split USDG into YES/NO claims, trade conditional ETH
-            discovery on Uniswap v4, and settle under ECDSA + ML-DSA-44.
+            {eventProfile.copy.heroLead}
           </p>
         </div>
         <div className="hero__scroll mono" aria-hidden="true">
@@ -361,7 +361,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="Three v4 Pools" className="split display" />
             <p className="lead" data-reveal>
-              Simultaneous ETH and probability discovery across both branches of the Core PCE fork.
+              Simultaneous ETH and probability discovery across both branches of the fork.
             </p>
           </div>
           <ul className="plist">
@@ -497,8 +497,7 @@ export default function HomePage() {
               className="split display-sm"
             />
             <p className="lead" data-reveal>
-              TimelineHook enforces the 13:25 UTC pre-release lock directly inside beforeSwap across
-              ETH-YES, ETH-NO, and YES/NO—eliminating toxic release-second front-running.
+              {eventProfile.copy.lockLead}
             </p>
             <Link href="/market/" className="link-arrow" data-reveal data-cursor>
               Enter Conditional Market →
@@ -537,8 +536,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="What is enforced on-chain" className="split display-md" />
             <p className="lead" data-reveal>
-              Every fee, beta cap, release source, and 48-hour expiry fallback is encoded in immutable
-              smart contracts.
+              {eventProfile.copy.enforced}
             </p>
           </div>
           <ul className="flist">
@@ -667,7 +665,7 @@ export default function HomePage() {
         </div>
         <div className="ftr__bottom mono">
           <span>
-            © 2026 QTimeline Protocol · Robinhood Chain 4663 · Core PCE Oct 2026. All rights
+            © 2026 QTimeline Protocol · Robinhood Chain 4663 · {eventProfile.copy.footer}. All rights
             reserved.
           </span>
           <nav aria-label="Protocol">
