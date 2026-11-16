@@ -6,7 +6,7 @@ import SmoothScroll from "@/components/landing/SmoothScroll";
 import { Cursor, Loader } from "@/components/landing/LoaderAndCursor";
 import Header from "@/components/landing/Header";
 import ContractsSection from "@/components/landing/ContractsSection";
-import { IpoCountdown, IpoScrubber } from "@/components/landing/IpoWidgets";
+import { IpoCountdown, IpoScrubber, IpoStack } from "@/components/landing/IpoWidgets";
 import { IpoStory } from "@/components/landing/IpoStory";
 import "@/app/landing.css";
 
@@ -43,7 +43,7 @@ const ARCHITECTURE_ITEMS = [
     slug: "vault",
     index: "VLT",
     kindLabel: "Custody",
-    icon: "custodia-de-criptoactivos",
+    icon: "qt-vault",
     name: "OutcomeVault",
     label: "Split USDG into equal YES and NO claims, merge pairs pre-resolution, or redeem winners 1:1.",
     href: "/market/",
@@ -52,7 +52,7 @@ const ARCHITECTURE_ITEMS = [
     slug: "pools",
     index: "V4",
     kindLabel: "Liquidity",
-    icon: "redes-blockchain",
+    icon: "qt-pools",
     name: "Three v4 Pools",
     label: "Coupled ETH-YES, ETH-NO, and YES/NO concentrated liquidity pools with 0.30% LP fees.",
     href: "/market/",
@@ -61,7 +61,7 @@ const ARCHITECTURE_ITEMS = [
     slug: "hook",
     index: "HOOK",
     kindLabel: "Cutoff",
-    icon: "soluciones-blockchain",
+    icon: "qt-hook",
     name: eventProfile.id === "ipo" ? "IpoTimelineHook" : "TimelineHook",
     label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC—five minutes before release.",
     href: "/rules/",
@@ -70,7 +70,7 @@ const ARCHITECTURE_ITEMS = [
     slug: "oracle",
     index: "PQ",
     kindLabel: "Security",
-    icon: "consultoria-blockchain",
+    icon: "qt-oracle",
     name: "ML-DSA-44 Oracle",
     label: eventProfile.copy.oracleCard,
     href: "/rules/",
@@ -79,7 +79,7 @@ const ARCHITECTURE_ITEMS = [
     slug: "qtl",
     index: "QTL",
     kindLabel: "Governance",
-    icon: "tokenizacion-de-activos",
+    icon: "qt-voting",
     name: "$QTL Voting",
     label: eventProfile.id === "ipo" ? "Hold $QTL to nominate the next event and vote on which market launches across 24h cycles." : "Hold $QTL to nominate macro triggers and vote on the next market across 24h cycles.",
     href: "/vote/",
@@ -165,21 +165,21 @@ const OPERATOR_CARDS = [
   {
     index: "TRD",
     kind: "Traders",
-    icon: "tokenizacion-de-activos",
+    icon: "qt-traders",
     name: eventProfile.id === "ipo" ? "IPO Traders" : "Macro Traders",
     label: eventProfile.copy.traderCard,
   },
   {
     index: "LP",
     kind: "Liquidity",
-    icon: "soluciones-blockchain",
+    icon: "qt-lp",
     name: "v4 Liquidity Providers",
     label: "Earn 0.30% LP fees across concentrated [0.80×, 1.25×] ETH and 35%–65% probability ranges.",
   },
   {
     index: "GOV",
     kind: "Governors",
-    icon: "redes-blockchain",
+    icon: "qt-holders",
     name: "$QTL Holders",
     label: eventProfile.id === "ipo" ? "Nominate upcoming events in 24h windows and vote on the next live market." : "Nominate upcoming macro catalysts in 24h windows and vote on the next live timeline.",
   },
@@ -273,8 +273,9 @@ export default function HomePage() {
           <p className="hero__lead lead" data-reveal data-delay="0.75">
             {eventProfile.copy.heroLead}
           </p>
-          {eventProfile.id === "ipo" && eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
+          {eventProfile.id === "ipo" ? <IpoStack /> : null}
         </div>
+        {eventProfile.id === "ipo" && eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
         <div className="hero__scroll mono" aria-hidden="true">
           <span>Scroll</span>
           <i />

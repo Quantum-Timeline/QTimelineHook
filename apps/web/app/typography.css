@@ -6,15 +6,19 @@
   --font-ui: Archivo, "Helvetica Neue", Arial, sans-serif;
   --font-data: "JetBrains Mono", ui-monospace, monospace;
   --wdth-body: 100;
-  --wdth-display: 108;
+  --wdth-display: 120;
 }
 
 html, body { font-family: var(--font-ui); font-variation-settings: "wdth" var(--wdth-body); }
 
-/* Everything in the product shell speaks Archivo, SVG text included. */
+/* Everything in the product shell speaks Archivo for UI/display, and JetBrains Mono for technical labels, hashes, and data. */
 .product-shell,
-.product-shell *:not(code):not(kbd):not(.data) { font-family: var(--font-ui); }
-.product-shell code, .product-shell kbd, .product-shell .data { font-family: var(--font-data); }
+.product-shell *:not(code):not(kbd):not(.data):not(.mono):not(.net-pill):not(.net-pill *):not(.phero__tag):not(.fchip__label):not(.pool-card dt):not(.pool-card dd):not(.product-footer small) {
+  font-family: var(--font-ui);
+}
+.product-shell :is(code, kbd, .data, .mono, .net-pill, .net-pill *, .phero__tag, .fchip__label, .pool-card dt, .pool-card dd, .product-footer small) {
+  font-family: var(--font-data);
+}
 .product-shell svg text { font-family: var(--font-ui); letter-spacing: 0.02em; }
 
 /* Display text shares one width so headings, big numbers and the wordmark look cut from the same face. */
