@@ -2608,3 +2608,14 @@ html.is-warping {
   .qt-erestyra .ftr__bottom { flex-direction: column; align-items: flex-start; }
   .qt-erestyra .ftr__bottom nav { flex-wrap: wrap; gap: 12px 20px; }
 }
+
+/* Section index on the right edge */
+.qt-erestyra .rail-index { position: fixed; right: 18px; top: 50%; z-index: 45; display: grid; gap: 4px; transform: translateY(-50%); opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease); mix-blend-mode: difference; }
+.qt-erestyra .rail-index[data-shown="true"] { opacity: 1; pointer-events: auto; }
+.qt-erestyra .rail-index a { display: flex; align-items: center; justify-content: flex-end; gap: 12px; height: 22px; color: #fff; }
+.qt-erestyra .rail-index__label { font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0; transform: translateX(6px); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); white-space: nowrap; }
+.qt-erestyra .rail-index a:hover .rail-index__label, .qt-erestyra .rail-index a.is-active .rail-index__label { opacity: 1; transform: none; }
+.qt-erestyra .rail-index i { display: block; width: 12px; height: 1px; background: currentColor; opacity: 0.45; transition: width 0.4s var(--ease), opacity 0.3s var(--ease); }
+.qt-erestyra .rail-index a:hover i { opacity: 1; }
+.qt-erestyra .rail-index a.is-active i { width: 28px; opacity: 1; }
+@media (max-width: 1200px) { .qt-erestyra .rail-index { display: none; } }

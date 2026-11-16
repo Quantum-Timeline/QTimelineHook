@@ -103,7 +103,7 @@ export function IpoStory({ cutoffLabel, threshold }: Props) {
   }, [threshold]);
 
   return (
-    <section className="section story" id="story" data-step="0" ref={root}>
+    <section className="section story" id="how-it-works" data-step="0" ref={root}>
       <div className="wrap story__inner">
         <div className="story__copy">
           <p className="eyebrow"><span className="eyebrow__n">FLOW</span>One market, start to payout</p>

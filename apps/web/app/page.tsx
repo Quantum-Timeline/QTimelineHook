@@ -9,6 +9,7 @@ import Header from "@/components/landing/Header";
 import ContractsSection from "@/components/landing/ContractsSection";
 import { IpoCountdown, IpoScrubber, IpoStack } from "@/components/landing/IpoWidgets";
 import { IpoStory } from "@/components/landing/IpoStory";
+import SectionRail from "@/components/landing/SectionRail";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -254,6 +255,7 @@ export default function HomePage() {
       <SmoothScroll />
       <Cursor />
       <Header />
+      <SectionRail />
 
       {/* 01 · HERO */}
       <section className="hero">
@@ -376,7 +378,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="Three v4 Pools" className="split display" />
             <p className="lead" data-reveal>
-              Simultaneous ETH and probability discovery across both branches of the fork.
+              Simultaneous ETH and probability discovery across both worlds.
             </p>
           </div>
           <ul className="plist">
@@ -424,6 +426,7 @@ export default function HomePage() {
       </section>
 
       {/* 07 · HOW IT WORKS */}
+      {eventProfile.id !== "ipo" ? (
       <section className="section features" id="how-it-works" data-dim="0.5">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
@@ -450,6 +453,7 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+      ) : null}
 
       {/* 08 · OPERATORS */}
       <section className="section" id="operators" data-dim="0.5">
