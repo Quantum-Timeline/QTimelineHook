@@ -38,16 +38,28 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
     address: "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
   },
   {
-    name: "IpoTimelineHook",
+    name: "IpoHookDeployer",
     kind: "HOOK",
-    role: "beforeSwap cutoff guard on Uniswap v4 pools",
-    address: "0xc79062f4a0A67142c84F042b4aE85952A4A0A880",
+    role: "CREATE2 deployer for each market's beforeSwap cutoff hook",
+    address: "0xaAa28FA6a7DB709129879c1daF13Bc90B843064f",
   },
   {
-    name: "IpoConditionalVault",
-    kind: "VAULT",
-    role: "1:1 USDG-backed YES/NO vault & redemption",
-    address: "0x6B690Cc6e05de26A617ea530bA068B556489E889",
+    name: "IpoTimelineHook beacon",
+    kind: "BEACON",
+    role: "Upgrade point for every market's cutoff hook",
+    address: "0xa9928908754d2876613787E362bc35DA559C97FE",
+  },
+  {
+    name: "IpoConditionalVault beacon",
+    kind: "BEACON",
+    role: "Upgrade point for every market's 1:1 USDG-backed YES/NO vault",
+    address: "0x326be2C0e8883dd7b24d3afD17d9f37B3D512329",
+  },
+  {
+    name: "IpoOutcomeToken beacon",
+    kind: "BEACON",
+    role: "Upgrade point for the four YES/NO claim tokens of each market",
+    address: "0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214",
   },
   {
     name: "MLDSA44Verifier",
@@ -72,6 +84,12 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
     kind: "UNISWAP V4",
     role: "Canonical Uniswap v4 singleton pool manager",
     address: "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+  },
+  {
+    name: "PositionManager",
+    kind: "UNISWAP V4",
+    role: "Holds the market's concentrated liquidity positions",
+    address: "0x58daec3116aae6D93017bAAea7749052E8a04fA7",
   },
   {
     name: "Quoter",

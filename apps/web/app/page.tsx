@@ -125,7 +125,9 @@ const POOL_MODULES = [
 const FIGURES_ITEMS = [
   { count: 4663, symbol: null, unit: "CHAIN", caption: "Robinhood Chain L2 network deployment" },
   { count: 3, symbol: null, unit: "POOLS", caption: "Coupled Uniswap v4 pools per market" },
-  { count: 300, symbol: null, unit: "SEC", caption: eventProfile.copy.lockCaption },
+  eventProfile.id === "ipo"
+    ? { count: 1, symbol: null, unit: "FILING", caption: "Only the first Form 424B4 on SEC EDGAR settles the market" }
+    : { count: 300, symbol: null, unit: "SEC", caption: eventProfile.copy.lockCaption },
   { count: 48, symbol: null, unit: "HRS", caption: "Reporting deadline before 50/50 cancel" },
 ];
 
@@ -152,7 +154,7 @@ const LIFECYCLE_ROWS = [
     n: "SIGN",
     kicker: "Attestation",
     title: "Dual ECDSA + ML-DSA-44",
-    text: "PostQuantumResolver requires both a classical ECDSA signature and a FIPS 204 ML-DSA-44 lattice signature.",
+    text: `${eventProfile.id === "ipo" ? "IpoResolutionAdapter" : "PostQuantumResolver"} requires both a classical ECDSA signature and a FIPS 204 ML-DSA-44 lattice signature.`,
   },
   {
     n: "CLAIM",
@@ -197,7 +199,7 @@ const TRANSPARENCY_ROWS = [
     n: "CAP",
     kicker: "Beta Caps",
     title: "0.10 ETH & 500 USDG limits",
-    text: "Open-beta transaction and position caps protect early liquidity calibrated around the ~$173 reference seed model.",
+    text: "Open-beta collateral caps of 0.10 ETH and 500 USDG protect early liquidity while the market is new.",
   },
   {
     n: eventProfile.copy.sourceKey,
@@ -572,7 +574,7 @@ export default function HomePage() {
       <section className="section press" id="telemetry" data-dim="0.6">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">LIVE</span>Protocol Telemetry
+            <span className="eyebrow__n">SPEC</span>Protocol notes
           </p>
           <SplitHeading text="Verified specifications..." className="split display-md" />
           <ul className="press__list">
@@ -614,7 +616,7 @@ export default function HomePage() {
       <section className="cta" id="genesis">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">LAUNCH</span>{eventProfile.id === "ipo" ? "Live market" : "Genesis Market"}
+            <span className="eyebrow__n">LAUNCH</span>{eventProfile.id === "ipo" ? "Anthropic IPO market" : "Genesis Market"}
           </p>
           <SplitHeading text="Ready to trade parallel timelines?" className="split display" />
           <Link href="/market/" className="cta__btn" data-cursor data-reveal>
@@ -680,7 +682,7 @@ export default function HomePage() {
                   <a href="#settlement" className="rh-inline" aria-label="Robinhood Chain 4663"><RobinhoodMark h={13} /> <i>4663</i></a>
                 </li>
                 <li>
-                  <a href="#telemetry">Telemetry</a>
+                  <a href="#telemetry">Protocol notes</a>
                 </li>
                 <li>
                   <Link href="/rules/">Resolution Rules</Link>
