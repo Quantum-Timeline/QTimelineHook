@@ -126,3 +126,16 @@
 .product-shell .rh-inline { display: inline-flex; align-items: center; gap: 8px; }
 .product-shell .rh-inline i { font-style: normal; }
 .product-shell .rh-mark { display: block; width: auto; }
+
+/* responsive pass: small phones */
+@media (max-width: 640px) {
+  .product-shell .topbar__nav { max-width: 100%; overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+  .product-shell .topbar__nav::-webkit-scrollbar { display: none; }
+  .product-shell .topbar__nav a { flex: none; padding: 8px 14px; }
+  .numbers__item { padding: 16px 14px; min-width: 0; }
+  .numbers__item b { font-size: clamp(1.5rem, 8vw, 2.2rem); overflow-wrap: anywhere; }
+  .numbers__item span, .numbers__item small { overflow-wrap: anywhere; }
+}
+@media (max-width: 400px) {
+  .numbers { grid-template-columns: minmax(0, 1fr); }
+}
