@@ -12,6 +12,8 @@ export type EventProfile = {
   reportedLabel: string;
   oracleRule: string;
   cutoffNumber: [string, string, string];
+  /** Unix seconds when swaps stop; drives the landing countdown. */
+  cutoffAt?: number;
   copy: Record<string, string>;
   formatThreshold(thresholdBps: number): string;
   formatValue(valueBps: number): string;
@@ -78,6 +80,7 @@ const ipo: EventProfile = {
   reportedLabel: "Final offer price",
   oracleRule: "A project bot reads the final prospectus (Form 424B4) on SEC EDGAR and reports the printed offering price in cents. The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the SEC number. The filing and its hash are public.",
   cutoffNumber: ["Before pricing", "Trading stops", "Swaps close on-chain before the offering is priced"],
+  cutoffAt: 1795003200,
   copy: {
     heroEyebrow: "Anthropic IPO price",
     heroA: "One IPO price",

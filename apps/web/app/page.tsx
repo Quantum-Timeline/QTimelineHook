@@ -6,6 +6,7 @@ import SmoothScroll from "@/components/landing/SmoothScroll";
 import { Cursor, Loader } from "@/components/landing/LoaderAndCursor";
 import Header from "@/components/landing/Header";
 import ContractsSection from "@/components/landing/ContractsSection";
+import { IpoCountdown, IpoScrubber } from "@/components/landing/IpoWidgets";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -271,6 +272,7 @@ export default function HomePage() {
           <p className="hero__lead lead" data-reveal data-delay="0.75">
             {eventProfile.copy.heroLead}
           </p>
+          {eventProfile.id === "ipo" && eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
         </div>
         <div className="hero__scroll mono" aria-hidden="true">
           <span>Scroll</span>
@@ -293,6 +295,8 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {eventProfile.id === "ipo" ? <IpoScrubber /> : null}
 
       {/* 03 · PINNED HORIZONTAL SCROLL RAIL */}
       <section id="architecture">
