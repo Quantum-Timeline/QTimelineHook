@@ -629,16 +629,26 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer className="ftr" data-dim="true">
         <div className="ftr__top">
-          <Link href="/" className="ftr__logo" aria-label="QTimeline Protocol">
-            <img
-              src="/brand/qtimeline-logo.png"
-              alt=""
-              width={88}
-              height={88}
-              style={{ width: "88px", height: "88px", objectFit: "contain", display: "block" }}
-            />
-            <span className="ftr__wordmark">QTIMELINE</span>
-          </Link>
+          <div className="ftr__brand">
+            <Link href="/" className="ftr__logo" aria-label="QTimeline Protocol">
+              <img
+                src="/brand/qtimeline-logo.png"
+                alt=""
+                width={56}
+                height={56}
+                style={{ width: "56px", height: "56px", objectFit: "contain", display: "block" }}
+              />
+              <span className="ftr__wordmark">QTIMELINE</span>
+            </Link>
+            <p className="ftr__blurb">
+              {eventProfile.id === "ipo"
+                ? "Conditional markets on Uniswap v4. Trade the Anthropic IPO price, settled from the SEC filing."
+                : "Conditional markets on Uniswap v4, settled under hybrid ECDSA and ML-DSA-44 attestation."}
+            </p>
+            <Link href="/market/" className="ftr__open" data-cursor>
+              Open app <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
           <div className="ftr__cols">
             <div>
               <p className="eyebrow">Architecture</p>
@@ -687,6 +697,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+        {eventProfile.id === "ipo" ? <div className="ftr__stack"><IpoStack /></div> : null}
         <div className="ftr__bottom mono">
           <span>
             © 2026 QTimeline Protocol · Robinhood Chain 4663 · {eventProfile.copy.footer}. All rights
@@ -701,6 +712,7 @@ export default function HomePage() {
             </a>
           </nav>
         </div>
+              <div className="ftr__giant" aria-hidden="true">QTIMELINE</div>
       </footer>
     </div>
   );

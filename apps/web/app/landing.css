@@ -2585,3 +2585,26 @@ html.is-warping {
 .qt-erestyra .rh-inline i { font-style: normal; }
 .qt-erestyra .rh-mark { display: block; width: auto; }
 .qt-erestyra .lang a .rh-mark { opacity: 0.9; }
+
+/* Footer v2: brand block, tidy link columns, the stack row, a ghost wordmark */
+.qt-erestyra .ftr { padding: clamp(64px, 8vw, 112px) var(--gutter) 0; overflow: hidden; }
+.qt-erestyra .ftr__top { grid-template-columns: minmax(260px, 1.1fr) 2.4fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
+.qt-erestyra .ftr__brand { display: grid; gap: 22px; justify-items: start; }
+.qt-erestyra .ftr__logo { flex-direction: row; align-items: center; gap: 14px; }
+.qt-erestyra .ftr__wordmark { font-size: 14px; letter-spacing: 0.26em; }
+.qt-erestyra .ftr__blurb { margin: 0; max-width: 34ch; font-size: 0.95rem; line-height: 1.55; color: var(--dim); }
+.qt-erestyra .ftr__open { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 0.85rem; font-weight: 500; color: var(--fg); transition: background-color 0.3s var(--ease), color 0.3s var(--ease); }
+.qt-erestyra .ftr__open:hover { background: var(--fg); color: var(--bg); }
+.qt-erestyra .ftr__cols { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px clamp(24px, 4vw, 64px); }
+.qt-erestyra .ftr__cols .eyebrow { margin: 0 0 18px; font-size: 0.66rem; letter-spacing: 0.16em; color: var(--dim); }
+.qt-erestyra .ftr__cols ul { gap: 12px; }
+.qt-erestyra .ftr__cols a { font-size: 0.95rem; line-height: 1.3; }
+.qt-erestyra .ftr__stack { max-width: var(--max); margin: clamp(48px, 6vw, 84px) auto 0; padding-top: 28px; border-top: 1px solid var(--line); }
+.qt-erestyra .ftr__bottom { margin-top: clamp(32px, 4vw, 48px); padding-top: 20px; border-top: 1px solid var(--line); }
+.qt-erestyra .ftr__giant { max-width: var(--max); margin: clamp(24px, 4vw, 56px) auto 0; text-align: center; font: 700 clamp(40px, 12.6vw, 240px)/0.9 var(--f-display); letter-spacing: -0.04em; white-space: nowrap; user-select: none; background: linear-gradient(180deg, rgba(243, 242, 236, 0.14), rgba(243, 242, 236, 0) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 8px; }
+@media (max-width: 900px) {
+  .qt-erestyra .ftr__top { grid-template-columns: 1fr; }
+  .qt-erestyra .ftr__cols { grid-template-columns: 1fr 1fr; }
+  .qt-erestyra .ftr__bottom { flex-direction: column; align-items: flex-start; }
+  .qt-erestyra .ftr__bottom nav { flex-wrap: wrap; gap: 12px 20px; }
+}
