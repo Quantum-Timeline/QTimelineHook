@@ -7,6 +7,7 @@ const ITEMS = [
   { id: "how-it-works", label: "Flow" },
   { id: "architecture", label: "Stack" },
   { id: "pools", label: "Pools" },
+  { id: "resolution", label: "Oracle" },
   { id: "operators", label: "Roles" },
   { id: "settlement", label: "Execution" },
   { id: "transparency", label: "Spec" },

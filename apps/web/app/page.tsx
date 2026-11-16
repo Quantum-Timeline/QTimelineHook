@@ -10,6 +10,7 @@ import ContractsSection from "@/components/landing/ContractsSection";
 import { IpoCountdown, IpoScrubber, IpoStack } from "@/components/landing/IpoWidgets";
 import { IpoStory } from "@/components/landing/IpoStory";
 import SectionRail from "@/components/landing/SectionRail";
+import { IpoTerminal } from "@/components/landing/IpoTerminal";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -426,6 +427,10 @@ export default function HomePage() {
       </section>
 
       {/* 07 · HOW IT WORKS */}
+      {eventProfile.id === "ipo" ? (
+        <IpoTerminal threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) : "at cutoff"} />
+      ) : null}
+
       {eventProfile.id !== "ipo" ? (
       <section className="section features" id="how-it-works" data-dim="0.5">
         <div className="wrap">
