@@ -2570,3 +2570,18 @@ html.is-warping {
   .qt-erestyra .ipo-stack img { zoom: 0.78; }
   .qt-erestyra .ipo-stack b { font-size: 0.95rem; }
 }
+
+/* Hero foot on one line: logos left, countdown right */
+@media (min-width: 1101px) {
+  .qt-erestyra .hero__foot { flex-wrap: nowrap; gap: 32px; }
+  .qt-erestyra .ipo-stack { min-width: 0; }
+  .qt-erestyra .ipo-stack ul { flex-wrap: nowrap; gap: clamp(18px, 2vw, 32px); }
+  .qt-erestyra .hero__foot .ipo-count { flex-wrap: nowrap; flex: none; gap: 20px; white-space: nowrap; }
+}
+@media (min-width: 1101px) and (max-width: 1400px) {
+  .qt-erestyra .ipo-stack img { zoom: 0.84; }
+  .qt-erestyra .ipo-stack b { font-size: 1rem; }
+  .qt-erestyra .ipo-stack li { gap: 9px; }
+  .qt-erestyra .hero__foot .ipo-count { gap: 14px; }
+  .qt-erestyra .ipo-count__digits { gap: 14px; }
+}
