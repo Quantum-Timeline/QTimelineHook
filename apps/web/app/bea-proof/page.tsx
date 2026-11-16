@@ -1,8 +1,16 @@
 import { Frame, PageHeading } from "@/components/Frame";
 import { MarketSnapshot } from "@/components/MarketSnapshot";
+import { robinhoodChain } from "@qtimeline/chain";
 import type { Address, Hex } from "viem";
 
 export default function BeaProofPage() {
+  if (robinhoodChain.id !== 46630) {
+    return (
+      <Frame>
+        <PageHeading tag="Testnet only" title="Nothing to show here." body="This page displays a testnet fixture and is not part of the Mainnet site." />
+      </Frame>
+    );
+  }
   const registry = process.env.NEXT_PUBLIC_BEA_TESTNET_REGISTRY as Address | undefined;
   const marketId = process.env.NEXT_PUBLIC_BEA_TESTNET_MARKET_ID as Hex | undefined;
   const transactionHash = process.env.NEXT_PUBLIC_BEA_TESTNET_REPORT_TX as Hex | undefined;

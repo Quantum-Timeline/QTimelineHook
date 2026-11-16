@@ -108,7 +108,14 @@ async function main() {
   if (existing && (existing.period !== period || BigInt(existing.cutoffAt) !== BigInt(cutoffText) || existing.thresholdCents !== thresholdCents)) {
     throw new Error("Manifest market does not match QT_IPO_PERIOD / QT_IPO_CUTOFF_AT / QT_IPO_THRESHOLD");
   }
-  const budget = seedBudget({ ethUsd });
+  // Seed size in whole USD per side: each ETH timeline pool (default 53) and the probability pool (default 67). Smaller seeds cost less capital but raise price impact.
+  const wholeUsd = (name, fallback) => {
+    const text = process.env[name];
+    if (text === undefined || text === "") return fallback;
+    if (!/^[1-9]\d{0,3}$/.test(text)) throw new Error(`${name} must be a whole number of USD between 1 and 9999`);
+    return BigInt(text);
+  };
+  const budget = seedBudget({ ethUsd, usdPerTimeline: wholeUsd("QT_IPO_SEED_TIMELINE_USD", 53n), probabilityUsdg: wholeUsd("QT_IPO_SEED_PROBABILITY_USD", 67n) });
   const periodId = keccak256(stringToHex(period));
 
   const ethBalance = await client.getBalance({ address: account.address });
