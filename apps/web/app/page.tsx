@@ -273,9 +273,13 @@ export default function HomePage() {
           <p className="hero__lead lead" data-reveal data-delay="0.75">
             {eventProfile.copy.heroLead}
           </p>
-          {eventProfile.id === "ipo" ? <IpoStack /> : null}
+          {eventProfile.id === "ipo" ? (
+            <div className="hero__foot" data-reveal data-delay="0.95">
+              <IpoStack />
+              {eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
+            </div>
+          ) : null}
         </div>
-        {eventProfile.id === "ipo" && eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
         <div className="hero__scroll mono" aria-hidden="true">
           <span>Scroll</span>
           <i />
