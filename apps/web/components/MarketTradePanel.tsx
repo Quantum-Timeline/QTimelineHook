@@ -56,6 +56,7 @@ export function MarketTradePanel() {
   // Market state and the visitor's balances, independent of the typed amount, so the panel can always say why a trade is or is not possible.
   const [info, setInfo] = useState<{ status: number; open: boolean; opensAt: bigint; asset: Address; tokens: readonly Address[]; usdDecimals: number }>();
   const [balances, setBalances] = useState<Record<string, bigint>>({});
+  const [gasBalance, setGasBalance] = useState<bigint>();
   useEffect(() => {
     if (!validConfig || !marketId || !registry || !factory) return;
     let active = true;
@@ -73,9 +74,12 @@ export function MarketTradePanel() {
         if (active) setInfo({ status, open, opensAt: market.opensAt, asset: market.asset, tokens, usdDecimals });
         if (account) {
           const addresses = [market.asset, ...tokens] as Address[];
-          const values = await Promise.all(addresses.map((address) => client.readContract({ address, abi: erc20Abi, functionName: "balanceOf", args: [account] })));
-          if (active) setBalances(Object.fromEntries(addresses.map((address, i) => [address.toLowerCase(), values[i]])));
-        } else if (active) setBalances({});
+          const [values, native] = await Promise.all([
+            Promise.all(addresses.map((address) => client.readContract({ address, abi: erc20Abi, functionName: "balanceOf", args: [account] }))),
+            client.getBalance({ address: account }),
+          ]);
+          if (active) { setBalances(Object.fromEntries(addresses.map((address, i) => [address.toLowerCase(), values[i]]))); setGasBalance(native); }
+        } else if (active) { setBalances({}); setGasBalance(undefined); }
       } catch { /* the quote effect reports chain read problems */ }
     }
     void read();
@@ -132,6 +136,12 @@ export function MarketTradePanel() {
     }
   }, [amount, client, direction, factory, instrument, marketId, outcomeYes, quoter, registry, router, validConfig]);
 
+  // A new amount or side starts a new ticket: drop the previous trade's result and any stale error.
+  useEffect(() => {
+    if (busy) return;
+    setDone(false); setFailed(false); setStep(-1); setTx(undefined); setMessage("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount, direction, instrument, outcomeYes]);
   useEffect(() => { const timer = window.setTimeout(() => { void refreshQuote(); }, 250); return () => window.clearTimeout(timer); }, [refreshQuote]);
   // The two world lanes beside the ticket can switch the side being traded.
   useEffect(() => {
@@ -298,6 +308,7 @@ export function MarketTradePanel() {
       </label>
       <div className="balance-row">
         <span>{account ? (balanceText === undefined ? "Reading your balance…" : `Balance: ${balanceText} ${inputUnit}`) : "Connect a wallet to see your balance"}</span>
+        {account && gasBalance === 0n && <em className="gas-warning">No ETH for network fees</em>}
         {account && inputBalance !== undefined && inputBalance > 0n && <button type="button" onClick={() => setAmount(formatUnits(inputBalance, inputDec))}>Max</button>}
       </div>
       <div className="chips" role="group" aria-label="Quick amounts">
@@ -325,7 +336,7 @@ export function MarketTradePanel() {
           : wrongChain ? "Switch network"
           : !amountValid || amountUnits === 0n ? "Enter an amount"
           : overBalance ? `Not enough ${inputUnit}`
-          : quote === undefined ? "Getting a quote…"
+          : quote === undefined ? (message && !busy ? "Quote unavailable" : "Getting a quote…")
           : busy ? "Waiting for your wallet…"
           : direction === "buy" ? `Buy ${side}` : `Sell ${side}`;
         const action = !account ? () => void connectWallet() : wrongChain ? () => void switchChain() : trade;

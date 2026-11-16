@@ -122,3 +122,4 @@
   .worlds > .world .world__example { flex: 1; justify-content: center; }
   .worlds > .world .world__cta { margin-top: auto; align-self: flex-start; }
 }
+.balance-row .gas-warning { font-style: normal; color: #e9b872; font-size: 0.78rem; margin-left: auto; }
