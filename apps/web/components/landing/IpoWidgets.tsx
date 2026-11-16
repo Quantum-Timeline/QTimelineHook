@@ -41,8 +41,8 @@ const STACK = [
   { name: "Robinhood Chain", icon: "/partners/robinhood-wordmark.svg", m: 1.05 },
   { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", m: 1.3 },
   { name: "Ethereum", icon: "/partners/ethereum.svg", m: 1.45 },
-  { name: "USDG", icon: "/partners/usdg.png", m: 1.1, mark: true },
-  { name: "SEC EDGAR", icon: "/partners/sec.svg", m: 1.2, mark: true },
+  { name: "USDG", icon: "/partners/usdg.png", m: 1.25, mark: true },
+  { name: "SEC", icon: "/partners/sec-logo-white-1x.png", m: 1.25, mark: true },
 ] as const;
 
 /** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */

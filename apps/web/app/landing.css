@@ -2557,8 +2557,8 @@ html.is-warping {
 .qt-erestyra .ipo-stack li { display: flex; align-items: center; opacity: 0.8; transition: opacity 0.3s var(--ease); }
 .qt-erestyra .ipo-stack li:hover { opacity: 1; }
 .qt-erestyra .ipo-stack img { width: auto; display: block; filter: brightness(0) invert(1); }
-.qt-erestyra .ipo-stack li[data-mark] img { filter: grayscale(1) brightness(1.7); }
-.qt-erestyra .ipo-stack li[data-mark]:hover img { filter: none; }
+.qt-erestyra .ipo-stack li[data-mark] img { filter: none; }
+.qt-erestyra .ipo-stack img[src$="usdg.png"] { border-radius: 50%; }
 @media (max-width: 1100px) {
   .qt-erestyra .hero__foot .ipo-count { margin: 0; }
 }
