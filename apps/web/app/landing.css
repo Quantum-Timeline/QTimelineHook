@@ -2579,3 +2579,9 @@ html.is-warping {
   .qt-erestyra .hero__foot .ipo-count { gap: 14px; }
   .qt-erestyra .ipo-count__digits { gap: 14px; }
 }
+
+/* Inline Robinhood mark next to a chain id */
+.qt-erestyra .rh-inline { display: inline-flex; align-items: center; gap: 8px; }
+.qt-erestyra .rh-inline i { font-style: normal; }
+.qt-erestyra .rh-mark { display: block; width: auto; }
+.qt-erestyra .lang a .rh-mark { opacity: 0.9; }

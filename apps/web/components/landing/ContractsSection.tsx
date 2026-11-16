@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { RobinhoodMark } from "@/components/RobinhoodMark";
 
 type ContractEntry = {
   name: string;
@@ -117,7 +118,7 @@ export default function ContractsSection() {
           </div>
           <div className="contracts__meta mono">
             <span>SYSTEM / anthropic-ipo-pricing</span>
-            <span>CHAIN / Robinhood Mainnet (4663)</span>
+            <span className="rh-inline">CHAIN / <RobinhoodMark h={13} /> <i>Mainnet (4663)</i></span>
             <span className="contracts__status">STATUS / Deployed &amp; Sealed</span>
           </div>
         </div>

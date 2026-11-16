@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { RobinhoodMark } from "@/components/RobinhoodMark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { robinhoodChain } from "@qtimeline/chain";
@@ -110,7 +111,7 @@ function FrameInner({ children }: { children: React.ReactNode }) {
             </svg>
           </a>
           <span className="net-pill" title={robinhoodChain.name}>
-            <span>{isTestnet ? "TESTNET · 46630" : "ROBINHOOD · 4663"}</span>
+            {isTestnet ? <span>TESTNET · 46630</span> : <span className="rh-inline"><RobinhoodMark h={14} /> <i>4663</i></span>}
           </span>
           <WalletButton />
         </div>
@@ -122,7 +123,7 @@ function FrameInner({ children }: { children: React.ReactNode }) {
       <footer className="product-footer">
         <div className="product-footer__brand">
           <span>QTIMELINE</span>
-          <small>{isTestnet ? "ROBINHOOD TESTNET · 46630" : "ROBINHOOD CHAIN · 4663"}</small>
+          <small>{isTestnet ? "ROBINHOOD TESTNET · 46630" : <span className="rh-inline"><RobinhoodMark h={12} /> <i>· 4663</i></span>}</small>
         </div>
         <div className="product-footer__links">
           <Link href="/">Overview</Link>

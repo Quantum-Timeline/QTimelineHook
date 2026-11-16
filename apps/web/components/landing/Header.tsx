@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { RobinhoodMark } from "@/components/RobinhoodMark";
 import { eventProfile } from "@/lib/event-profile";
 import Link from "next/link";
 
@@ -59,8 +60,8 @@ export default function Header() {
 
         <nav className="hdr__right" aria-label="Primary">
           <div className="lang" role="group" aria-label="Network">
-            <Link href="/rules/" aria-current="true">
-              ROBINHOOD
+            <Link href="/rules/" aria-current="true" aria-label="Robinhood Chain">
+              <RobinhoodMark h={15} />
             </Link>
             <span aria-hidden="true">/</span>
             <Link href="/#how-it-works">4663</Link>
@@ -186,7 +187,7 @@ export default function Header() {
         </div>
 
         <div className="menu__foot">
-          <span>Robinhood Chain · 4663</span>
+          <span className="rh-inline"><RobinhoodMark h={14} /> <i>· 4663</i></span>
           <a href="https://x.com/QTimelineHook" target="_blank" rel="noopener noreferrer">
             X (@QTimelineHook) ↗
           </a>

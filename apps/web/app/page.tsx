@@ -1,4 +1,5 @@
 import React from "react";
+import { RobinhoodMark } from "@/components/RobinhoodMark";
 import { eventProfile } from "@/lib/event-profile";
 import Link from "next/link";
 import Scene from "@/components/landing/Scene";
@@ -501,7 +502,8 @@ export default function HomePage() {
               <span className="eyebrow__n">V4</span>Execution layer
             </p>
             <div className="partner__mark" data-reveal>
-              QTIMELINE · 4663
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/partners/uniswap-wordmark.svg" alt="Uniswap" />
             </div>
             <SplitHeading
               as="h3"
@@ -665,7 +667,7 @@ export default function HomePage() {
               <p className="eyebrow">QTimeline</p>
               <ul>
                 <li>
-                  <a href="#settlement">Robinhood 4663</a>
+                  <a href="#settlement" className="rh-inline" aria-label="Robinhood Chain 4663"><RobinhoodMark h={13} /> <i>4663</i></a>
                 </li>
                 <li>
                   <a href="#telemetry">Telemetry</a>
