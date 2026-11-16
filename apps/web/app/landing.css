@@ -2553,22 +2553,16 @@ html.is-warping {
 .qt-erestyra .hero__foot .ipo-count { position: static; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; width: auto; max-width: none; margin: 0; padding: 0; border: 0; }
 .qt-erestyra .ipo-stack { display: grid; gap: 18px; }
 .qt-erestyra .ipo-stack__cap { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); }
-.qt-erestyra .ipo-stack ul { display: flex; flex-wrap: wrap; align-items: center; gap: 18px clamp(26px, 2.5vw, 40px); margin: 0; padding: 0; list-style: none; }
-.qt-erestyra .ipo-stack li { display: flex; align-items: center; gap: 12px; opacity: 0.74; transition: opacity 0.3s var(--ease); }
+.qt-erestyra .ipo-stack ul { display: flex; flex-wrap: nowrap; align-items: center; gap: 18px clamp(32px, 4vw, 64px); margin: 0; padding: 0; list-style: none; }
+.qt-erestyra .ipo-stack li { display: flex; align-items: center; opacity: 0.8; transition: opacity 0.3s var(--ease); }
 .qt-erestyra .ipo-stack li:hover { opacity: 1; }
-.qt-erestyra .ipo-stack img { width: auto; display: block; }
-.qt-erestyra .ipo-stack li[data-kind="word"] img, .qt-erestyra .ipo-stack li[data-kind="mono"] img { filter: brightness(0) invert(1); }
-.qt-erestyra .ipo-stack li[data-kind="color"] img { filter: grayscale(1) brightness(1.6); }
-.qt-erestyra .ipo-stack li[data-kind="color"]:hover img { filter: none; }
-.qt-erestyra .ipo-stack b { font: 500 0.7rem/1.25 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.qt-erestyra .ipo-stack img { width: auto; display: block; filter: brightness(0) invert(1); }
 @media (max-width: 1100px) {
   .qt-erestyra .hero__foot .ipo-count { margin: 0; }
 }
 @media (max-width: 640px) {
   .qt-erestyra .hero:has(.hero__foot) { padding-bottom: 96px; }
   .qt-erestyra .ipo-stack ul { gap: 16px 26px; }
-  .qt-erestyra .ipo-stack img { zoom: 0.78; }
-  .qt-erestyra .ipo-stack b { font-size: 0.62rem; }
 }
 
 /* Hero foot on one line: logos left, countdown right */
@@ -2579,9 +2573,6 @@ html.is-warping {
   .qt-erestyra .hero__foot .ipo-count { flex-wrap: nowrap; flex: none; gap: 20px; white-space: nowrap; }
 }
 @media (min-width: 1101px) and (max-width: 1400px) {
-  .qt-erestyra .ipo-stack img { zoom: 0.84; }
-  .qt-erestyra .ipo-stack b { font-size: 0.64rem; }
-  .qt-erestyra .ipo-stack li { gap: 9px; }
   .qt-erestyra .hero__foot .ipo-count { gap: 14px; }
   .qt-erestyra .ipo-count__digits { gap: 14px; }
 }

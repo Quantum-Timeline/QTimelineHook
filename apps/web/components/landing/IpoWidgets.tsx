@@ -38,24 +38,21 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
 }
 
 const STACK = [
-  { name: "Robinhood", icon: "/partners/robinhood-wordmark.svg", kind: "word", h: 26 },
-  { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", kind: "word", h: 34 },
-  { name: "Ethereum", icon: "/partners/ethereum.svg", kind: "word", h: 28 },
-  { name: "USDG", icon: "/tokens/usdg.png", kind: "color", h: 26 },
-  { name: "SEC EDGAR", icon: "/partners/sec.svg", kind: "color", h: 30 },
+  { name: "Robinhood Chain", icon: "/partners/robinhood-wordmark.svg", m: 1.05 },
+  { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", m: 1.3 },
+  { name: "Ethereum", icon: "/partners/ethereum.svg", m: 1.45 },
 ] as const;
 
-/** The real marks of what the market is built on: bare logos under a small caption, no containers. */
+/** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */
 export function IpoStack() {
   return (
     <div className="ipo-stack">
       <span className="ipo-stack__cap mono">Built with</span>
       <ul aria-label="Built with">
         {STACK.map((item) => (
-          <li key={item.name} data-kind={item.kind}>
+          <li key={item.name}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.icon} alt={item.kind === "word" ? item.name : ""} style={{ height: item.h }} />
-            {item.kind !== "word" ? <b>{item.name}</b> : null}
+            <img src={item.icon} alt={item.name} style={{ height: `calc(${item.m} * clamp(20px, 2vw, 30px))` }} />
           </li>
         ))}
       </ul>
