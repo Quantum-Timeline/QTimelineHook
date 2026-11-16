@@ -38,27 +38,28 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
 }
 
 const STACK = [
-  { name: "Robinhood Chain", note: "Chain 4663", icon: "/partners/robinhood.svg" },
-  { name: "Uniswap v4", note: "Hooks + 3 pools", icon: "/partners/uniswap.svg" },
-  { name: "Ethereum", note: "ETH collateral", icon: "/partners/ethereum.svg" },
-  { name: "USDG", note: "Settlement asset", icon: "/tokens/usdg.png" },
-  { name: "SEC EDGAR", note: "Form 424B4", icon: "/partners/sec.svg" },
+  { name: "Robinhood Chain", icon: "/partners/robinhood.svg", mono: true },
+  { name: "Uniswap v4", icon: "/partners/uniswap.svg", mono: true },
+  { name: "Ethereum", icon: "/partners/ethereum.svg", mono: true },
+  { name: "USDG", icon: "/tokens/usdg.png" },
+  { name: "SEC EDGAR", icon: "/partners/sec.svg" },
 ] as const;
 
-/** The real marks of what the market is built on, as a quiet row under the hero copy. */
+/** The real marks of what the market is built on: bare logos under a small caption, no containers. */
 export function IpoStack() {
   return (
-    <ul className="ipo-stack" aria-label="Built with">
-      {STACK.map((item) => (
-        <li key={item.name}>
-          <span className="ipo-stack__mark" aria-hidden="true">
+    <div className="ipo-stack">
+      <span className="ipo-stack__cap mono">Built with</span>
+      <ul aria-label="Built with">
+        {STACK.map((item) => (
+          <li key={item.name} className={"mono" in item ? "is-mono" : undefined}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.icon} alt="" width={22} height={22} />
-          </span>
-          <span className="ipo-stack__text"><b>{item.name}</b><i className="mono">{item.note}</i></span>
-        </li>
-      ))}
-    </ul>
+            <img src={item.icon} alt="" height={24} />
+            <b>{item.name}</b>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
