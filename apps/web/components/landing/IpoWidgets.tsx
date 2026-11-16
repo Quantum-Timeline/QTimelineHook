@@ -41,6 +41,8 @@ const STACK = [
   { name: "Robinhood Chain", icon: "/partners/robinhood-wordmark.svg", m: 1.05 },
   { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", m: 1.3 },
   { name: "Ethereum", icon: "/partners/ethereum.svg", m: 1.45 },
+  { name: "USDG", icon: "/partners/usdg.png", m: 1.1, mark: true },
+  { name: "SEC EDGAR", icon: "/partners/sec.svg", m: 1.2, mark: true },
 ] as const;
 
 /** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */
@@ -50,7 +52,7 @@ export function IpoStack() {
       <span className="ipo-stack__cap mono">Built with</span>
       <ul aria-label="Built with">
         {STACK.map((item) => (
-          <li key={item.name}>
+          <li key={item.name} data-mark={"mark" in item ? "true" : undefined}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.icon} alt={item.name} style={{ height: `calc(${item.m} * clamp(20px, 2vw, 30px))` }} />
           </li>
