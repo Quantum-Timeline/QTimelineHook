@@ -7,6 +7,7 @@ import { Cursor, Loader } from "@/components/landing/LoaderAndCursor";
 import Header from "@/components/landing/Header";
 import ContractsSection from "@/components/landing/ContractsSection";
 import { IpoCountdown, IpoScrubber } from "@/components/landing/IpoWidgets";
+import { IpoStory } from "@/components/landing/IpoStory";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -297,6 +298,7 @@ export default function HomePage() {
       </section>
 
       {eventProfile.id === "ipo" ? <IpoScrubber /> : null}
+      {eventProfile.id === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}
 
       {/* 03 · PINNED HORIZONTAL SCROLL RAIL */}
       <section id="architecture">

@@ -237,6 +237,19 @@ export default function SmoothScroll() {
         );
       }
 
+      // The marquee leans into the scroll: skew follows scroll velocity and settles back
+      const marquee = document.querySelector<HTMLElement>(".marquee");
+      if (marquee) {
+        ScrollTrigger.create({
+          trigger: marquee,
+          start: "top bottom",
+          end: "bottom top",
+          onUpdate: (self) => {
+            gsap.to(marquee, { skewX: gsap.utils.clamp(-10, 10, self.getVelocity() / -140), duration: 0.5, ease: "power3.out", overwrite: "auto" });
+          },
+        });
+      }
+
       // Fine-pointer magnetic buttons & 3D card tilt
       if (window.matchMedia("(pointer: fine)").matches) {
         document.querySelectorAll<HTMLElement>(".hdr__app-btn, .cta__btn, .plist__site").forEach((btn) => {
