@@ -40,8 +40,8 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
 const STACK = [
   { name: "Robinhood", icon: "/partners/robinhood-wordmark.svg", kind: "word", h: 26 },
   { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", kind: "word", h: 34 },
-  { name: "Ethereum", icon: "/partners/ethereum.svg", kind: "mono", h: 26 },
-  { name: "USDG", icon: "/tokens/usdg.png", kind: "color", h: 28 },
+  { name: "Ethereum", icon: "/partners/ethereum.svg", kind: "word", h: 28 },
+  { name: "USDG", icon: "/tokens/usdg.png", kind: "color", h: 26 },
   { name: "SEC EDGAR", icon: "/partners/sec.svg", kind: "color", h: 30 },
 ] as const;
 
