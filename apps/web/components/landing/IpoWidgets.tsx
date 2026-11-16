@@ -20,10 +20,9 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
     [left % 60, "sec"],
   ] as const;
   const when = new Date(cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
-  const threshold = Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74;
   return (
-    <aside className="ipo-count" role="timer" aria-label="Time until trading closes">
-      <div className="ipo-count__top mono"><span>Trading closes</span><span>Anthropic IPO · ANT</span></div>
+    <div className="ipo-count" role="timer" aria-label="Time until trading closes">
+      <span className="ipo-count__label mono">Trading closes</span>
       {left === 0 ? (
         <strong className="ipo-count__done">Waiting for the Form 424B4</strong>
       ) : (
@@ -33,28 +32,28 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
           ))}
         </div>
       )}
-      <div className="ipo-count__foot mono"><span>{when} UTC</span><span>Threshold ${threshold.toFixed(2)}</span></div>
-    </aside>
+      <span className="ipo-count__when mono">{when} UTC</span>
+    </div>
   );
 }
 
 const STACK = [
   { name: "Robinhood Chain", note: "Chain 4663", icon: "/partners/robinhood.svg" },
-  { name: "Uniswap v4", note: "Hooks + 3 pools", glyph: "v4" },
+  { name: "Uniswap v4", note: "Hooks + 3 pools", icon: "/partners/uniswap.svg" },
   { name: "Ethereum", note: "ETH collateral", icon: "/partners/ethereum.svg" },
-  { name: "USDG", note: "Settlement asset", icon: "/tokens/usdg.png", photo: true },
-  { name: "SEC EDGAR", note: "Form 424B4", glyph: "SEC" },
-  { name: "NIST FIPS 204", note: "ML-DSA-44", glyph: "PQ" },
+  { name: "USDG", note: "Settlement asset", icon: "/tokens/usdg.png" },
+  { name: "SEC EDGAR", note: "Form 424B4", icon: "/partners/sec.svg" },
 ] as const;
 
-/** The pieces the market is built on, as a quiet row of marks under the hero copy. */
+/** The real marks of what the market is built on, as a quiet row under the hero copy. */
 export function IpoStack() {
   return (
     <ul className="ipo-stack" aria-label="Built with">
       {STACK.map((item) => (
         <li key={item.name}>
-          <span className={`ipo-stack__mark${"photo" in item ? " is-photo" : ""}`} aria-hidden="true">
-            {"icon" in item ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={item.icon} alt="" width={20} height={20} /> : <b className="mono">{item.glyph}</b>}
+          <span className="ipo-stack__mark" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={item.icon} alt="" width={22} height={22} />
           </span>
           <span className="ipo-stack__text"><b>{item.name}</b><i className="mono">{item.note}</i></span>
         </li>
