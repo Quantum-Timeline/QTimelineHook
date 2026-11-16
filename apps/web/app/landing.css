@@ -889,7 +889,8 @@ html.has-cursor .qt-erestyra .cur {
 }
 
  .qt-erestyra .hero__lead {
-  max-width: 40ch;
+  max-width: 44ch;
+  text-wrap: balance;
 }
 
  .qt-erestyra .hero__scroll {
