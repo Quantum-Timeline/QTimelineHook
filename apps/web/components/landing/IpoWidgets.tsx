@@ -38,11 +38,11 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
 }
 
 const STACK = [
-  { name: "Robinhood Chain", icon: "/partners/robinhood.svg", mono: true },
-  { name: "Uniswap v4", icon: "/partners/uniswap.svg", mono: true },
-  { name: "Ethereum", icon: "/partners/ethereum.svg", mono: true },
-  { name: "USDG", icon: "/tokens/usdg.png" },
-  { name: "SEC EDGAR", icon: "/partners/sec.svg" },
+  { name: "Robinhood", icon: "/partners/robinhood-wordmark.svg", kind: "word", h: 26 },
+  { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", kind: "word", h: 34 },
+  { name: "Ethereum", icon: "/partners/ethereum.svg", kind: "mono", h: 26 },
+  { name: "USDG", icon: "/tokens/usdg.png", kind: "color", h: 28 },
+  { name: "SEC EDGAR", icon: "/partners/sec.svg", kind: "color", h: 30 },
 ] as const;
 
 /** The real marks of what the market is built on: bare logos under a small caption, no containers. */
@@ -52,10 +52,10 @@ export function IpoStack() {
       <span className="ipo-stack__cap mono">Built with</span>
       <ul aria-label="Built with">
         {STACK.map((item) => (
-          <li key={item.name} className={"mono" in item ? "is-mono" : undefined}>
+          <li key={item.name} data-kind={item.kind}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.icon} alt="" height={24} />
-            <b>{item.name}</b>
+            <img src={item.icon} alt={item.kind === "word" ? item.name : ""} style={{ height: item.h }} />
+            {item.kind !== "word" ? <b>{item.name}</b> : null}
           </li>
         ))}
       </ul>
