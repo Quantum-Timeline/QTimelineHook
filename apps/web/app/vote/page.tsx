@@ -5,6 +5,18 @@ import { QtlMark } from "@/components/TokenLogo";
 import { VotingPanel } from "@/components/VotingPanel";
 
 export default function VotePage() {
+  const votingConfigured = !!process.env.NEXT_PUBLIC_VOTING && !/^0x0*$/i.test(process.env.NEXT_PUBLIC_VOTING);
+  if (!votingConfigured) {
+    return (
+      <Frame>
+        <PageHeading
+          tag="QTL governance"
+          title="Voting is not open yet."
+          body="No vote is running for this market. When the community vote for the next market opens, you will find it here."
+        />
+      </Frame>
+    );
+  }
   return (
     <Frame>
       <PageHeading

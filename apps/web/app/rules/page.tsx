@@ -52,7 +52,7 @@ export default function RulesPage() {
           </Reveal>
         ))}
       </section>
-      <div className="callout risk">Risk: pool prices move with liquidity and may diverge from any fair value. USDG depends on issuer transfer policy. Smart contract, oracle parsing, signer, RPC and hosting risks remain. This market is not live in this build.</div>
+      <div className="callout risk">Risk: pool prices move with liquidity and may diverge from any fair value. USDG depends on issuer transfer policy. Smart contract, oracle parsing, signer, RPC and hosting risks remain. Only trade money you can afford to lose.</div>
     </Frame>
   );
 }
