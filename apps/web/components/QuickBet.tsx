@@ -41,15 +41,16 @@ export function QuickBet() {
 
       <div className="qb__card">
         {sides.map(({ side, label, cond }) => {
-          const c = cents(side === "yes");
+          const real = cents(side === "yes");
+          const c = real ?? 50;
           return (
-            <button key={side} type="button" className={`qb__half qb__half--${side}`} onClick={() => pick(side)} aria-label={`Buy ${label}${c === undefined ? "" : ` at ${c} cents`}`}>
+            <button key={side} type="button" className={`qb__half qb__half--${side}${real === undefined ? " is-idle" : ""}`} onClick={() => pick(side)} aria-label={`Buy ${label} at ${c} cents`}>
               <span className="qb__eyebrow mono">{label} · {cond}</span>
               <span className="qb__num">
-                {c === undefined ? <em>––</em> : <AnimatedNumber value={String(c)} />}
-                {c !== undefined && <i>¢</i>}
+                {real === undefined ? <>{c}</> : <AnimatedNumber value={String(c)} />}
+                <i>¢</i>
               </span>
-              <span className="qb__cap mono">{c === undefined ? "price appears once trading opens" : "market price per share"}</span>
+              <span className="qb__cap mono">{real === undefined ? "opening price · moves once people trade" : "market price per share"}</span>
               <span className="qb__cta">Buy {label} <b aria-hidden="true">→</b></span>
             </button>
           );

@@ -21,6 +21,7 @@ export default function MarketPage() {
 
   return (
     <Frame>
+      <div className={isIpo ? "ipo-market" : undefined}>
       <PageHeading
         tag={testnet ? "Testnet · lifecycle smoke test" : eventProfile.tag}
         title={testnet ? "Test the market lifecycle." : isIpo ? question : "Two paths for ETH."}
@@ -66,6 +67,7 @@ export default function MarketPage() {
       </section>
 
       <PoolStrip />
+      </div>
     </Frame>
   );
 }
