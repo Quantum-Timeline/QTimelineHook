@@ -135,11 +135,11 @@
 @media (prefers-reduced-motion: reduce) { .guide li { animation: none !important; } }
 
 /* ── Market page (IPO): keep the hero compact on wide screens ── */
-.ipo-market .phero h1 { font-size: clamp(1.9rem, 3.4vw, 3.3rem); line-height: 1.04; max-width: 24ch; letter-spacing: -0.03em; }
-.ipo-market .phero__intro { max-width: 58ch; }
+.ipo-market .phero h1 { font-size: clamp(1.8rem, 2.9vw, 3rem); line-height: 1.05; max-width: none; letter-spacing: -0.03em; }
+.ipo-market .phero__intro { max-width: 90ch; }
 
 /* ── Quick bet: one card, two sides, seam at the market price ── */
-.qb { margin: 4px 0 26px; max-width: 1120px; }
+.qb { margin: 4px 0 22px; width: 100%; }
 .qb__meta { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 6px 10px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted, #9a9d94); }
 .qb__card { position: relative; display: grid; grid-template-columns: var(--seam) minmax(0, 1fr); border-radius: 26px; overflow: hidden; border: 1px solid var(--glass-line, rgba(243, 242, 236, 0.14)); background: #0b0e0c; transition: grid-template-columns 0.9s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)); box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(243, 242, 236, 0.06); }
 .qb__half { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "eye eye" "num cta" "cap cap"; align-items: end; row-gap: 10px; column-gap: 16px; text-align: left; padding: clamp(18px, 2vw, 28px) clamp(18px, 2.4vw, 34px); border: 0; color: var(--paper, #f3f2ec); cursor: pointer; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; min-width: 0; transition: background-color 0.3s var(--ease, ease); }
