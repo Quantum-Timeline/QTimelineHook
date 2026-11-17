@@ -128,7 +128,9 @@ async function main() {
     deployer: account.address, deployerEth: formatEther(ethBalance), deployerUsdg: (Number(usdgBalance) / 1e6).toString(),
   };
   const shortfalls = [];
-  const needEth = existing?.seeded ? 0n : budget.ethSplit + 5_000_000_000_000_000n;
+  // Gas on this chain is about 0.02 gwei, so the whole flow costs well under 0.0005 ETH. Headroom defaults to 0.001 ETH (override with QT_IPO_GAS_HEADROOM_WEI).
+  const gasHeadroom = BigInt(process.env.QT_IPO_GAS_HEADROOM_WEI ?? 1_000_000_000_000_000n);
+  const needEth = existing?.seeded ? 0n : budget.ethSplit + gasHeadroom;
   const needUsdg = existing?.seeded ? 0n : budget.usdgSplit;
   if (ethBalance < needEth) shortfalls.push(`ETH: need ${formatEther(needEth)} (seed + gas headroom), have ${formatEther(ethBalance)}`);
   if (usdgBalance < needUsdg) shortfalls.push(`USDG: need ${Number(needUsdg) / 1e6}, have ${Number(usdgBalance) / 1e6}`);
