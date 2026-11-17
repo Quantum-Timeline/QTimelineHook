@@ -84,7 +84,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Governance",
     icon: "qt-voting",
     name: "$QTL Voting",
-    label: eventProfile.id === "ipo" ? "Hold $QTL to nominate the next event and vote on which market launches across 24h cycles." : "Hold $QTL to nominate macro triggers and vote on the next market across 24h cycles.",
+    label: eventProfile.id === "ipo" ? "Coming next: $QTL holders will nominate the next event and vote on which market launches." : "Hold $QTL to nominate macro triggers and vote on the next market across 24h cycles.",
     href: "/vote/",
   },
 ];
@@ -186,7 +186,7 @@ const OPERATOR_CARDS = [
     kind: "Governors",
     icon: "qt-holders",
     name: "$QTL Holders",
-    label: eventProfile.id === "ipo" ? "Nominate upcoming events in 24h windows and vote on the next live market." : "Nominate upcoming macro catalysts in 24h windows and vote on the next live timeline.",
+    label: eventProfile.id === "ipo" ? "Voting opens after this market. Nominate upcoming events and vote on the next live one." : "Nominate upcoming macro catalysts in 24h windows and vote on the next live timeline.",
   },
 ];
 

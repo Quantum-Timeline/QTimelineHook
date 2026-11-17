@@ -85,7 +85,9 @@ const ipo: EventProfile = {
     heroEyebrow: "Anthropic IPO price",
     heroA: "One IPO price",
     heroB: "two timelines",
-    heroLead: "Will Anthropic's final IPO price clear the threshold? Split USDG into YES/NO claims, trade conditional ETH discovery on Uniswap v4, and settle from the SEC's final prospectus under ECDSA + ML-⁠DSA-⁠44.",
+    heroLead: thresholdDollars
+      ? `Will Anthropic's final IPO price be at or above $${Number(thresholdDollars).toFixed(2)}? Buy YES or NO shares. Each winning share pays $1.00 once the SEC's final prospectus is out, settled on Uniswap v4 under ECDSA + ML-⁠DSA-⁠44.`
+      : "Will Anthropic's final IPO price clear the threshold? Buy YES or NO shares. Each winning share pays $1.00 once the SEC's final prospectus is out.",
     manifesto: "We split one IPO pricing question into two live Uniswap v4 timelines on Robinhood Chain. Trade conditional ETH exposure and settle from the SEC Form 424B4 under hybrid ECDSA plus NIST FIPS 204 post-quantum signatures.",
     lockCaption: "Swap lock before the offering is priced",
     lockKicker: "Cutoff",
