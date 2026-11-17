@@ -309,7 +309,7 @@ export default function HomePage() {
       </section>
 
       {eventProfile.id === "ipo" ? <IpoScrubber /> : null}
-      {eventProfile.id === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}
+      {eventProfile.id === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}
 
       {/* 03 · PINNED HORIZONTAL SCROLL RAIL */}
       <section id="architecture">
@@ -428,7 +428,7 @@ export default function HomePage() {
 
       {/* 07 · HOW IT WORKS */}
       {eventProfile.id === "ipo" ? (
-        <IpoTerminal threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) : "at cutoff"} />
+        <IpoTerminal threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "at cutoff"} />
       ) : null}
 
       {eventProfile.id !== "ipo" ? (

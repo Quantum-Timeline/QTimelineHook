@@ -19,7 +19,7 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
     [Math.floor((left % 3600) / 60), "min"],
     [left % 60, "sec"],
   ] as const;
-  const when = new Date(cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+  const when = new Date(cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" });
   return (
     <div className="ipo-count" role="timer" aria-label="Time until trading closes">
       <span className="ipo-count__label mono">Trading closes</span>
@@ -32,7 +32,7 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
           ))}
         </div>
       )}
-      <span className="ipo-count__when mono">{when} UTC</span>
+      <span className="ipo-count__when mono">{when} ET</span>
     </div>
   );
 }

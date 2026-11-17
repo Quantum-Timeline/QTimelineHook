@@ -107,7 +107,7 @@ export function IpoTerminal({ threshold, cutoffLabel }: { threshold: number; cut
           </div>
 
           <footer className="term__foot mono">
-            <span>Trading stops {cutoffLabel} UTC</span>
+            <span>Trading stops {cutoffLabel}</span>
             <span>No report in 48 h → every claim redeems for 50%</span>
           </footer>
         </div>
