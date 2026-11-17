@@ -133,3 +133,23 @@
   .product-shell .claim-grid, .product-shell .candidate-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .guide li { animation: none !important; } }
+
+/* ── Quick bet: the one-tap YES / NO pair at the top of the IPO market ── */
+.quickbet { margin: 4px 0 22px; }
+.quickbet__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.quickbet__btn { display: grid; gap: 6px; align-content: start; text-align: left; padding: clamp(16px, 2.2vw, 26px); border-radius: 22px; border: 1px solid var(--glass-line, rgba(243, 242, 236, 0.14)); color: var(--paper, #f3f2ec); cursor: pointer; font-family: Archivo, "Helvetica Neue", Arial, sans-serif; transition: border-color 0.25s var(--ease, ease), background-color 0.25s var(--ease, ease), transform 0.25s var(--ease-out, ease); }
+.quickbet__btn--yes { background: radial-gradient(120% 90% at 0% 0%, rgba(207, 239, 140, 0.16), transparent 62%), var(--glass, rgba(243, 242, 236, 0.04)); }
+.quickbet__btn--no { background: radial-gradient(120% 90% at 100% 0%, rgba(240, 165, 143, 0.16), transparent 62%), var(--glass, rgba(243, 242, 236, 0.04)); }
+.quickbet__btn--yes:hover, .quickbet__btn--yes:focus-visible { border-color: rgba(207, 239, 140, 0.6); transform: translateY(-2px); }
+.quickbet__btn--no:hover, .quickbet__btn--no:focus-visible { border-color: rgba(240, 165, 143, 0.6); transform: translateY(-2px); }
+.quickbet__btn:focus-visible { outline: 2px solid var(--paper, #f3f2ec); outline-offset: 3px; }
+.quickbet__side { font-weight: 600; font-size: clamp(0.95rem, 1.6vw, 1.15rem); letter-spacing: -0.01em; }
+.quickbet__btn--yes .quickbet__side { color: var(--lime, #cfef8c); }
+.quickbet__btn--no .quickbet__side { color: var(--no, #f0a58f); }
+.quickbet__price { font-weight: 600; font-variation-settings: "wdth" 112; font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 0.95; letter-spacing: -0.04em; display: inline-flex; align-items: baseline; gap: 4px; }
+.quickbet__price i { font-style: normal; font-size: 0.4em; opacity: 0.7; letter-spacing: 0; }
+.quickbet__sub { font-family: "JetBrains Mono", monospace; font-size: 0.74rem; letter-spacing: 0.04em; opacity: 0.75; overflow-wrap: anywhere; }
+.quickbet__rule { margin: 14px 2px 0; color: var(--muted, #9a9d94); font-size: 0.92rem; line-height: 1.5; }
+.quickbet__rule b { color: var(--paper, #f3f2ec); font-weight: 600; }
+@media (max-width: 420px) { .quickbet__row { gap: 10px; } .quickbet__btn { padding: 14px; border-radius: 18px; } }
+@media (prefers-reduced-motion: reduce) { .quickbet__btn { transition: none; } .quickbet__btn:hover { transform: none; } }

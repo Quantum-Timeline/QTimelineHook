@@ -30,7 +30,7 @@ type PoolKey = { currency0: Address; currency1: Address; fee: number; tickSpacin
 
 export function MarketTradePanel() {
   const [direction, setDirection] = useState<"buy"|"sell">("buy");
-  const [instrument, setInstrument] = useState<"eth"|"probability">("eth");
+  const [instrument, setInstrument] = useState<"eth"|"probability">("probability");
   const [outcomeYes, setOutcomeYes] = useState(true);
   const [amount, setAmount] = useState("5");
   const { account, connect: connectWallet, wrongChain, switchChain } = useWallet();
@@ -146,8 +146,11 @@ export function MarketTradePanel() {
   // The two world lanes beside the ticket can switch the side being traded.
   useEffect(() => {
     const onOutcome = (event: Event) => { const side = (event as CustomEvent<string>).detail; if (side === "yes" || side === "no") setOutcomeYes(side === "yes"); };
+    // The Buy YES / Buy NO buttons at the top of the page always mean "bet on the outcome".
+    const onBet = (event: Event) => { const side = (event as CustomEvent<string>).detail; if (side === "yes" || side === "no") { setInstrument("probability"); setDirection("buy"); setOutcomeYes(side === "yes"); } };
     window.addEventListener("qt:outcome", onOutcome);
-    return () => window.removeEventListener("qt:outcome", onOutcome);
+    window.addEventListener("qt:bet", onBet);
+    return () => { window.removeEventListener("qt:outcome", onOutcome); window.removeEventListener("qt:bet", onBet); };
   }, []);
 
   async function trade() {
@@ -264,8 +267,8 @@ export function MarketTradePanel() {
   const balanceText = inputBalance === undefined ? undefined : Number(formatUnits(inputBalance, inputDec)).toLocaleString(undefined, { maximumFractionDigits: inputDec === 18 ? 6 : 2 });
   const side = outcomeYes ? "YES" : "NO";
   const otherSide = outcomeYes ? "NO" : "YES";
-  const outputUnit = instrument === "eth" && direction === "buy" ? "ETH conditional" : "USDG conditional";
-  const inputUnit = direction === "buy" ? "USDG" : instrument === "eth" ? "ETH claim" : "USDG claim";
+  const outputUnit = instrument === "eth" && direction === "buy" ? "ETH conditional" : instrument === "probability" ? (direction === "buy" ? `${side} shares` : "USDG") : "USDG conditional";
+  const inputUnit = direction === "buy" ? "USDG" : instrument === "eth" ? "ETH claim" : `${side} shares`;
   const chips = direction === "sell" && instrument === "eth" ? ["0.0025", "0.005", "0.01"] : ["5", "10", "25", "50"];
   const minReceived = quote === undefined ? undefined : (() => {
     try {
@@ -281,7 +284,9 @@ export function MarketTradePanel() {
   return (
     <section className="trade-panel" id="trade-ticket" data-outcome={outcomeYes ? "yes" : "no"} data-closed={info ? String(!info.open) : "false"}>
       <div className="trade-title">
-        <div><small>Trade conditional ETH</small><h2>Choose a timeline</h2></div>
+        {instrument === "probability"
+          ? <div><small>Your ticket</small><h2>Pick YES or NO</h2></div>
+          : <div><small>Trade conditional ETH</small><h2>Choose a timeline</h2></div>}
         <span className="fee-label">0.30% LP fee</span>
       </div>
       {info && !info.open && (
@@ -291,9 +296,9 @@ export function MarketTradePanel() {
           {info.status >= 4 && <Link href="/positions/">Go to Positions to redeem →</Link>}
         </div>
       )}
-      <div className="segmented" style={{ ["--i" as string]: instrument === "eth" ? 0 : 1 }}>
-        <button className={instrument === "eth" ? "selected" : ""} onClick={() => setInstrument("eth")}>Trade ETH</button>
+      <div className="segmented" style={{ ["--i" as string]: instrument === "probability" ? 0 : 1 }}>
         <button className={instrument === "probability" ? "selected" : ""} onClick={() => setInstrument("probability")}>Bet on the outcome</button>
+        <button className={instrument === "eth" ? "selected" : ""} onClick={() => setInstrument("eth")}>Trade ETH · advanced</button>
       </div>
       <div className="segmented" style={{ ["--i" as string]: direction === "buy" ? 0 : 1 }}>
         <button className={direction === "buy" ? "selected" : ""} onClick={() => setDirection("buy")}>{instrument === "eth" ? "Buy ETH" : "Buy outcome"}</button>
@@ -303,7 +308,7 @@ export function MarketTradePanel() {
         <button className={outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(true)}>{YES_LABEL}</button>
         <button className={!outcomeYes ? "selected" : ""} onClick={() => setOutcomeYes(false)}>{NO_LABEL}</button>
       </div>
-      <label className="amount-label">{direction === "buy" ? "USDG input" : instrument === "eth" ? "ETH claim input" : "USDG claim input"}
+      <label className="amount-label">{direction === "buy" ? (instrument === "probability" ? "Amount to spend (USDG)" : "USDG input") : instrument === "eth" ? "ETH claim input" : `${side} shares to sell`}
         <div><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /><span className="amount-unit"><ClaimIcon asset={inputAsset} yes={outcomeYes} size={26} />{inputUnit}</span></div>
       </label>
       <div className="balance-row">
@@ -322,8 +327,8 @@ export function MarketTradePanel() {
         <ul className="receipt" aria-label="What you will hold after this trade">
           {instrument === "eth" && direction === "buy" && <><li>≈ <b>{shownQuote}</b> ETH that exists only in the <b>{side}</b> world</li><li>+ <b>{amount}</b> USDG claim for the <b>{otherSide}</b> world</li></>}
           {instrument === "eth" && direction === "sell" && <li>You give <b>{amount}</b> ETH claim and get ≈ <b>{shownQuote}</b> USDG claim in the <b>{side}</b> world</li>}
-          {instrument === "probability" && direction === "buy" && <li>≈ <b>{shownQuote}</b> {side} claims. They pay <b>1 USDG each</b> if {side} wins, nothing if {otherSide} wins</li>}
-          {instrument === "probability" && direction === "sell" && <li>You get ≈ <b>{shownQuote}</b> USDG back for your {side} claims</li>}
+          {instrument === "probability" && direction === "buy" && <li>≈ <b>{shownQuote}</b> {side} shares. Each pays <b>$1.00</b> if {side} wins and $0 if {otherSide} wins</li>}
+          {instrument === "probability" && direction === "sell" && <li>You get ≈ <b>{shownQuote}</b> USDG back for your {side} shares</li>}
         </ul>
       )}
       <p className="trade-note">{instrument === "eth" ? direction === "buy" ? "The split also returns the opposite claim on your input collateral." : "Selling swaps your existing ETH claim. Matching opposite USDG claims merge to collateral; unpaired output stays conditional." : direction === "buy" ? "Collateral is split, then the opposite side is exchanged in the YES/NO pool." : "Your existing outcome claim is sold; matching opposite claims merge to collateral."} Minimum swap output uses a 1% slippage bound.</p>
