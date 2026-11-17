@@ -1,0 +1,203 @@
+================================================================================
+PROJECT SUBMISSION & HANDOVER REPORT — QTIMELINE
+Target Chain: Robinhood Chain (EVM) Mainnet 4663
+Generated: November 2026
+================================================================================
+
+--------------------------------------------------------------------------------
+SECTION 1: BRIEF
+--------------------------------------------------------------------------------
+Status: Live on Production Mainnet. The market is open and trading.
+- Repository: https://github.com/Quantum-Timeline/QTimelineHook
+- Branch: main (production)
+- Protocol: QTimeline — conditional prediction markets on Uniswap v4, settled onchain from an SEC filing with a dual ECDSA + ML-DSA-44 signature
+- Live market: "Will Anthropic's final IPO price be at or above $74.00 per share?"
+- Resolution source: first Form 424B4 filed on SEC EDGAR by Anthropic, PBC (CIK 0002130357)
+
+
+--------------------------------------------------------------------------------
+SECTION 2: DEV KERJA
+--------------------------------------------------------------------------------
+1. Live Production Web URL:
+   https://www.qtimeline.tech  (apex qtimeline.tech → 308 redirect)
+
+2. Platform Routes:
+   - Landing (question, countdown, how it works):  https://www.qtimeline.tech/
+   - Market Terminal (Buy YES / Buy NO, ticket):   https://www.qtimeline.tech/market/
+   - Positions (claims, merge, redeem):            https://www.qtimeline.tech/positions/
+   - Rules & Risks:                                https://www.qtimeline.tech/rules/
+   - QTL Voting (unavailable until token verified): https://www.qtimeline.tech/vote/
+   - BEA Fixture Proof (Core PCE parser):          https://www.qtimeline.tech/bea-proof/
+
+3. GitHub Repository:
+   https://github.com/Quantum-Timeline/QTimelineHook
+   Branch: main
+
+4. Tech Stack & Architecture:
+   - Frontend: Next.js 15.5 (static export) + React 19 + TypeScript 5.9 (strict)
+   - Web3 Client: viem 2.57, EIP-6963 wallet discovery with a window.ethereum fallback, pinned to chain 4663
+   - Smart Contracts: Solidity 0.8.30 (EVM osaka, via-IR, optimizer 10,000 runs), Foundry 1.7.1
+   - AMM Framework: Uniswap v4 core 1.0.2 + periphery 1.0.3
+   - Libraries: OpenZeppelin Contracts + Upgradeable 5.4.0
+   - Hook: IpoTimelineHook (CREATE2 salt mined, flags 0x2880: beforeInitialize, beforeAddLiquidity, beforeSwap)
+   - Market Engine: IpoMarketFactory + IpoMarketRegistry + IpoConditionalVault + IpoOutcomeToken (four claim tokens per market)
+   - Trade Entry Point: IpoTimelineRouter (buyProbability, sellProbability, tradeAsset, closeConditional)
+   - Resolution: IpoResolutionAdapter + IpoPQKeyRegistry + MLDSA44Verifier (NIST FIPS 204 ML-DSA-44) + ECDSA secp256k1
+   - Resolver Bot: Node 24 on GitHub Actions, protected Environment "robinhood-mainnet-ipo", scheduled every 15 minutes on 19-21 Nov from 13:00 UTC
+   - Hosting: Vercel (static export)
+
+5. Documentation Index:
+   - Project Report (qtimeline_report.md):      https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/qtimeline_report.md
+   - Operations Runbook:                https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/OPERATIONS.md
+   - IPO Expense Report:                https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/PENGELUARAN-IPO.md
+   - Implementation Plan:               https://github.com/Quantum-Timeline/QTimelineHook/blob/main/QTimeline-Implementation-Plan.md
+   - Mainnet Manifest:                  https://github.com/Quantum-Timeline/QTimelineHook/blob/main/deployments/robinhood-mainnet-ipo.json
+   - Main Repository README:            https://github.com/Quantum-Timeline/QTimelineHook/blob/main/README.md
+   (The report, the README and this file reach the links above once they are committed and pushed to main.)
+
+
+--------------------------------------------------------------------------------
+SECTION 3: QUALITY ASSURANCE (QA) REPORT
+--------------------------------------------------------------------------------
+[PASS] 1. Code Quality & Compilation:
+   - Strict TypeScript compilation: zero errors (tsc --noEmit in apps/web, exit code 0).
+   - Foundry unit, fuzz and invariant tests: 52 passed, 0 failed, 2 skipped (fork-only).
+   - Foundry mainnet fork tests: 9 passed, 0 failed (official PoolManager and USDG).
+   - Release and withdrawal script tests (node:test): 18 passed.
+   - Resolver tests (node:test): 27 passed (SEC 424B4 and BEA parsers, report builder, retry logic).
+   - Run on 18 Nov 2026. The fork suites exercise the Core PCE contracts with the ML-DSA verifier stubbed. The IPO contracts are covered by contracts/test/IpoMarket.t.sol and by the fork rehearsal in item 3.
+
+[PASS] 2. Responsive UI:
+   - Horizontal overflow measured at 320, 360, 375, 768 and 1024 px on the landing page, at 320 px on every product page, and at 375 px on the market page: no horizontal overflow.
+   - Market page leads with the question, a one-tap Buy YES / Buy NO card whose seam follows the market price, and a $74 threshold ruler. At 1920x940 the heading, card, ruler and the sentence under it end at pixel 639, so they fit one screen.
+   - Not visually verified on a phone: the landing footer, the hero foot, and the contracts list.
+
+[PASS] 3. End-to-End Application Flow (rehearsed on a local fork of Robinhood Mainnet 4663, production UI and production scripts):
+   - Market creation, seeding and activation with the live parameters; full treasury liquidity withdrawal returned the collateral (USDG within about $0.000002, ETH in full).
+   - Production web UI driven by a test wallet: connect, Buy YES, Buy NO, Sell YES, Sell NO, Buy ETH (YES and NO pools), Sell ETH (YES and NO pools). All transactions succeeded.
+   - Swaps rejected after the cutoff.
+   - Resolver replaying a saved real Form 424B4 (Circle, $31.00) to Final NO, and the same filing edited to $78.00 to Final YES. Redemption and treasury exit worked in both outcomes.
+   - A bug found in this rehearsal (a truncated upper swap price limit that made some ETH sells revert) was fixed in commit 915be4a and deployed.
+   - These are fork results, not mainnet transactions by users.
+
+[PASS] 4. Mainnet Deployment & Market Activation (Robinhood Chain 4663):
+   - Contracts deployed, wired and sealed (27 deployment transactions, about 47.3M gas, about 0.00095 ETH).
+   - Market created, seeded and activated (17 transactions, about 6.2M gas, about 0.00013 ETH). Status read back from chain: activated, threshold 7400 cents, three LP positions owned by the deployer.
+   - Bytecode of every core address read back from chain 4663.
+   - Quotes on mainnet after opening: a $5 trade moves the YES / NO pool by 3.12% (buy) and 3.23% (exit), and each ETH pool by 6.31%, before the 0.30% fee.
+
+[PASS] 5. Resolver Operations:
+   - GitHub Actions workflow resolve-mainnet-ipo.yml ran as a dry run: 27 resolver tests passed, the contracts built, and the SEC poll reported "no 424B4 on EDGAR yet".
+   - The workflow had a bug (the manifest check ran before checkout, so it always failed). Found by the dry run, fixed in commit c48d568.
+   - Scheduled runs broadcast; manual runs are simulation-only unless broadcast is set.
+
+[NOTE] 6. Repository State:
+   - Branch main is synced with origin/main for every commit that belongs to the deployed system.
+   - Pending in the working tree when this report was written: the new README.md, docs/qtimeline_report.md, docs/submission_package.txt, docs/OPERATIONS.md (the previous README, kept in full) and one unreleased brand image (apps/web/public/brand/x-header.png).
+   - Private keys are never read by the app. Resolver and deployer keys live in ignored local files and in the protected GitHub Environment.
+
+[OPEN] 7. Items Not Yet Done:
+   - No independent security audit or cryptographic review has been completed.
+   - No real-wallet trade by an outside user on mainnet has been observed yet.
+   - The Positions page was not re-checked in a visible browser tab after a merge. In a hidden tab the number animation did not update, while the onchain balance was correct.
+   - QTL voting is unavailable until the QTL token is verified.
+
+
+--------------------------------------------------------------------------------
+SECTION 4: ON-CHAIN MAINNET CONTRACT ADDRESSES (ROBINHOOD CHAIN 4663)
+--------------------------------------------------------------------------------
+
+Network: Robinhood Chain Mainnet (EVM)
+Chain ID: 4663
+Native Currency: ETH
+Block Explorer: https://robinhoodchain.blockscout.com
+
+1. IpoMarketFactory (Market Creator, upgradeable proxy):
+   Address: 0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6
+   Tx Hash: 0xf10a3286449cf64cb760d046b4a0a4984127739d233d936b54da4ee68e2564d7
+   Block:   114258173
+
+2. IpoMarketRegistry (Market State Machine, upgradeable proxy):
+   Address: 0x5444CF6E91462938C975668266c9E24b6233BD37
+   Tx Hash: 0x82a1efcc2701c4a8ef224342a676f26fc665c3afc5d4e929963ae86ecf6b962a
+   Block:   114258161
+
+3. IpoResolutionAdapter (Dual-Signature Resolver, upgradeable proxy):
+   Address: 0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA
+   Tx Hash: 0x4b88f383be1349171cfa0a93d0b20855f9bd7d9854ca23776cbc5ada03fdb60c
+   Block:   114258179
+
+4. TimelineRouter (Trade Entry Point, upgradeable proxy):
+   Address: 0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45
+   Tx Hash: 0x56604600307493178888933e3f9bd483b8fba1afa93cd6abe6b33ba6cbe8aa66
+   Block:   114258185
+
+5. PQKeyRegistry (Post-Quantum Key Registry, sealed, upgradeable proxy):
+   Address: 0x78F42d96AD69Ed3D696875CF59eFF8A447Cd80A8
+   Tx Hash: 0x2ea0a66be9ed4417d7f3596af21c1634d970245fd6bdf8c4576913a22fe4d00d
+   Block:   114258167
+
+6. MLDSA44Verifier (NIST FIPS 204 ML-DSA-44 Verifier):
+   Address: 0x668Fe10f9b424349FDD41F7E6C5DF2cC21Bf3214
+   Tx Hash: 0xc365da5c5cf918768469e19298e2fc378129bdbe4fdec3d93002698d583a7f80
+   Block:   114257982
+
+7. IpoHookDeployer (Deterministic CREATE2 Hook Deployer):
+   Address: 0xaAa28FA6a7DB709129879c1daF13Bc90B843064f
+   Tx Hash: 0xbd6615ae08f8338dcdffd8995ad5d529f99886a43e27e198559116aae5eb7daa
+   Block:   114258133
+
+8. F1600Helper (Keccak-f[1600] Helper for the Verifier):
+   Address: 0x0438deB1f25BA0D88D257acfe89191B3EB3de75F
+   Block:   114257972
+
+9. Implementations (behind the proxies) and Beacons:
+   - IpoMarketRegistry implementation:     0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE
+   - IpoPQKeyRegistry implementation:      0x5B0f7981EC187C0e95977693C9418387aF4d5897
+   - IpoMarketFactory implementation:      0x68E6e6689502c7ff4D05F0569c6c72066AdFD164
+   - IpoResolutionAdapter implementation:  0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A
+   - IpoTimelineRouter implementation:     0x74E9B2F75a0BACeA0974D63806DBbfA95BA221F1
+   - IpoConditionalVault implementation:   0x6B690Cc6e05de26A617ea530bA068B556489E889
+   - IpoOutcomeToken implementation:       0xa8801A0cf08D21752331BA241198ed6e6De35584
+   - IpoTimelineHook implementation:       0xc79062f4a0A67142c84F042b4aE85952A4A0A880
+   - Outcome token beacon:                 0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214
+   - Vault beacon:                         0x326be2C0e8883dd7b24d3afD17d9f37B3D512329
+   - Hook beacon:                          0xa9928908754d2876613787E362bc35DA559C97FE
+
+10. The Live Market:
+    - Market ID:       0x19d1b881668c8c8c776c92c1745daf74933b2c40c82065ba5f6017ee5e6aeafa
+    - Question:        Will Anthropic's final IPO price be at or above $74.00 per share? (threshold 7400 cents)
+    - Hook:            0x35A5E21FC31614a30f88D10CC35e5cD5829E2880
+    - Vault:           0x7ACf9Dca7A456175ED66BbEc8B8600C9Fe6e5c0d
+    - ETH-YES claim:   0xE186dc05674B798deDF7059644E84A5c8F6144Eb
+    - ETH-NO claim:    0xe1d59cf537e8b2EB51911ea3733D8b9Ce8Ec4bD6
+    - USDG-YES claim:  0x45eB501957E64f5C732a9A30Cded87B77C1C5076
+    - USDG-NO claim:   0x75F443e26421c0c024AA3745CF074D43375e8001
+    - LP positions:    PositionManager NFTs 4311004, 4311005, 4311006
+    - Create Tx:       0x7f004edbc4d5a255036b785b421f739406150bfeaf9685c99ac1804b40c6fb77 (block 116738977)
+    - Activate Tx:     0x5344cff69d110ec3d97b511f0b354431be1c4da99a31d5d5a830c0c5cc085c0c (block 116739091)
+    - Opens:           17 Nov 2026, 18:03:39 UTC (13:03 ET)
+    - Closes:          18 Nov 2026, 12:00 UTC (07:00 ET)
+    - Earliest report: 19 Nov 2026, 06:00 UTC
+    - Cancellation:    from 21 Nov 2026, 06:00 UTC; every claim then redeems for 50%
+
+11. Canonical Dependencies:
+    - Uniswap v4 PoolManager:    0x8366a39CC670B4001A1121B8F6A443A643e40951
+    - Uniswap v4 PositionManager: 0x58daec3116aae6D93017bAAea7749052E8a04fA7
+    - Uniswap v4 Quoter:         0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94
+    - USDG (Global Dollar):      0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168 (6 decimals)
+    - WETH (Wrapped Ether):      0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73 (18 decimals)
+
+12. Protocol Roles & Accounts:
+    - Deployer (owner of every ProxyAdmin and beacon, holder of the LP position NFTs): 0x3B06A7c6839dF369d62961DcA54ea56185332828
+    - Resolver signer (ECDSA): 0xB1eeCD3799E929c01aA0aeCbb6CaDEC6d5a30801
+    - Report relayer: a separate wallet that pays gas only
+
+13. Trust Model:
+    - Core contracts are upgradeable proxies. The deployer wallet owns every ProxyAdmin and beacon with no timelock, so it can replace logic, including the vault logic that holds collateral.
+    - The resolver ECDSA key and ML-DSA-44 key are controlled by the project. The dual signature protects against the loss of one key, not against the operator.
+    - Collateral per market is capped at 0.1 ETH and 500 USDG by the factory.
+    - Opening liquidity is thin (28 USDG and about 0.0045 ETH). The treasury is the counterparty to every trade.
+
+Verification: Bytecode of every core address was read back from Robinhood Chain Mainnet (4663) on 17 Nov 2026. The deployment manifest records the wiring readback at block 114269075.
+================================================================================
