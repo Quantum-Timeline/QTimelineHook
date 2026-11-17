@@ -6,11 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const STEPS = [
-  { key: "Split", title: "Lock USDG. Get two claims.", text: "Deposit USDG in the vault and receive the same amount of YES and NO claims. Merge them back any time before the result." },
+  { key: "Split", title: "Lock USDG. Get two shares.", text: "Deposit USDG in the vault and receive the same amount of YES and NO shares. Merge them back any time before the result." },
   { key: "Trade", title: "Each world has its own ETH.", text: "ETH-YES and ETH-NO are separate Uniswap v4 pools. Trade the one that matches what you expect the IPO price to do." },
   { key: "Close", title: "Swaps stop before pricing.", text: "The hook shuts every pool on-chain before the offering is priced, so nobody trades with the answer in hand." },
   { key: "Resolve", title: "The 424B4 decides.", text: "The bot reads the final offering price from the SEC filing. The report needs both an ECDSA and an ML-DSA-44 signature." },
-  { key: "Redeem", title: "Winners redeem 1 for 1.", text: "The winning claim pays one USDG. The other pays nothing. With no result after 48 hours, each claim redeems for half." },
+  { key: "Redeem", title: "Winners redeem 1 for 1.", text: "The winning share pays one USDG. The other pays nothing. With no result after 48 hours, each share redeems for half." },
 ] as const;
 
 const UP = "M0 96 C 30 94, 50 78, 80 72 S 120 74, 150 52 S 210 40, 240 22 S 266 12, 280 8";
@@ -137,13 +137,13 @@ export function IpoStory({ cutoffLabel, threshold }: Props) {
               <div className="s1-flow">{Array.from({ length: 5 }).map((_, i) => <i key={i} className="s1-dot" />)}</div>
               <div className="s1-pair">
                 <div className="s1-claim s1-claim--yes">
-                  <span className="mono"><i className="tok tok--yes">Y</i>YES claim</span>
+                  <span className="mono"><i className="tok tok--yes">Y</i>YES share</span>
                   <b className="s1-num s1-num--yes">0.00</b>
                   <small>Pays 1 USDG if the price is ≥ ${threshold}</small>
                   <span className="s1-bar"><i /></span>
                 </div>
                 <div className="s1-claim s1-claim--no">
-                  <span className="mono"><i className="tok tok--no">N</i>NO claim</span>
+                  <span className="mono"><i className="tok tok--no">N</i>NO share</span>
                   <b className="s1-num s1-num--no">0.00</b>
                   <small>Pays 1 USDG if the price is &lt; ${threshold}</small>
                   <span className="s1-bar"><i /></span>
@@ -222,16 +222,16 @@ export function IpoStory({ cutoffLabel, threshold }: Props) {
             {/* 4 · Redeem */}
             <div className="st-scene" data-i="4">
               <div className="s5-row s5-row--win">
-                <span className="s5-who"><i className="tok tok--yes">Y</i><b>10 YES claims</b><small className="mono">winning side</small></span>
+                <span className="s5-who"><i className="tok tok--yes">Y</i><b>10 YES shares</b><small className="mono">winning side</small></span>
                 <i className="s5-arrow" />
                 <b className="s5-win">$0.00</b>
               </div>
               <div className="s5-row s5-row--lose">
-                <span className="s5-who"><i className="tok tok--no">N</i><b>10 NO claims</b><small className="mono">other side</small></span>
+                <span className="s5-who"><i className="tok tok--no">N</i><b>10 NO shares</b><small className="mono">other side</small></span>
                 <i className="s5-arrow" />
                 <b>$0.00</b>
               </div>
-              <div className="s5-cancel mono"><span>If cancelled or no result in 48 h</span><b>every claim → $0.50</b></div>
+              <div className="s5-cancel mono"><span>If cancelled or no result in 48 h</span><b>every share → $0.50</b></div>
               <p className="s5-done mono">✓ Redeemed to your wallet · 1 : 1</p>
             </div>
           </div>

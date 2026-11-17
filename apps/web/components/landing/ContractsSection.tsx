@@ -100,7 +100,7 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
   {
     name: "USDG",
     kind: "SETTLEMENT",
-    role: "Collateral & 1:1 winning claim payout asset",
+    role: "Collateral & 1:1 winning share payout asset",
     address: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
   },
 ];

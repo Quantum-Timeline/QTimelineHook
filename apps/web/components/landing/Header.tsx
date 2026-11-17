@@ -46,6 +46,7 @@ export default function Header() {
 
   return (
     <>
+      <div className="hdr-fade" aria-hidden="true" />
       <header className="hdr">
         <Link href="/" className="hdr__logo" aria-label="QTimeline" onClick={closeMenu} data-cursor>
           <img

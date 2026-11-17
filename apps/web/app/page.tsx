@@ -48,7 +48,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Custody",
     icon: "qt-vault",
     name: "OutcomeVault",
-    label: "Split USDG into equal YES and NO claims, merge pairs pre-resolution, or redeem winners 1:1.",
+    label: "Split USDG into equal YES and NO shares, merge pairs pre-resolution, or redeem winners 1:1.",
     href: "/market/",
   },
   {
@@ -110,7 +110,7 @@ const POOL_MODULES = [
     index: "Y/N",
     prefix: "YES / ",
     bold: "NO",
-    label: "Direct implied probability curve in USDG claims across a 35%–65% active seed band.",
+    label: "Direct implied probability curve in USDG shares across a 35%–65% active seed band.",
     cta: "Price Odds",
     href: "/market/",
   },
@@ -137,8 +137,8 @@ const LIFECYCLE_ROWS = [
   {
     n: "SPLIT",
     kicker: "Collateral",
-    title: "Mint YES & NO claims",
-    text: "Deposit USDG into OutcomeVault via TimelineRouter to receive equal quantities of conditional YES and NO claims.",
+    title: "Mint YES & NO shares",
+    text: "Deposit USDG into OutcomeVault via TimelineRouter to receive equal quantities of conditional YES and NO shares.",
   },
   {
     n: "SWAP",
@@ -161,8 +161,8 @@ const LIFECYCLE_ROWS = [
   {
     n: "CLAIM",
     kicker: "Settlement",
-    title: "1:1 claim or 50/50 fallback",
-    text: "Winning claims redeem 1 USDG each. If no valid report lands within 48h, cancelExpired unlocks 50% per claim.",
+    title: "$1 per share or 50/50 fallback",
+    text: "Winning shares redeem 1 USDG each. If no valid report lands within 48h, cancelExpired unlocks 50% per share.",
   },
 ];
 

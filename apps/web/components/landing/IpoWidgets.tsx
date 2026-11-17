@@ -91,11 +91,11 @@ export function IpoScrubber() {
             <div className="scrub__ends mono"><span>{money(MIN)}</span><span>{money(MAX)}</span></div>
           </div>
           <div className="scrub__pay">
-            <div className={`scrub__claim${yes ? " is-win" : ""}`}><span className="mono">YES claim</span><b>{yes ? "$1.00" : "$0.00"}</b><small>{eventProfile.yesLabel}</small></div>
-            <div className={`scrub__claim${yes ? "" : " is-win"}`}><span className="mono">NO claim</span><b>{yes ? "$0.00" : "$1.00"}</b><small>{eventProfile.noLabel}</small></div>
+            <div className={`scrub__claim${yes ? " is-win" : ""}`}><span className="mono">YES share</span><b>{yes ? "$1.00" : "$0.00"}</b><small>{eventProfile.yesLabel}</small></div>
+            <div className={`scrub__claim${yes ? "" : " is-win"}`}><span className="mono">NO share</span><b>{yes ? "$0.00" : "$1.00"}</b><small>{eventProfile.noLabel}</small></div>
           </div>
         </div>
-        <p className="scrub__note">Each claim redeems for 1 USDG on the winning side and nothing on the other. If no result is reported within 48 hours, every claim redeems for $0.50.</p>
+        <p className="scrub__note">Each share redeems for 1 USDG on the winning side and nothing on the other. If no result is reported within 48 hours, every share redeems for $0.50.</p>
       </div>
     </section>
   );
