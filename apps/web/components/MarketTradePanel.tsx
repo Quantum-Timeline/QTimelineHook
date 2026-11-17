@@ -287,7 +287,7 @@ export function MarketTradePanel() {
       {info && !info.open && (
         <div className="closed-banner" role="status">
           <b>{info.status === 1 ? "Trading has not opened yet" : info.status === 3 ? "Trading is closed" : info.status === 4 || info.status === 5 ? `Resolved ${info.status === 4 ? "YES" : "NO"}` : info.status === 6 ? "Market cancelled" : "Trading is closed"}</b>
-          <span>{info.status === 1 ? `Opens ${new Date(Number(info.opensAt) * 1000).toLocaleString()}.` : info.status === 3 ? "Waiting for the official result." : info.status === 4 || info.status === 5 ? "Winning claims redeem 1 : 1." : info.status === 6 ? "Each claim redeems for 50%." : ""}</span>
+          <span>{info.status === 1 ? `Opens ${new Date(Number(info.opensAt) * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" })} ET.` : info.status === 3 ? "Waiting for the official result." : info.status === 4 || info.status === 5 ? "Winning claims redeem 1 : 1." : info.status === 6 ? "Each claim redeems for 50%." : ""}</span>
           {info.status >= 4 && <Link href="/positions/">Go to Positions to redeem →</Link>}
         </div>
       )}

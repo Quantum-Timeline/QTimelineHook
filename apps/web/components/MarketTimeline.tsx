@@ -60,7 +60,7 @@ export function MarketTimeline({ status, activated, opensAt, cutoffAt, releaseAt
           <div key={STAGES[i]} className={i <= stageIndex ? "is-done" : ""}>
             <span>{STAGES[i]}</span>
             <time dateTime={new Date(Number(mark) * 1000).toISOString()}>
-              {new Date(Number(mark) * 1000).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              {new Date(Number(mark) * 1000).toLocaleString("en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" })} ET
             </time>
           </div>
         ))}
