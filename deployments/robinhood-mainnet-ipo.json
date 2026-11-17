@@ -312,5 +312,114 @@
     }
   },
   "deployedAndSealed": true,
-  "deploymentBlock": "114269075"
+  "deploymentBlock": "114269075",
+  "ipoMarket": {
+    "marketId": "0x19d1b881668c8c8c776c92c1745daf74933b2c40c82065ba5f6017ee5e6aeafa",
+    "configHash": "0x2f935c03ceba0ec75dff76a5dd1992183f70421311c90b527783ee1bcfb9e6ba",
+    "period": "ANT-IPO-PRICE-2026-11",
+    "periodId": "0x20f2a32fa24e98cbcd511d75dabfd846d27a0d33e37cc3d25e05880f7803218b",
+    "thresholdCents": 7400,
+    "thresholdBps": 7400,
+    "opensAt": "1794938619",
+    "cutoffAt": "1795003200",
+    "releaseAt": "1795068000",
+    "deadline": "1795240800",
+    "hook": "0x35A5E21FC31614a30f88D10CC35e5cD5829E2880",
+    "referenceEthUsd": "1778.03",
+    "transactions": {
+      "create": {
+        "hash": "0x7f004edbc4d5a255036b785b421f739406150bfeaf9685c99ac1804b40c6fb77",
+        "gasUsed": "3658869",
+        "blockNumber": "116738977"
+      },
+      "initializePools": {
+        "hash": "0x970b487f0107b1b2bfec658d7e994b9fe8073f32e2dcea5654f47160593b6e76",
+        "gasUsed": "236776"
+      },
+      "splitEth": {
+        "hash": "0xa6c913ea3e2d098a40d110d373d05eeb0f8ae8e1acb3728f536e5cfa8952ea65",
+        "gasUsed": "206584"
+      },
+      "splitUsdg": {
+        "hash": "0xc6c5adde6e3beed14e67768b52464bd6206d58e00a41ed0bec228efef8e983f5",
+        "gasUsed": "259938"
+      },
+      "positions": [
+        {
+          "hash": "0xfd9b96395f74ca4b6220f1dfc83e3fba73a96b59adcaa3dda24504a7cf8fefe2",
+          "gasUsed": "506352"
+        },
+        {
+          "hash": "0x7cc3654b671c478ace603a6085accf38b577e006479fb4bf024ab45eccde6362",
+          "gasUsed": "489252"
+        },
+        {
+          "hash": "0x0fa4e8c6806529deb940b5c06b2536a09dfa4a5e0be1a032cbcdd815144ff546",
+          "gasUsed": "455096"
+        }
+      ],
+      "activate": {
+        "hash": "0x5344cff69d110ec3d97b511f0b354431be1c4da99a31d5d5a830c0c5cc085c0c",
+        "gasUsed": "93847"
+      }
+    },
+    "vault": "0x7ACf9Dca7A456175ED66BbEc8B8600C9Fe6e5c0d",
+    "tokens": [
+      "0xE186dc05674B798deDF7059644E84A5c8F6144Eb",
+      "0xe1d59cf537e8b2EB51911ea3733D8b9Ce8Ec4bD6",
+      "0x45eB501957E64f5C732a9A30Cded87B77C1C5076",
+      "0x75F443e26421c0c024AA3745CF074D43375e8001"
+    ],
+    "poolIds": [
+      "0x1a89bc025acefefbd2cb6462e27729468affda12d1b825f7044a9a7841871336",
+      "0x7ffcd04cddfa3d1a45f47846c1abea1b25f54f84aacff0b8fac9eedae2a5181d",
+      "0xbf52d85e90e26e1bd0b5b1020c549538e4ffa799c090719c0d24a9c994ffbbf7"
+    ],
+    "positionIds": [
+      "4311004",
+      "4311005",
+      "4311006"
+    ],
+    "seeded": true,
+    "positions": [
+      {
+        "currency0": "0x45eB501957E64f5C732a9A30Cded87B77C1C5076",
+        "currency1": "0xE186dc05674B798deDF7059644E84A5c8F6144Eb",
+        "tickLower": 199200,
+        "tickUpper": 203760,
+        "liquidity": "1755234328141",
+        "sqrtPriceX96": "1878927581114741726242897422806282",
+        "amount0Max": "8000000",
+        "amount1Max": "4499361653065472",
+        "amount0Needed": "7948538",
+        "amount1Needed": "4498911716898466"
+      },
+      {
+        "currency0": "0x75F443e26421c0c024AA3745CF074D43375e8001",
+        "currency1": "0xe1d59cf537e8b2EB51911ea3733D8b9Ce8Ec4bD6",
+        "tickLower": 199200,
+        "tickUpper": 203760,
+        "liquidity": "1755234328141",
+        "sqrtPriceX96": "1878927581114741726242897422806282",
+        "amount0Max": "8000000",
+        "amount1Max": "4499361653065472",
+        "amount0Needed": "7948538",
+        "amount1Needed": "4498911716898466"
+      },
+      {
+        "currency0": "0x45eB501957E64f5C732a9A30Cded87B77C1C5076",
+        "currency1": "0x75F443e26421c0c024AA3745CF074D43375e8001",
+        "tickLower": -6240,
+        "tickUpper": 6240,
+        "liquidity": "74617438",
+        "sqrtPriceX96": "79228162514264337593543950336",
+        "amount0Max": "20000000",
+        "amount1Max": "20000000",
+        "amount0Needed": "19998000",
+        "amount1Needed": "19998000"
+      }
+    ],
+    "activated": true,
+    "status": "Scheduled"
+  }
 }
