@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { Frame, PageHeading } from "@/components/Frame";
 import { eventProfile } from "@/lib/event-profile";
 import { GuideCard } from "@/components/GuideCard";
 import { QtlMark } from "@/components/TokenLogo";
 import { VotingPanel } from "@/components/VotingPanel";
+
+export const metadata: Metadata = { title: "Vote" };
 
 export default function VotePage() {
   const votingConfigured = !!process.env.NEXT_PUBLIC_VOTING && !/^0x0*$/i.test(process.env.NEXT_PUBLIC_VOTING);

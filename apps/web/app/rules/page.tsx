@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Frame, PageHeading } from "@/components/Frame";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { ClaimIcon, TokenLogo } from "@/components/TokenLogo";
@@ -17,6 +18,8 @@ const numbers = [
   ["48 h", "Report deadline", "Then anyone can cancel"],
   ["50%", "Payout if cancelled", "Per claim; pairs merge to 100%"],
 ] as const;
+
+export const metadata: Metadata = { title: "Rules and risk" };
 
 export default function RulesPage() {
   return (

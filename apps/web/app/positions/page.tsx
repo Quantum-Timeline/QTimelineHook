@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { Frame, PageHeading } from "@/components/Frame";
 import { GuideCard } from "@/components/GuideCard";
 import { PositionsPanel } from "@/components/PositionsPanel";
 import { ClaimIcon, TokenLogo } from "@/components/TokenLogo";
+
+export const metadata: Metadata = { title: "Positions" };
 
 export default function PositionsPage() {
   return (

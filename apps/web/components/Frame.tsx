@@ -122,6 +122,13 @@ function FrameInner({ children }: { children: React.ReactNode }) {
 
       <footer className="product-footer">
         <div className="product-footer__brand">
+          <img
+            src="/brand/qtimeline-logo.png"
+            alt=""
+            width={20}
+            height={20}
+            style={{ width: "20px", height: "20px", objectFit: "contain", flexShrink: 0 }}
+          />
           <span>QTIMELINE</span>
           <small>{isTestnet ? "ROBINHOOD TESTNET · 46630" : <span className="rh-inline"><RobinhoodMark h={12} /> <i>· 4663</i></span>}</small>
         </div>

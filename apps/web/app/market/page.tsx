@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Frame, PageHeading } from "@/components/Frame";
 import { HowToTrade } from "@/components/HowToTrade";
 import { MarketSnapshot } from "@/components/MarketSnapshot";
@@ -8,6 +9,8 @@ import { TokenLogo } from "@/components/TokenLogo";
 import { WorldLane } from "@/components/WorldLane";
 import { robinhoodChain } from "@qtimeline/chain";
 import { eventProfile } from "@/lib/event-profile";
+
+export const metadata: Metadata = { title: "Market" };
 
 export default function MarketPage() {
   const testnet = robinhoodChain.id === 46630;

@@ -46,9 +46,18 @@ export function WalletModal() {
     <div className="wmodal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !connectingId) closePicker(); }}>
       <div className="wmodal__card" role="dialog" aria-modal="true" aria-labelledby="wmodal-title">
         <header>
-          <div>
-            <h2 id="wmodal-title">Connect a wallet</h2>
-            <p>Pick the wallet you use. We will switch it to {robinhoodChain.name}.</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <img
+              src="/brand/qtimeline-logo.png"
+              alt=""
+              width={28}
+              height={28}
+              style={{ width: "28px", height: "28px", objectFit: "contain", flexShrink: 0 }}
+            />
+            <div>
+              <h2 id="wmodal-title">Connect a wallet</h2>
+              <p>Pick the wallet you use. We will switch it to {robinhoodChain.name}.</p>
+            </div>
           </div>
           <button className="wmodal__close" onClick={closePicker} disabled={connectingId !== undefined} aria-label="Close">✕</button>
         </header>
