@@ -16,7 +16,7 @@ The Mainnet workflow is `.github/workflows/resolve-mainnet.yml`. It uses a separ
 
 After deployment, commit the public `deployments/robinhood-mainnet.json` manifest (it contains contract addresses and transaction evidence, not signer keys). After market activation, set `QTIMELINE_MAINNET_MANIFEST`, `QT_MAINNET_MARKET_ID`, `BEA_PERIOD_ID`, and `BEA_RELEASE_URL` in the `robinhood-mainnet` Environment. The scheduled job stays disabled until the repository variable `QTIMELINE_MAINNET_ENABLED=true`. A manual run defaults to simulation; its `broadcast` input must be explicitly enabled to submit. Do not put signer values in the repository, Vercel, or a public build. Keep an encrypted offline backup of `contracts/.secrets/` before registering keys.
 
-The release workflow is configured for the October 2026 PIO article on November 25, 2026 at 13:30 UTC. If deployment or activation misses the release window, select a later BEA period and change the workflow schedule and environment variables together. Market activation still requires the audit, quote, gas, resolver, and hosting/legal release gates in the implementation plan.
+The release workflow is configured for the October 2026 PIO article on November 25, 2026 at 13:30 UTC. If deployment or activation misses the release window, select a later BEA period and change the workflow schedule and environment variables together. Market activation still requires the audit, quote, gas, resolver, and hosting/legal release gates listed in docs/OPERATIONS.md.
 
 ## Testnet runner
 

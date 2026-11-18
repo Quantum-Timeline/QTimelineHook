@@ -422,7 +422,6 @@ These are real, and they matter more than the list above:
 | [`docs/submission_package.txt`](docs/submission_package.txt) | Submission and handover report |
 | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Release runbook, fork rehearsal evidence and testnet history |
 | [`docs/PENGELUARAN-IPO.md`](docs/PENGELUARAN-IPO.md) | Expense report for the IPO deployment |
-| [`QTimeline-Implementation-Plan.md`](QTimeline-Implementation-Plan.md) | Implementation decisions and release checklist |
 | [`ops/resolver/README.md`](ops/resolver/README.md) | Resolver operations and secrets |
 
 ---

@@ -359,7 +359,7 @@ async function quote({ client, manifest, factoryArt, registryArt, factory }) {
     const impactBps = q.out >= afterFee ? 0n : ((afterFee - q.out) * 10_000n) / afterFee;
     rows.push({ direction: label, amountIn: amount.toString(), quotedOut: q.out.toString(), impactBpsExFee: Number(impactBps), meetsOnePercentTarget: impactBps <= 100n, gasEstimate: q.gas.toString() });
   }
-  // Probability pool, measured on the product routes in the implementation plan (section 4.3 / 10.2):
+  // Probability pool, measured on the product routes:
   //  - buy: $5 USDG is split into 5 YES + 5 NO, the 5 opposite tickets are swapped, the user keeps 5 + out tickets;
   //  - exit: a $5 position swaps about half of it, merges the pair, and the swap leg bears the price impact.
   const EXIT_SWAP = 2_500_000n;
