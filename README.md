@@ -203,8 +203,7 @@ QTimeline/
 └── docs/
     ├── qtimeline_report.md              # Project report and architecture overview
     ├── submission_package.txt    # Submission and handover report
-    ├── OPERATIONS.md             # Release runbook, rehearsal evidence, testnet history
-    └── PENGELUARAN-IPO.md        # Expense report for the IPO deployment
+    └── OPERATIONS.md             # Release runbook, rehearsal evidence, testnet history
 ```
 
 ---
@@ -421,7 +420,6 @@ These are real, and they matter more than the list above:
 | [`docs/qtimeline_report.md`](docs/qtimeline_report.md) | Project report and architecture overview |
 | [`docs/submission_package.txt`](docs/submission_package.txt) | Submission and handover report |
 | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Release runbook, fork rehearsal evidence and testnet history |
-| [`docs/PENGELUARAN-IPO.md`](docs/PENGELUARAN-IPO.md) | Expense report for the IPO deployment |
 | [`ops/resolver/README.md`](ops/resolver/README.md) | Resolver operations and secrets |
 
 ---

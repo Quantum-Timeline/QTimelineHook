@@ -49,7 +49,6 @@ SECTION 2: DEV KERJA
 5. Documentation Index:
    - Project Report (qtimeline_report.md):      https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/qtimeline_report.md
    - Operations Runbook:                https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/OPERATIONS.md
-   - IPO Expense Report:                https://github.com/Quantum-Timeline/QTimelineHook/blob/main/docs/PENGELUARAN-IPO.md
    - Mainnet Manifest:                  https://github.com/Quantum-Timeline/QTimelineHook/blob/main/deployments/robinhood-mainnet-ipo.json
    - Main Repository README:            https://github.com/Quantum-Timeline/QTimelineHook/blob/main/README.md
    (The report, the README and this file reach the links above once they are committed and pushed to main.)

@@ -20,3 +20,5 @@ contracts/.secrets/
 __pycache__/
 *.py[cod]
 *.tsbuildinfo
+# private expense notes, kept locally only
+/docs/PENGELUARAN-IPO.md
