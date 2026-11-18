@@ -112,7 +112,7 @@ test("testnet UI buys, merges paired claims, and sells through the injected wall
 
   await page.goto(`/market/?id=${manifest.smokeMarket.marketId}`);
   await page.getByRole("button", { name: "Connect wallet to trade" }).click();
-  await expect(page.locator(".quote-row strong")).not.toHaveText("—", { timeout: 30_000 });
+  await expect(page.locator(".quote-row strong")).not.toHaveText("n/a", { timeout: 30_000 });
   await page.getByRole("button", { name: /^Buy YES/ }).click();
   const tradeMessage = page.locator(".trade-message");
   await expect(tradeMessage).toContainText("Trade confirmed", { timeout: 90_000 });
@@ -140,7 +140,7 @@ test("testnet UI buys, merges paired claims, and sells through the injected wall
   await page.getByRole("button", { name: "Connect wallet to trade" }).click();
   await page.getByRole("button", { name: "Sell ETH" }).click();
   await page.locator(".amount-label input").fill(remainingYes);
-  await expect(page.locator(".quote-row strong")).not.toHaveText("—", { timeout: 30_000 });
+  await expect(page.locator(".quote-row strong")).not.toHaveText("n/a", { timeout: 30_000 });
   await page.getByRole("button", { name: /^Sell YES/ }).click();
   await expect(page.locator(".trade-message")).toContainText("Trade confirmed", { timeout: 90_000 });
   await expect(page.locator(".trade-message a")).toHaveAttribute("href", /\/tx\//);

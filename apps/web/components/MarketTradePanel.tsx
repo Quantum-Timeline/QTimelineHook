@@ -253,7 +253,7 @@ export function MarketTradePanel() {
     finally { setBusy(false); }
   }
 
-  let shownQuote = quote === undefined ? "—" : formatUnits(quote, outputDecimals);
+  let shownQuote = quote === undefined ? "n/a" : formatUnits(quote, outputDecimals);
   if (quote !== undefined && instrument === "probability" && direction === "buy") {
     try { shownQuote = formatUnits(quote + parseUnits(amount, inputDecimals), outputDecimals); } catch { /* Keep the last valid quote formatting while input is incomplete. */ }
   }
@@ -321,8 +321,8 @@ export function MarketTradePanel() {
         {chips.map((chip) => <button key={chip} type="button" className={amount === chip ? "is-on" : ""} onClick={() => setAmount(chip)}>{chip}</button>)}
       </div>
       <div className="quote-box" data-loading={quoteLoading}>
-        <div className="quote-row"><span>Estimated output</span><strong key={flash}>{quote === undefined ? <span className="shimmer-text">{quoteLoading ? "quoting…" : "—"}</span> : <span className="quote-out"><AnimatedNumber value={shownQuote} /><ClaimIcon asset={outputAsset} yes={instrument === "probability" && direction === "buy" ? outcomeYes : outcomeYes} size={20} />{outputUnit}</span>}</strong></div>
-        <div className="quote-row quote-row--sub"><span>Minimum after 1% slippage</span><strong>{minReceived ?? "—"}</strong></div>
+        <div className="quote-row"><span>Estimated output</span><strong key={flash}>{quote === undefined ? <span className="shimmer-text">{quoteLoading ? "quoting…" : "n/a"}</span> : <span className="quote-out"><AnimatedNumber value={shownQuote} /><ClaimIcon asset={outputAsset} yes={instrument === "probability" && direction === "buy" ? outcomeYes : outcomeYes} size={20} />{outputUnit}</span>}</strong></div>
+        <div className="quote-row quote-row--sub"><span>Minimum after 1% slippage</span><strong>{minReceived ?? "n/a"}</strong></div>
       </div>
       {quote !== undefined && amountValid && (
         <ul className="receipt" aria-label="What you will hold after this trade">

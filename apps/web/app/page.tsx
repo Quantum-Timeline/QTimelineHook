@@ -66,7 +66,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Cutoff",
     icon: "qt-hook",
     name: eventProfile.id === "ipo" ? "IpoTimelineHook" : "TimelineHook",
-    label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC—five minutes before release.",
+    label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC, five minutes before release.",
     href: "/rules/",
   },
   {
@@ -92,7 +92,7 @@ const ARCHITECTURE_ITEMS = [
 const POOL_MODULES = [
   {
     index: "ETH·Y",
-    prefix: "ETH — ",
+    prefix: "ETH · ",
     bold: "YES",
     label: eventProfile.copy.ethYes,
     cta: "Trade Pool",
@@ -100,7 +100,7 @@ const POOL_MODULES = [
   },
   {
     index: "ETH·N",
-    prefix: "ETH — ",
+    prefix: "ETH · ",
     bold: "NO",
     label: eventProfile.copy.ethNo,
     cta: "Trade Pool",
@@ -262,7 +262,7 @@ export default function HomePage() {
       <section className="hero">
         <div className="wrap hero__inner">
           <p className="eyebrow hero__eyebrow" data-reveal data-delay="0.15">
-            <span className="eyebrow__n">RH·4663</span> QTimeline — Robinhood Chain 4663 · {eventProfile.copy.heroEyebrow}
+            <span className="eyebrow__n">RH·4663</span> QTimeline · Robinhood Chain 4663 · {eventProfile.copy.heroEyebrow}
           </p>
           <h1 className="hero__title" aria-label={`${eventProfile.copy.heroA}, ${eventProfile.copy.heroB}`}>
             <span className="hero__line" aria-hidden="true">

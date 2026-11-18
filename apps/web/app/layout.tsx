@@ -11,7 +11,7 @@ import "./usability.css";
 import "./typography.css";
 
 const ipo = eventProfile.id === "ipo";
-const title = ipo ? "QTimeline — Anthropic IPO price market" : "QTimeline — Every pool, two timelines";
+const title = ipo ? "QTimeline: Anthropic IPO price market" : "QTimeline: Every pool, two timelines";
 const description = ipo
   ? `${eventProfile.question} Buy YES or NO on Robinhood Chain. Each winning share pays $1.00, settled from the SEC's Form 424B4.`
   : "Split USDG into YES/NO claims, trade conditional ETH discovery across three Uniswap v4 pools, and settle under ECDSA + ML-DSA-44 on Robinhood Chain.";
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         url: "/brand/og-banner.png",
         width: 1503,
         height: 789,
-        alt: "QTimeline — One IPO price, two timelines",
+        alt: "QTimeline: One IPO price, two timelines",
       },
     ],
   },

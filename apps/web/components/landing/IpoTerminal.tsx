@@ -46,7 +46,7 @@ export function IpoTerminal({ threshold, cutoffLabel }: { threshold: number; cut
   const step = Math.max(-1, Math.min(4, phase - 1));
   const lines = LOG.flatMap((group, i) => (i <= step ? group.map((text) => ({ i, text })) : [])).slice(-8);
   const cents = threshold * 100 + 400;
-  const field = (from: number, value: string) => (step >= from ? value : "—");
+  const field = (from: number, value: string) => (step >= from ? value : "pending");
 
   return (
     <section className="section term" id="resolution" ref={root}>

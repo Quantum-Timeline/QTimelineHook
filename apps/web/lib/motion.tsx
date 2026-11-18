@@ -54,7 +54,7 @@ export function AnimatedNumber({ value, durationMs = 520 }: { value: string; dur
     const target = Number(value);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const decimals = (value.split(".")[1] ?? "").length;
-    if (reduce || !Number.isFinite(target) || !Number.isFinite(fromRef.current) || value === "—") {
+    if (reduce || !Number.isFinite(target) || !Number.isFinite(fromRef.current) || value === "n/a") {
       setShown(value);
       fromRef.current = target;
       return;
