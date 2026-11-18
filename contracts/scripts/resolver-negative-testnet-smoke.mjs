@@ -80,7 +80,7 @@ try {
   const now = await waitForReportWindow(publicClient, market.releaseAt, market.deadline);
 
   const sourceId = keccak256(toBytes("bea:core-pce:mom:first-release"));
-  const evidence = Buffer.from(JSON.stringify({ testnetOnly: true, question: "Dalam 5 menit ke depan, gue berak gak?", result: "YES", observedAt: Number(now), note: "Synthetic test evidence; not a real-world oracle observation." }));
+  const evidence = Buffer.from(JSON.stringify({ testnetOnly: true, question: "Will the test event happen within the next 5 minutes?", result: "YES", observedAt: Number(now), note: "Synthetic test evidence; not a real-world oracle observation." }));
   const evidenceJson = `0x${evidence.toString("hex")}`;
   const evidenceHash = keccak256(evidenceJson);
   const report = { marketId: smoke.marketId, sourceId, periodId: market.periodId, valueBps: 31, evidenceHash, signatureExpiry: market.deadline };

@@ -5,7 +5,7 @@ const manifestPath = process.env.QTIMELINE_TESTNET_MANIFEST || "deployments/robi
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 if (manifest.chainId !== 46630) throw new Error("Browser smoke tests require a Robinhood Testnet manifest");
 const marketId: string = manifest.smokeMarket.marketId;
-const question = "Dalam 5 menit ke depan, gue berak gak?";
+const question = "Will the test event happen within the next 5 minutes?";
 const testAccount = manifest.deployer as `0x${string}`;
 
 test.beforeEach(async ({ page }) => {
