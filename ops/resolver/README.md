@@ -1,4 +1,24 @@
-# BEA resolver bot
+# Resolver bot
+
+## Shared event runner (current)
+
+One resolver serves every market on the shared event engine. It lives in `src/submit-mainnet-ipo.mjs` and runs as `pnpm --filter @qtimeline/resolver resolve:ipo`. The data source is chosen per run:
+
+| `QT_EVENT_SOURCE` | Reads | Bound source id on chain |
+|---|---|---|
+| `bea` | The BEA Personal Income and Outlays release for `QT_BEA_DATA_PERIOD` (`YYYY-MM`), Core PCE month over month, reported in basis points | `bea:core-pce:mom:first-release` |
+| `sec` (default) | The first Form 424B4 on SEC EDGAR, offering price in US cents | the original IPO source |
+
+Before it signs, the runner reads `expectedSource(marketId)` from the adapter and **refuses to sign when the market is not bound to the source it is about to report**. It also checks the chain id, the resolver and relayer, the market period and the deadline. It simulates, sends once, then reads the final status, value and evidence hash back from chain. A run against a market that is already final submits nothing. An unpublished release (404) is a quiet no-op.
+
+The workflow is `.github/workflows/resolve-mainnet-event.yml`. It uses the protected `robinhood-mainnet-ipo` Environment and these secrets: `QT_MAINNET_RPC`, `QT_MAINNET_RELAYER_ADDRESS`, `QT_MAINNET_RELAYER_PRIVATE_KEY` (a dedicated low-balance relayer that only pays gas), `QT_IPO_RESOLVER_ECDSA_PRIVATE_KEY` and `QT_IPO_RESOLVER_MLDSA_SEED_HEX`. Its repository variables are `QTIMELINE_EVENT_ENABLED`, `QTIMELINE_EVENT_MARKET_ID`, `QT_EVENT_PERIOD`, `QT_EVENT_SOURCE`, `QT_BEA_DATA_PERIOD` and, for the SEC source, `QT_SEC_USER_AGENT`.
+
+The schedule is a `cron` line (for the October 2026 Core PCE release: every 15 minutes, 13:00 to 18:59 UTC, 25 to 27 Nov). Scheduled runs broadcast. A manual run defaults to simulation and needs the explicit `broadcast` input. For a new event, change the variables and the `cron` line together, and run the workflow by hand once as a dry run.
+
+For tests, `QT_EVENT_REHEARSAL_HTML` replaces the fetched release with a local file, and it is only honoured when the RPC is on localhost.
+
+The sections below describe the runners of the original Core PCE system, which is not deployed on mainnet.
+
 
 The resolver has isolated Robinhood Chain Testnet and Mainnet entry points. Both parse the official BEA Personal Income and Outlays article, sign the same EIP-712 report with ECDSA and ML-DSA-44, simulate before sending, and verify the final chain state.
 

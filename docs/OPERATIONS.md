@@ -1,5 +1,45 @@
 > Operations notes. This file was the repository README before the public README.md replaced it. It keeps the release runbook, rehearsal evidence and testnet history in full.
 
+## Running the next event on the shared engine (current runbook)
+
+Everything below uses the contracts that are already deployed on Robinhood Chain 4663. A new event is a new market, not a new deployment. The older sections of this file are kept as history.
+
+1. **Plan.** Export the market inputs, then run the read-only plan. It prints the schedule, seed budget, ticks and liquidity and sends nothing.
+
+   ```sh
+   export QT_EVENT_KEY=core-pce-2026-11          # stored in manifest.events[key]
+   export QT_IPO_PERIOD=CORE-PCE-2026-11         # period string encoded in the market
+   export QT_IPO_CUTOFF_AT=<unix>                # last moment of trading
+   export QT_EVENT_RELEASE_AT=<unix>             # earliest report: 5 minutes to 7 days after the cutoff
+   export QT_EVENT_THRESHOLD_BPS=<signed int>    # in the unit the source reports (30 means 0.30%)
+   export QT_EVENT_SOURCE_ID=bea:core-pce:mom:first-release
+   export QT_ETH_USD=<reference ETH price>
+   pnpm market:ipo:plan
+   ```
+
+   Bounds enforced by the contracts: release gap 5 minutes to 7 days, reporting window 1 to 14 days (`QT_EVENT_WINDOW_SECONDS`, default 172800), at least 12 hours between `opensAt` and the cutoff, collateral caps 0.1 ETH and 500 USDG.
+
+2. **Create, seed, activate.** `pnpm market:ipo:create` is resumable. It signs `createMarket` (ECDSA + ML-DSA-44), **binds the data source with `setMarketSource`**, initializes the three pools, splits collateral, mints three LP positions and activates the market. The source can be bound once, only by the deployer, and only before the earliest report time.
+
+3. **Quote.** After `opensAt`, run `pnpm market:ipo:quote` to check price impact in every direction.
+
+4. **Point the site at it.**
+
+   ```sh
+   QT_EVENT_KIND=pce QT_EVENT_PERIOD_LABEL="November 2026" pnpm web:ipo:configure
+   ```
+
+   Set the matching GitHub repository variables used by `deploy-web.yml`: `NEXT_PUBLIC_MARKET_ID`, `NEXT_PUBLIC_EVENT_KIND`, `NEXT_PUBLIC_EVENT_THRESHOLD_BPS`, `NEXT_PUBLIC_EVENT_PERIOD_LABEL`, `NEXT_PUBLIC_EVENT_CUTOFF_AT`. A push to `main` rebuilds and deploys the site to Cloudflare Pages. Add the ended market to `apps/web/lib/past-markets.ts` so holders can reach their claims.
+
+5. **Point the resolver at it.** Update the variables read by `.github/workflows/resolve-mainnet-event.yml`: `QTIMELINE_EVENT_ENABLED=true`, `QTIMELINE_EVENT_MARKET_ID`, `QT_EVENT_PERIOD`, `QT_EVENT_SOURCE` (`bea` or `sec`) and, for BEA, `QT_BEA_DATA_PERIOD` (`YYYY-MM`). Change the `cron` line to the new release window. Run the workflow once by hand as a dry run first: it must report that the release is not published yet, which proves the RPC, the market, the bound source and the keys all line up.
+
+6. **After the result.** Check the market status on chain. To take the treasury liquidity back, run `pnpm withdraw:ipo` (read-only plan) and `pnpm withdraw:ipo -- --broadcast`. Holders redeem on the Positions page.
+
+**Changing contract logic.** The proxies are upgradeable by the deployer: `QT_IPO_UPGRADE_TARGET=<key> QT_IPO_UPGRADE_CONTRACT=<artifact> pnpm upgrade:ipo [-- --broadcast]`. Rehearse on a fork first, keep the storage layout, and note that the deployer key has no timelock. The manifest records every upgrade under `upgradeHistory`.
+
+**Evidence from the Core PCE launch (24 Nov 2026).** Rehearsed on a mainnet fork, then run on mainnet: three proxy upgrades (adapter, registry, factory), the IPO liquidity withdrawal, and the creation, seeding and activation of the Core PCE market (9 transactions, about 5.95M gas). The adapter reads back the bound source, and the resolver dry run on GitHub Actions reports "not published yet".
+
+
 ﻿# QTimeline
 
 QTimeline is a conditional-market application for Uniswap v4 on Robinhood Chain.
