@@ -150,6 +150,9 @@ const eventBps = Number(process.env.NEXT_PUBLIC_EVENT_THRESHOLD_BPS ?? "30");
 const periodLabel = process.env.NEXT_PUBLIC_EVENT_PERIOD_LABEL ?? "October 2026";
 const eventCutoffAt = Number(process.env.NEXT_PUBLIC_EVENT_CUTOFF_AT) || undefined;
 const pctText = percent(eventBps);
+const releaseDate = eventCutoffAt
+  ? new Date((eventCutoffAt + 300) * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" })
+  : undefined;
 const pceQuestion = `Will US Core PCE rise at least ${pctText} month over month in ${periodLabel}?`;
 
 const pceEngine: EventProfile = {
@@ -166,10 +169,15 @@ const pceEngine: EventProfile = {
   cutoffNumber: ["5 min", "Cutoff before release", "Swaps close on-chain"],
   cutoffAt: eventCutoffAt,
   copy: {
-    heroEyebrow: `Core PCE ${periodLabel}`,
-    heroA: "One inflation print",
-    heroB: "two timelines",
-    heroLead: `${pceQuestion} Buy YES or NO shares. Each winning share pays $1.00 once BEA publishes the number, settled on Uniswap v4 under ECDSA + ML-⁠DSA-⁠44.`,
+    heroEyebrow: "Prediction market on Robinhood Chain",
+    heroA: "Bet on inflation,",
+    heroB: "before it prints.",
+    heroLead: `Core PCE is the Fed's preferred inflation gauge, and the BEA publishes the ${periodLabel} number${releaseDate ? ` on ${releaseDate}` : ""}. Buy YES if it prints ${pctText} or higher, NO if lower. A winning share pays $1.00 in USDG, all on-chain with no account needed.`,
+    heroCta: "Trade YES or NO",
+    heroCtaAlt: "How it works",
+    heroStep1: "Pick YES or NO",
+    heroStep2: "BEA publishes the number",
+    heroStep3: "Winners get $1.00 a share",
     manifesto: "We split one macroeconomic print into two live Uniswap v4 timelines on Robinhood Chain. Trade conditional ETH exposure and settle from the first BEA release under hybrid ECDSA plus NIST FIPS 204 post-quantum signatures.",
     lockCaption: "Swap lock before the BEA release",
     lockKicker: "Cutoff",

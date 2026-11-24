@@ -263,7 +263,7 @@ export default function HomePage() {
       <section className="hero">
         <div className="wrap hero__inner">
           <p className="eyebrow hero__eyebrow" data-reveal data-delay="0.15">
-            <span className="eyebrow__n">RH·4663</span> QTimeline · Robinhood Chain 4663 · {eventProfile.copy.heroEyebrow}
+            <span className="eyebrow__n">RH·4663</span> QTimeline · {eventProfile.copy.heroEyebrow}
           </p>
           <h1 className="hero__title" aria-label={`${eventProfile.copy.heroA}, ${eventProfile.copy.heroB}`}>
             <span className="hero__line" aria-hidden="true">
@@ -280,6 +280,27 @@ export default function HomePage() {
           <p className="hero__lead lead" data-reveal data-delay="0.75">
             {eventProfile.copy.heroLead}
           </p>
+          {eventProfile.copy.heroCta ? (
+            <div className="hero__actions" data-reveal data-delay="0.85">
+              <Link href="/market/" className="hero__btn hero__btn--primary" data-cursor>
+                <span>{eventProfile.copy.heroCta}</span>
+                <svg viewBox="0 0 34 12" aria-hidden="true">
+                  <path d="M0 6h32M27 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+              </Link>
+              <a href="#how-it-works" className="hero__btn hero__btn--ghost" data-cursor>
+                {eventProfile.copy.heroCtaAlt}
+              </a>
+              <ol className="hero__steps mono">
+                {[eventProfile.copy.heroStep1, eventProfile.copy.heroStep2, eventProfile.copy.heroStep3].map((step, idx) => (
+                  <li key={idx}>
+                    <b>{idx + 1}</b>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
           {eventProfile.id === "ipo" ? (
             <div className="hero__foot" data-reveal data-delay="0.95">
               <IpoStack />
