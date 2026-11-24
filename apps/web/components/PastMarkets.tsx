@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eventProfile } from "@/lib/event-profile";
 import { PAST_MARKETS, explorerAddress } from "@/lib/past-markets";
 
@@ -17,9 +18,16 @@ export function PastMarkets({ heading = true }: { heading?: boolean }) {
             </div>
             <p className="past__q">{m.question}</p>
             <p className="past__out">{m.outcome}</p>
-            <a className="past__link mono" href={explorerAddress(m.vault)} target="_blank" rel="noreferrer">
-              Market vault on the explorer ↗
-            </a>
+            <div className="past__links">
+              {m.status !== "Settled NO" && (
+                <Link className="past__link past__link--primary mono" href={`/positions/?id=${m.marketId}`}>
+                  Check your claims and redeem →
+                </Link>
+              )}
+              <a className="past__link mono" href={explorerAddress(m.vault)} target="_blank" rel="noreferrer">
+                Market vault on the explorer ↗
+              </a>
+            </div>
           </li>
         ))}
       </ul>

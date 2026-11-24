@@ -201,3 +201,6 @@
 .past__link { justify-self: start; color: var(--lime, #cfef8c); font-size: 0.74rem; letter-spacing: 0.06em; text-decoration: none; }
 .past__link:hover { text-decoration: underline; }
 .landing-past { padding: clamp(40px, 6vw, 96px) 0; }
+.past__links { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; }
+.past__link--primary { color: #0b0b0b; background: var(--lime, #cfef8c); padding: 8px 14px; border-radius: 999px; font-weight: 600; }
+.past__link--primary:hover { text-decoration: none; filter: brightness(1.08); }
