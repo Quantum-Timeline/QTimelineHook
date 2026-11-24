@@ -12,8 +12,11 @@ import "./typography.css";
 
 const title = eventProfile.metaTitle;
 const description = eventProfile.metaDescription;
-// The shared banner artwork is about the IPO price, so it is only attached to that event's link previews.
-const banner = eventProfile.event === "ipo" ? [{ url: "/brand/og-banner.png", width: 1503, height: 789, alt: "QTimeline: One IPO price, two timelines" }] : undefined;
+// Each event has its own link-preview artwork: the IPO banner for the IPO market, a Core PCE banner for the macro market.
+const bannerUrl = eventProfile.event === "ipo" ? "/brand/og-banner.png" : "/brand/og-pce.png";
+const banner = eventProfile.event === "ipo"
+  ? [{ url: bannerUrl, width: 1503, height: 789, alt: "QTimeline: One IPO price, two timelines" }]
+  : [{ url: bannerUrl, width: 1200, height: 630, alt: "QTimeline: Bet on inflation, before it prints" }];
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.qtimeline.tech"),
@@ -27,12 +30,12 @@ export const metadata: Metadata = {
     images: banner,
   },
   twitter: {
-    card: banner ? "summary_large_image" : "summary",
+    card: "summary_large_image",
     site: "@QTimelineHook",
     creator: "@QTimelineHook",
     title,
     description,
-    images: banner ? ["/brand/og-banner.png"] : undefined,
+    images: [bannerUrl],
   },
 };
 
