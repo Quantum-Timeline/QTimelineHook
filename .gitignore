@@ -26,3 +26,4 @@ __pycache__/
 # Local static-export test builds
 apps/web/out-pce-test/
 apps/web/out-prod/
+apps/web/out-demo/

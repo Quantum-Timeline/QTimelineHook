@@ -133,7 +133,11 @@ export function MarketTradePanel() {
       if (!preserveMessage) setMessage("");
       if (pool.currency0.toLowerCase() !== outputToken.toLowerCase() && pool.currency1.toLowerCase() !== outputToken.toLowerCase()) throw new Error("Expected output token is not in the selected pool.");
     } catch (error) {
-      if (!preserveMessage) setMessage(friendlyError(error, "Unable to quote this trade."));
+      // A revert with no known cause is almost always a trade larger than the pool can absorb, so say that and what to try.
+      const shallow = instrument === "eth"
+        ? direction === "buy" ? "The ETH pools are shallow right now. Try 5 USDG or less." : "The ETH pool is too shallow for this size. Try a smaller amount."
+        : "The pool does not have enough depth for this size. Try a smaller amount.";
+      if (!preserveMessage) setMessage(friendlyError(error, "") || shallow);
     }
   }, [amount, client, direction, factory, instrument, marketId, outcomeYes, quoter, registry, router, validConfig]);
 
@@ -270,7 +274,7 @@ export function MarketTradePanel() {
   const otherSide = outcomeYes ? "NO" : "YES";
   const outputUnit = instrument === "eth" && direction === "buy" ? "ETH conditional" : instrument === "probability" ? (direction === "buy" ? `${side} shares` : "USDG") : "USDG conditional";
   const inputUnit = direction === "buy" ? "USDG" : instrument === "eth" ? "ETH claim" : `${side} shares`;
-  const chips = direction === "sell" && instrument === "eth" ? ["0.0025", "0.005", "0.01"] : ["5", "10", "25", "50"];
+  const chips = instrument === "eth" ? (direction === "sell" ? ["0.0025", "0.005", "0.01"] : ["1", "2", "5"]) : ["5", "10", "25", "50"];
   const minReceived = quote === undefined ? undefined : (() => {
     try {
       const gross = instrument === "probability" && direction === "buy" ? quote + parseUnits(amount, inputDecimals) : quote;
