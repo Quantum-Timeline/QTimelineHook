@@ -10,6 +10,7 @@ import ContractsSection from "@/components/landing/ContractsSection";
 import { IpoCountdown, IpoScrubber, IpoStack } from "@/components/landing/IpoWidgets";
 import { IpoStory } from "@/components/landing/IpoStory";
 import SectionRail from "@/components/landing/SectionRail";
+import { ReleaseDay } from "@/components/landing/ReleaseDay";
 import { IpoTerminal } from "@/components/landing/IpoTerminal";
 import { PastMarkets } from "@/components/PastMarkets";
 import "@/app/landing.css";
@@ -288,7 +289,7 @@ export default function HomePage() {
                   <path d="M0 6h32M27 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </Link>
-              <a href="#how-it-works" className="hero__btn hero__btn--ghost" data-cursor>
+              <a href={eventProfile.copy.relTitle ? "#release-day" : "#how-it-works"} className="hero__btn hero__btn--ghost" data-cursor>
                 {eventProfile.copy.heroCtaAlt}
               </a>
               <ol className="hero__steps mono">
@@ -329,6 +330,8 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {eventProfile.copy.relTitle && eventProfile.cutoffAt ? <ReleaseDay cutoffAt={eventProfile.cutoffAt} /> : null}
 
       {eventProfile.id === "ipo" && eventProfile.event === "ipo" ? <IpoScrubber /> : null}
       {eventProfile.id === "ipo" && eventProfile.event === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}

@@ -2735,3 +2735,35 @@ html.is-warping {
 .qt-erestyra .hero__steps li { display: inline-flex; align-items: center; gap: 8px; }
 .qt-erestyra .hero__steps b { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line-strong); color: var(--accent); font-weight: 500; font-size: 0.62rem; }
 @media (max-width: 640px) { .qt-erestyra .hero__btn { padding: 12px 18px; } }
+
+/* Release day: the four moments of one market and the three ways it ends */
+.qt-erestyra .relday { padding: clamp(72px, 11vw, 160px) 0; }
+.qt-erestyra .relday__title { margin-top: 18px; max-width: 18ch; text-wrap: balance; }
+.qt-erestyra .relday__lead { margin-top: 22px; max-width: 58ch; color: var(--dim); }
+.qt-erestyra .relday__grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 88px); margin-top: clamp(40px, 6vw, 72px); align-items: start; }
+.qt-erestyra .relday__steps { position: relative; margin: 0; padding: 0; list-style: none; display: grid; gap: 0; }
+.qt-erestyra .relday__steps::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 64px; width: 1px; background: var(--line-strong); }
+.qt-erestyra .relday__step { position: relative; display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px 24px; padding: 0 0 clamp(26px, 3.4vw, 40px) 36px; }
+.qt-erestyra .relday__step::before { content: ""; position: absolute; left: 0; top: 4px; width: 15px; height: 15px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line-strong); }
+.qt-erestyra .relday__step--done::before { background: var(--accent); border-color: var(--accent); }
+.qt-erestyra .relday__step--next::before { border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 8px var(--accent); }
+.qt-erestyra .relday__when { font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); padding-top: 3px; }
+.qt-erestyra .relday__step--idle .relday__when { color: var(--dim); }
+.qt-erestyra .relday__step h3 { font-size: clamp(1.15rem, 1.9vw, 1.5rem); font-weight: 500; font-stretch: 112%; letter-spacing: -0.005em; margin: 0; }
+.qt-erestyra .relday__step p { margin: 8px 0 0; color: var(--dim); line-height: 1.5; max-width: 52ch; }
+.qt-erestyra .relday__clock { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-left: 36px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.qt-erestyra .relday__clock b { color: var(--fg); font-weight: 500; font-size: 1.25rem; letter-spacing: 0.02em; }
+.qt-erestyra .relday__ends { display: grid; gap: 14px; }
+.qt-erestyra .relday__ends-cap { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); margin: 0 0 2px; }
+.qt-erestyra .relday__end { border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; background: rgba(8, 10, 9, 0.88); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.qt-erestyra .relday__end span { font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.qt-erestyra .relday__end p { margin: 10px 0 0; line-height: 1.45; color: var(--fg); }
+.qt-erestyra .relday__end--yes { border-color: rgba(207, 239, 140, 0.55); }
+.qt-erestyra .relday__end--yes span { color: var(--accent); }
+.qt-erestyra .relday__end--no span { color: #f0a59a; }
+.qt-erestyra .relday__end--cancel span { color: var(--dim); }
+.qt-erestyra .relday__cta { justify-self: start; margin-top: 6px; padding: 14px 22px; border-radius: 999px; background: var(--accent); color: #080a09; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
+@media (max-width: 900px) {
+  .qt-erestyra .relday__grid { grid-template-columns: minmax(0, 1fr); }
+  .qt-erestyra .relday__step { grid-template-columns: minmax(0, 1fr); padding-left: 32px; }
+}
