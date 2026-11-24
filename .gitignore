@@ -22,3 +22,7 @@ __pycache__/
 *.tsbuildinfo
 # private expense notes, kept locally only
 /docs/PENGELUARAN-IPO.md
+
+# Local static-export test builds
+apps/web/out-pce-test/
+apps/web/out-prod/
