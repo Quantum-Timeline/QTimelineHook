@@ -3,6 +3,7 @@ import { Frame, PageHeading } from "@/components/Frame";
 import { HowToTrade } from "@/components/HowToTrade";
 import { MarketSnapshot } from "@/components/MarketSnapshot";
 import { MarketTradePanel } from "@/components/MarketTradePanel";
+import { PastMarkets } from "@/components/PastMarkets";
 import { PoolStrip } from "@/components/PoolStrip";
 import { QuickBet } from "@/components/QuickBet";
 import { TokenLogo } from "@/components/TokenLogo";
@@ -30,7 +31,7 @@ export default function MarketPage() {
         title={testnet ? "Test the market lifecycle." : isIpo ? question : "Two paths for ETH."}
         body={testnet
           ? "A short-window test market on Robinhood Chain Testnet exercises trading, resolution, cancellation, and redemption with synthetic evidence."
-          : isIpo ? "Pick a side. If you are right, each share pays $1.00 once the SEC publishes the final price. If not, it pays $0."
+          : isIpo ? eventProfile.copy.marketBlurb
           : "Read the lifecycle and quote live from Robinhood Chain. Trades split collateral, route through the selected Uniswap v4 pool, and return the paired opposite claim atomically."}
         note={testnet ? <>Testnet only · synthetic event · faucet USDG · no real-world oracle result.{process.env.NEXT_PUBLIC_BEA_TESTNET_MARKET_ID && <> <a className="proof-link" href="/bea-proof/">BEA fixture proof ↗</a></>}</> : undefined}
         facts={isIpo ? undefined : [
@@ -70,6 +71,8 @@ export default function MarketPage() {
       </section>
 
       <PoolStrip />
+
+      <PastMarkets />
       </div>
     </Frame>
   );

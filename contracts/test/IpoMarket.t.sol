@@ -135,23 +135,88 @@ contract IpoMarketTest is Test {
         assertEq(factory.resolutionWindow(), WINDOW);
     }
 
-    function testCreationRejectsTheCorePceFiveMinuteGap() public {
+    function testEachEventSetsItsOwnScheduleInsideTheBounds() public {
+        // A five-minute gap (a release-morning cutoff) and a one-day window are valid now.
         uint64 cutoff = uint64(block.timestamp + 3 days);
-        IpoMarketFactory.MarketConfig memory c = _config(opensAt, cutoff, cutoff + 300, cutoff + 300 + WINDOW, THRESHOLD_CENTS, 1);
+        bytes32 id = _create(opensAt, cutoff, cutoff + 300, cutoff + 300 + 1 days, 30, 1);
+        assertEq(registry.market(id).releaseAt, cutoff + 300);
+        // Below five minutes, above seven days, and a window outside 1 to 14 days are still rejected.
+        _expectCreateReverts(_config(opensAt, cutoff, cutoff + 299, cutoff + 299 + WINDOW, 30, 2));
+        _expectCreateReverts(_config(opensAt, cutoff, cutoff + 7 days + 1, cutoff + 7 days + 1 + WINDOW, 30, 2));
+        _expectCreateReverts(_config(opensAt, cutoff, cutoff + 300, cutoff + 300 + 1 days - 1, 30, 2));
+        _expectCreateReverts(_config(opensAt, cutoff, cutoff + 300, cutoff + 300 + 14 days + 1, 30, 2));
+    }
+
+    function testCreationAcceptsZeroAndNegativeThresholds() public {
+        for (int32 t = -1; t <= 0; ++t) {
+            bytes32 id = _create(opensAt, cutoffAt, releaseAt, deadline, t, uint256(uint32(t + 1)) + 1);
+            assertEq(registry.market(id).thresholdBps, t);
+        }
+    }
+
+    function _expectCreateReverts(IpoMarketFactory.MarketConfig memory c) private {
         (bytes memory ecdsaSig, bytes32 salt) = _sign(c);
         vm.prank(deployer);
         vm.expectRevert(IpoMarketFactory.InvalidConfig.selector);
         factory.createMarket(c, ecdsaSig, "pq-ok", salt);
     }
 
-    function testCreationRejectsZeroAndNegativeThresholds() public {
-        for (int32 bad = -1; bad <= 0; ++bad) {
-            IpoMarketFactory.MarketConfig memory c = _config(opensAt, cutoffAt, releaseAt, deadline, bad, 1);
-            (bytes memory ecdsaSig, bytes32 salt) = _sign(c);
-            vm.prank(deployer);
-            vm.expectRevert(IpoMarketFactory.InvalidConfig.selector);
-            factory.createMarket(c, ecdsaSig, "pq-ok", salt);
-        }
+    // ---------------------------------------------------------------- per-market sources
+
+    function testOnlyTheDeployerBindsASourceOnceAndBeforeTheEarliestReport() public {
+        bytes32 src = keccak256("bea:pio:core-pce-mom-bps:first-release");
+        vm.expectRevert(IpoResolutionAdapter.Unauthorized.selector);
+        adapter.setMarketSource(marketId, src);
+        vm.startPrank(deployer);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.setMarketSource(marketId, bytes32(0));
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.setMarketSource(keccak256("unknown"), src);
+        adapter.setMarketSource(marketId, src);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.setMarketSource(marketId, keccak256("other"));
+        vm.stopPrank();
+        assertEq(adapter.marketSource(marketId), src);
+        assertEq(adapter.expectedSource(marketId), src);
+
+        bytes32 later = _create(opensAt, cutoffAt, releaseAt, deadline, 30, 1);
+        vm.warp(releaseAt);
+        vm.prank(deployer);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.setMarketSource(later, src);
+    }
+
+    function testUnboundMarketsKeepTheOriginalSecSource() public view {
+        assertEq(adapter.marketSource(marketId), bytes32(0));
+        assertEq(adapter.expectedSource(marketId), adapter.SOURCE_ID());
+    }
+
+    function testABoundMarketResolvesOnlyFromItsSourceAndAcceptsZeroAndNegativeValues() public {
+        bytes32 src = keccak256("bea:pio:core-pce-mom-bps:first-release");
+        bytes32 pce = _create(opensAt, cutoffAt, releaseAt, deadline, 30, 1);
+        vm.prank(deployer);
+        adapter.setMarketSource(pce, src);
+        vm.warp(opensAt);
+        vm.prank(address(factory));
+        // Liquidity checks live in the factory; activate the registry entry directly as the factory would.
+        registry.activate(pce);
+        vm.warp(releaseAt);
+
+        // The SEC source cannot settle it.
+        IpoResolutionAdapter.Report memory r = _makeReport(31, PERIOD, "evidence");
+        r.marketId = pce;
+        r.periodId = registry.market(pce).periodId;
+        (bytes memory e, bytes memory p) = _signReport(r);
+        vm.expectRevert(IpoResolutionAdapter.InvalidReport.selector);
+        adapter.reportValue(r, "evidence", e, p);
+
+        // Its own source can, including a value of zero (below the 30 bps threshold, so NO).
+        r.sourceId = src;
+        r.valueBps = 0;
+        (e, p) = _signReport(r);
+        adapter.reportValue(r, "evidence", e, p);
+        assertEq(uint8(registry.market(pce).status), uint8(IQTimelineMarketRegistry.Status.FinalNo));
+        assertEq(registry.reportedValueBps(pce), 0);
     }
 
     function testOnlyTheDeployerCanCreateAndTheSignatureMustMatch() public {

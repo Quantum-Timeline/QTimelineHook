@@ -11,6 +11,7 @@ import { IpoCountdown, IpoScrubber, IpoStack } from "@/components/landing/IpoWid
 import { IpoStory } from "@/components/landing/IpoStory";
 import SectionRail from "@/components/landing/SectionRail";
 import { IpoTerminal } from "@/components/landing/IpoTerminal";
+import { PastMarkets } from "@/components/PastMarkets";
 import "@/app/landing.css";
 
 function SplitHeading({
@@ -66,7 +67,7 @@ const ARCHITECTURE_ITEMS = [
     kindLabel: "Cutoff",
     icon: "qt-hook",
     name: eventProfile.id === "ipo" ? "IpoTimelineHook" : "TimelineHook",
-    label: eventProfile.id === "ipo" ? "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced." : "On-chain beforeSwap guard halts all three pools at 13:25 UTC, five minutes before release.",
+    label: eventProfile.id === "ipo" ? eventProfile.copy.guardLabel : "On-chain beforeSwap guard halts all three pools at 13:25 UTC, five minutes before release.",
     href: "/rules/",
   },
   {
@@ -128,7 +129,7 @@ const FIGURES_ITEMS = [
   { count: 4663, symbol: null, unit: "CHAIN", caption: "Robinhood Chain L2 network deployment" },
   { count: 3, symbol: null, unit: "POOLS", caption: "Coupled Uniswap v4 pools per market" },
   eventProfile.id === "ipo"
-    ? { count: 1, symbol: null, unit: "FILING", caption: "Only the first Form 424B4 on SEC EDGAR settles the market" }
+    ? { count: 1, symbol: null, unit: eventProfile.copy.filingUnit, caption: eventProfile.copy.filingCaption }
     : { count: 300, symbol: null, unit: "SEC", caption: eventProfile.copy.lockCaption },
   { count: 48, symbol: null, unit: "HRS", caption: "Reporting deadline before 50/50 cancel" },
 ];
@@ -144,7 +145,7 @@ const LIFECYCLE_ROWS = [
     n: "SWAP",
     kicker: "Discovery",
     title: "Trade parallel worlds",
-    text: eventProfile.id === "ipo" ? "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to trade your view on the IPO price together with ETH." : "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to express correlated macro and ETH directional views.",
+    text: eventProfile.id === "ipo" ? eventProfile.copy.swapText : "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to express correlated macro and ETH directional views.",
   },
   {
     n: "LOCK",
@@ -171,7 +172,7 @@ const OPERATOR_CARDS = [
     index: "TRD",
     kind: "Traders",
     icon: "qt-traders",
-    name: eventProfile.id === "ipo" ? "IPO Traders" : "Macro Traders",
+    name: eventProfile.id === "ipo" ? eventProfile.copy.traders : "Macro Traders",
     label: eventProfile.copy.traderCard,
   },
   {
@@ -205,7 +206,7 @@ const TRANSPARENCY_ROWS = [
   },
   {
     n: eventProfile.copy.sourceKey,
-    kicker: eventProfile.id === "ipo" ? "First Filing" : "First Release",
+    kicker: eventProfile.id === "ipo" ? eventProfile.copy.kicker : "First Release",
     title: eventProfile.copy.sourceTitle,
     text: eventProfile.copy.sourceText,
   },
@@ -281,7 +282,7 @@ export default function HomePage() {
           </p>
           {eventProfile.id === "ipo" ? (
             <div className="hero__foot" data-reveal data-delay="0.95">
-              <IpoStack />
+              {eventProfile.event === "ipo" ? <IpoStack /> : null}
               {eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
             </div>
           ) : null}
@@ -308,8 +309,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {eventProfile.id === "ipo" ? <IpoScrubber /> : null}
-      {eventProfile.id === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}
+      {eventProfile.id === "ipo" && eventProfile.event === "ipo" ? <IpoScrubber /> : null}
+      {eventProfile.id === "ipo" && eventProfile.event === "ipo" ? <IpoStory cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "Cutoff"} threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} /> : null}
 
       {/* 03 · PINNED HORIZONTAL SCROLL RAIL */}
       <section id="architecture">
@@ -427,7 +428,7 @@ export default function HomePage() {
       </section>
 
       {/* 07 · HOW IT WORKS */}
-      {eventProfile.id === "ipo" ? (
+      {eventProfile.id === "ipo" && eventProfile.event === "ipo" ? (
         <IpoTerminal threshold={Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74} cutoffLabel={eventProfile.cutoffAt ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET" : "at cutoff"} />
       ) : null}
 
@@ -469,7 +470,7 @@ export default function HomePage() {
           <div className="products__head">
             <SplitHeading text="Built for every participant" className="split display-md" />
             <p className="lead" data-reveal>
-              {eventProfile.id === "ipo" ? "Conditional markets for IPO traders" : "Non-custodial conditional infrastructure for macro traders"}, Uniswap v4 LPs, and $QTL
+              {eventProfile.id === "ipo" ? eventProfile.copy.audience : "Non-custodial conditional infrastructure for macro traders"}, Uniswap v4 LPs, and $QTL
               voters.
             </p>
           </div>
@@ -621,11 +622,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 12b · PAST MARKETS */}
+      <div className="wrap landing-past"><PastMarkets /></div>
+
       {/* 13 · INVERTED CTA */}
       <section className="cta" id="genesis">
         <div className="wrap">
           <p className="eyebrow" data-reveal>
-            <span className="eyebrow__n">LAUNCH</span>{eventProfile.id === "ipo" ? "Anthropic IPO market" : "Genesis Market"}
+            <span className="eyebrow__n">LAUNCH</span>{eventProfile.id === "ipo" ? eventProfile.copy.launchLabel : "Genesis Market"}
           </p>
           <SplitHeading text="Ready to trade parallel timelines?" className="split display" />
           <Link href="/market/" className="cta__btn" data-cursor data-reveal>
@@ -653,7 +657,7 @@ export default function HomePage() {
             </Link>
             <p className="ftr__blurb">
               {eventProfile.id === "ipo"
-                ? "Conditional markets on Uniswap v4. Trade the Anthropic IPO price, settled from the SEC filing."
+                ? eventProfile.copy.footerBlurb
                 : "Conditional markets on Uniswap v4, settled under hybrid ECDSA and ML-DSA-44 attestation."}
             </p>
             <Link href="/market/" className="ftr__open" data-cursor>

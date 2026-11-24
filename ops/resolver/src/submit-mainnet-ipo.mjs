@@ -7,6 +7,7 @@ import { createPublicClient, createWalletClient, defineChain, hashTypedData, htt
 import { privateKeyToAccount } from 'viem/accounts';
 import { ANTHROPIC_CIK, documentUrl, fetchProspectus, fetchSubmissions, findFirstFinalProspectus, makeIpoEvidence, parseOfferPrice } from './sec.mjs';
 import { assertIpoManifest, buildIpoReport } from './ipo-report.mjs';
+import { SOURCE_ID as BEA_SOURCE_ID, fetchOfficialRelease, makeEvidence as makeBeaEvidence, officialReleaseUrl, parseCorePce } from './bea.mjs';
 import { terminalOutcome } from './mainnet-report.mjs';
 import { normalizeMainnetSeedHex } from './mainnet-seed.mjs';
 
@@ -20,10 +21,37 @@ const period = process.env.QT_IPO_PERIOD || 'ANT-IPO-PRICE-2026-11';
 const marketId = process.env.QT_IPO_MARKET_ID || manifest.ipoMarket?.marketId;
 if (!marketId || !/^0x[0-9a-fA-F]{64}$/.test(marketId)) throw new Error('Set QT_IPO_MARKET_ID after the IPO market is created.');
 
+// One resolver, several sources. QT_EVENT_SOURCE picks how the value is read: 'sec' (default, the original IPO price from the 424B4)
+// or 'bea' (US Core PCE month over month from the BEA release for QT_BEA_DATA_PERIOD, for example 2026-10). The market must be
+// bound to the same source on chain (IpoResolutionAdapter.setMarketSource); the check below refuses to sign otherwise.
+const eventSource = process.env.QT_EVENT_SOURCE || 'sec';
+if (eventSource !== 'sec' && eventSource !== 'bea') throw new Error("QT_EVENT_SOURCE must be 'sec' or 'bea'.");
+
 let first;
 let fetched;
 let parsed;
-if (process.env.QT_IPO_REHEARSAL === '1') {
+let beaEvidence;
+if (eventSource === 'bea') {
+  const dataPeriod = process.env.QT_BEA_DATA_PERIOD;
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dataPeriod ?? '')) throw new Error('Set QT_BEA_DATA_PERIOD to the data month, for example 2026-10.');
+  let release;
+  if (process.env.QT_EVENT_REHEARSAL_HTML) {
+    // Rehearsal seam: replays a saved real BEA page through the production signing and submission path. Honoured only against a
+    // local fork RPC, so it can never change what a real run reads from BEA.
+    const host = new URL(process.env.QT_MAINNET_RPC || 'http://invalid.invalid').hostname;
+    if (host !== '127.0.0.1' && host !== 'localhost') throw new Error('Rehearsal fixtures are only allowed against a local fork RPC.');
+    release = { published: true, url: officialReleaseUrl(dataPeriod), html: await readFile(process.env.QT_EVENT_REHEARSAL_HTML, 'utf8') };
+  } else {
+    release = await fetchOfficialRelease(officialReleaseUrl(dataPeriod));
+  }
+  if (!release.published) {
+    console.log(JSON.stringify({ chainId: 4663, period, published: false, reason: `BEA release for ${dataPeriod} is not published yet`, transactionSent: false }));
+    process.exit(0);
+  }
+  const bea = parseCorePce(release.html, dataPeriod);
+  parsed = { printed: bea.printed, priceCents: bea.valueBps };
+  beaEvidence = makeBeaEvidence({ url: release.url, periodId: dataPeriod, printedValue: bea.printed, html: release.html, fetchedAt: new Date().toISOString() });
+} else if (process.env.QT_IPO_REHEARSAL === '1') {
   // Rehearsal seam: replays a saved real 424B4 through the exact production signing and submission path.
   // It is honoured only against a local fork, so it can never change what a real run reads from the SEC.
   const host = new URL(process.env.QT_MAINNET_RPC || 'http://invalid.invalid').hostname;
@@ -43,7 +71,7 @@ if (process.env.QT_IPO_REHEARSAL === '1') {
   fetched = await fetchProspectus(documentUrl({ cik: ANTHROPIC_CIK, accession: first.accession, primaryDocument: first.primaryDocument }));
   parsed = parseOfferPrice(fetched.text);
 }
-const { evidence, canonicalJson, evidenceHash } = makeIpoEvidence({
+const { evidence, canonicalJson, evidenceHash } = beaEvidence ?? makeIpoEvidence({
   url: fetched.url,
   accession: first.accession,
   filingDate: first.filingDate,
@@ -92,6 +120,13 @@ if (onchainSigner.toLowerCase() !== signer.address.toLowerCase()) throw new Erro
 
 const market = await publicClient.readContract({ address: registry, abi: registryArtifact.abi, functionName: 'market', args: [marketId] });
 if (market.periodId.toLowerCase() !== keccak256(stringToHex(period)).toLowerCase()) throw new Error('On-chain IPO market period does not match the configured period.');
+const sourceIdText = eventSource === 'bea' ? BEA_SOURCE_ID : undefined;
+const expectedSourceAbi = [{ type: 'function', name: 'expectedSource', stateMutability: 'view', inputs: [{ type: 'bytes32' }], outputs: [{ type: 'bytes32' }] }];
+if (eventSource === 'bea') {
+  // The adapter only settles a market from the source it was bound to; refuse early (and clearly) if the binding is missing.
+  const bound = await publicClient.readContract({ address: adapter, abi: expectedSourceAbi, functionName: 'expectedSource', args: [marketId] });
+  if (bound.toLowerCase() !== keccak256(stringToHex(BEA_SOURCE_ID)).toLowerCase()) throw new Error('Market is not bound to the BEA source on chain; run setMarketSource first. No transaction sent.');
+}
 const priorOutcome = terminalOutcome(market.status);
 if (priorOutcome) {
   const result = { chainId: 4663, marketId, period, published: true, alreadyFinal: true, finalStatus: priorOutcome, newTransactionSent: false };
@@ -112,7 +147,7 @@ if (priorOutcome) {
   process.exit(0);
 }
 if (!market.activated) throw new Error('IPO market is not activated.');
-const report = buildIpoReport({ marketId, market, period, priceCents: parsed.priceCents, evidenceHash });
+const report = buildIpoReport({ marketId, market, period, priceCents: parsed.priceCents, evidenceHash, sourceIdText, allowNonPositive: eventSource !== 'sec' });
 const block = await publicClient.getBlock();
 if (block.timestamp < market.releaseAt) {
   console.log(JSON.stringify({ chainId: 4663, marketId, period, published: true, awaitingReleaseAt: market.releaseAt.toString(), transactionSent: false }));

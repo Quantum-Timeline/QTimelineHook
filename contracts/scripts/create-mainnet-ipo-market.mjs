@@ -6,6 +6,10 @@
 // Required env: QT_IPO_CUTOFF_AT (unix seconds, last moment of trading, before the offering is priced),
 //               QT_IPO_THRESHOLD (dollars, YES if the final offer price is at or above it), QT_ETH_USD (reference price).
 // Optional env: QT_IPO_PERIOD (default ANT-IPO-PRICE-2026-11), QT_IPO_OPENS_AT, QT_MAINNET_RPC (override, e.g. an Anvil fork).
+// New events on the same contracts (no redeploy): set QT_EVENT_KEY (for example core-pce-2026-10) and the market is stored under
+//   manifest.events[key] instead of manifest.ipoMarket. Then also set QT_EVENT_RELEASE_AT (unix seconds of the earliest report),
+//   QT_EVENT_THRESHOLD_BPS (signed integer in the unit the source reports, for example 30 for 0.30%) and QT_EVENT_SOURCE_ID
+//   (text id the adapter binds the market to, for example bea:core-pce:mom:first-release). QT_EVENT_WINDOW_SECONDS defaults to 172800.
 import { createPrivateKey, sign as signMldsa } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -24,6 +28,10 @@ const mode = flags.has("--broadcast") ? "broadcast" : flags.has("--quote") ? "qu
 if (!mode) throw new Error("Pass exactly one of --plan, --broadcast or --quote");
 const secretDir = resolve(root, "contracts/.secrets");
 const manifestPath = resolve(root, process.env.QTIMELINE_IPO_MANIFEST || "deployments/robinhood-mainnet-ipo.json");
+const eventKey = process.env.QT_EVENT_KEY ?? "";
+if (eventKey && !/^[a-z0-9][a-z0-9-]{2,48}$/.test(eventKey)) throw new Error("QT_EVENT_KEY must be 3-49 lowercase letters, digits or dashes");
+const readState = (m) => (eventKey ? m.events?.[eventKey] : m.ipoMarket);
+const writeState = (m, st) => { if (eventKey) { m.events = { ...(m.events ?? {}), [eventKey]: st }; } else { m.ipoMarket = st; } };
 const permit2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 const ZERO = "0x0000000000000000000000000000000000000000";
 const FIVE_USD = 5_000_000n;
@@ -93,18 +101,35 @@ async function main() {
   const cutoffText = process.env.QT_IPO_CUTOFF_AT;
   if (!/^[A-Za-z0-9._-]{3,64}$/.test(period)) throw new Error("QT_IPO_PERIOD must be 3-64 letters, digits, dots, dashes or underscores");
   if (!cutoffText || !/^\d+$/.test(cutoffText)) throw new Error("Set QT_IPO_CUTOFF_AT to the last moment of trading in unix seconds (before the offering is priced)");
-  const thresholdCents = parsePriceCents(process.env.QT_IPO_THRESHOLD ?? "");
+  const thresholdCents = eventKey
+    ? (() => { const t = process.env.QT_EVENT_THRESHOLD_BPS ?? ""; if (!/^-?\d{1,9}$/.test(t)) throw new Error("Set QT_EVENT_THRESHOLD_BPS to a signed integer"); return Number(t); })()
+    : parsePriceCents(process.env.QT_IPO_THRESHOLD ?? "");
   const ethUsd = parseUsdPrice(process.env.QT_ETH_USD ?? "");
   const block = await client.getBlock();
-  const existing = manifest.ipoMarket;
+  const existing = readState(manifest);
   const sched = manifest.schedule;
   if (!sched) throw new Error("The IPO manifest has no recorded schedule parameters");
-  const schedule = existing
-    ? { opensAt: BigInt(existing.opensAt), cutoffAt: BigInt(existing.cutoffAt), releaseAt: BigInt(existing.releaseAt), deadline: BigInt(existing.deadline) }
-    : ipoSchedule({
+  let schedule;
+  if (existing) {
+    schedule = { opensAt: BigInt(existing.opensAt), cutoffAt: BigInt(existing.cutoffAt), releaseAt: BigInt(existing.releaseAt), deadline: BigInt(existing.deadline) };
+  } else if (eventKey) {
+    // Each event picks its own schedule inside the contract bounds: report gap 5 minutes to 7 days, window 1 to 14 days.
+    const releaseText = process.env.QT_EVENT_RELEASE_AT;
+    if (!releaseText || !/^\d+$/.test(releaseText)) throw new Error("Set QT_EVENT_RELEASE_AT to the earliest report time in unix seconds");
+    const cutoff = BigInt(cutoffText); const release = BigInt(releaseText);
+    const window = BigInt(process.env.QT_EVENT_WINDOW_SECONDS ?? 172_800);
+    const opens = process.env.QT_IPO_OPENS_AT ? BigInt(process.env.QT_IPO_OPENS_AT) : block.timestamp + 3_600n;
+    const minimum = BigInt(sched.minimumTradingWindowSeconds);
+    if (!(release >= cutoff + 300n && release <= cutoff + 7n * 86_400n)) throw new Error("Report gap must be between 5 minutes and 7 days after the cutoff");
+    if (!(window >= 86_400n && window <= 14n * 86_400n)) throw new Error("Report window must be between 1 and 14 days");
+    if (!(block.timestamp < opens && opens + minimum <= cutoff)) throw new Error("Schedule leaves less than the minimum trading window between opensAt and the cutoff");
+    schedule = { opensAt: opens, cutoffAt: cutoff, releaseAt: release, deadline: release + window };
+  } else {
+    schedule = ipoSchedule({
       now: block.timestamp, cutoffAt: cutoffText, releaseDelay: sched.releaseDelaySeconds, resolutionWindow: sched.resolutionWindowSeconds,
       minimumTradingWindow: sched.minimumTradingWindowSeconds, opensAt: process.env.QT_IPO_OPENS_AT,
     });
+  }
   if (existing && (existing.period !== period || BigInt(existing.cutoffAt) !== BigInt(cutoffText) || existing.thresholdCents !== thresholdCents)) {
     throw new Error("Manifest market does not match QT_IPO_PERIOD / QT_IPO_CUTOFF_AT / QT_IPO_THRESHOLD");
   }
@@ -148,8 +173,8 @@ async function main() {
   }
   if (shortfalls.length) throw new Error(`Deployer is not funded for the seed: ${shortfalls.join("; ")}`);
 
-  const state = manifest.ipoMarket ?? {};
-  const save = async () => { manifest.ipoMarket = state; await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8"); };
+  const state = readState(manifest) ?? {};
+  const save = async () => { writeState(manifest, state); await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8"); };
   const send = async (label, request) => {
     const { request: prepared } = await client.simulateContract({ account, ...request });
     const hash = await wallet.writeContract(prepared);
@@ -200,6 +225,25 @@ async function main() {
       releaseAt: schedule.releaseAt.toString(), deadline: schedule.deadline.toString(), hook, referenceEthUsd: process.env.QT_ETH_USD,
       transactions: { create: { hash: created.hash, gasUsed: created.gasUsed, blockNumber: created.blockNumber } },
     });
+    await save();
+  }
+
+  // 1b. bind the market to its data source (new events only; the original IPO market uses the adapter's default SEC source)
+  if (eventKey) {
+    const sourceText = process.env.QT_EVENT_SOURCE_ID;
+    if (!sourceText || !/^[a-z0-9:._-]{8,120}$/.test(sourceText)) throw new Error("Set QT_EVENT_SOURCE_ID (for example bea:core-pce:mom:first-release)");
+    const sourceId = keccak256(stringToHex(sourceText));
+    const adapterArt = await artifact("IpoResolutionAdapter");
+    const current = await client.readContract({ address: a.IpoResolutionAdapter, abi: adapterArt.abi, functionName: "marketSource", args: [state.marketId] });
+    if (current === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+      const r = await send("IpoResolutionAdapter.setMarketSource", { address: a.IpoResolutionAdapter, abi: adapterArt.abi, functionName: "setMarketSource", args: [state.marketId, sourceId] });
+      state.transactions ??= {};
+      state.transactions.setSource = { hash: r.hash, gasUsed: r.gasUsed };
+    } else if (current.toLowerCase() !== sourceId.toLowerCase()) {
+      throw new Error("Market is already bound to a different source");
+    }
+    state.source = sourceText;
+    state.eventKey = eventKey;
     await save();
   }
 
@@ -324,7 +368,7 @@ function describePosition(p) {
 }
 
 async function quote({ client, manifest, factoryArt, registryArt, factory }) {
-  const state = manifest.ipoMarket;
+  const state = readState(manifest);
   if (!state?.marketId) throw new Error("No Mainnet market in the manifest");
   const a = manifest.addresses;
   const market = await client.readContract({ address: a.IpoMarketRegistry, abi: registryArt.abi, functionName: "market", args: [state.marketId] });
@@ -375,6 +419,7 @@ async function quote({ client, manifest, factoryArt, registryArt, factory }) {
     rows.push({ direction: `probability: exit $5 ${side} position (swap 2.5 + merge)`, amountIn: EXIT_SWAP.toString(), quotedOut: exit.out.toString(), impactBpsExFee: Number(exitImpact), meetsOnePercentTarget: exitImpact <= 100n, gasEstimate: exit.gas.toString() });
   }
   state.quotes = { measuredAt: now.toString(), rows };
+  writeState(manifest, state);
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   console.log(json(rows));
   if (rows.some((r) => !r.meetsOnePercentTarget)) { console.error("At least one direction misses the 1% opening-depth target; adjust ranges or amounts before activation."); process.exitCode = 2; }

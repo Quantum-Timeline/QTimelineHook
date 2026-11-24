@@ -25,6 +25,11 @@ contract IpoMarketRegistry is Initializable, IQTimelineMarketRegistry, IIpoSched
     error AlreadyExists();
     error InvalidTransition();
 
+    uint64 public constant MIN_RELEASE_GAP = 300;
+    uint64 public constant MAX_RELEASE_GAP = 7 days;
+    uint64 public constant MIN_REPORT_WINDOW = 1 days;
+    uint64 public constant MAX_REPORT_WINDOW = 14 days;
+
     address public deployer;
     uint64 public releaseDelay;
     uint64 public resolutionWindow;
@@ -86,7 +91,10 @@ contract IpoMarketRegistry is Initializable, IQTimelineMarketRegistry, IIpoSched
         if (_markets[marketId].vault != address(0)) revert AlreadyExists();
         if (marketId == bytes32(0) || configHash == bytes32(0) || vault == address(0) || periodId == bytes32(0)) revert InvalidConfig();
         if (!(opensAt < cutoffAt && cutoffAt < releaseAt && releaseAt < deadline)) revert InvalidConfig();
-        if (cutoffAt + releaseDelay != releaseAt || deadline != releaseAt + resolutionWindow) revert InvalidConfig();
+        // Each event sets its own schedule inside fixed bounds: the gap from swap cutoff to the earliest report is 5 minutes to 7 days
+        // and the report window is 1 to 14 days. The initializer values are the default used by the original IPO market.
+        if (releaseAt - cutoffAt < MIN_RELEASE_GAP || releaseAt - cutoffAt > MAX_RELEASE_GAP) revert InvalidConfig();
+        if (deadline - releaseAt < MIN_REPORT_WINDOW || deadline - releaseAt > MAX_REPORT_WINDOW) revert InvalidConfig();
         if (poolIds[0] == bytes32(0) || poolIds[1] == bytes32(0) || poolIds[2] == bytes32(0)) revert InvalidConfig();
         if (poolIds[0] == poolIds[1] || poolIds[0] == poolIds[2] || poolIds[1] == poolIds[2]) revert InvalidConfig();
 

@@ -17,6 +17,12 @@ export type EventProfile = {
   copy: Record<string, string>;
   formatThreshold(thresholdBps: number): string;
   formatValue(valueBps: number): string;
+  /** Which event this build shows. A "pce" event with id "ipo" is the macro event on the shared engine, not the legacy Core system. */
+  event: "ipo" | "pce";
+  metaTitle: string;
+  metaDescription: string;
+  /** Line drawn under the quick-bet card, in display units formatted by `format`. */
+  ruler?: { min: number; max: number; threshold: number; format(n: number): string };
 };
 
 const percent = (bps: number) => `${(bps / 100).toFixed(2)}%`;
@@ -63,9 +69,13 @@ const pce: EventProfile = {
   },
   formatThreshold: percent,
   formatValue: percent,
+  event: "pce",
+  metaTitle: "QTimeline: Every pool, two timelines",
+  metaDescription: "Split USDG into YES/NO claims, trade conditional ETH discovery across three Uniswap v4 pools, and settle under ECDSA + ML-DSA-44 on Robinhood Chain.",
 };
 
 const thresholdDollars = process.env.NEXT_PUBLIC_IPO_THRESHOLD;
+const ipoThreshold = Number(thresholdDollars) || 74;
 
 const ipo: EventProfile = {
   id: "ipo",
@@ -110,9 +120,99 @@ const ipo: EventProfile = {
     genesis: "Anthropic, PBC final IPO price per share, taken from the first Form 424B4 on SEC EDGAR. Trading halts on-chain at the cutoff, before the offering is priced.",
     releaseHeadline: "Filing expected in",
     voteNext: "Pick one of two fixed thresholds for the next event. Each wallet votes a single time.",
+    oracleTitle: "SEC filing, hybrid authorization",
+    guardLabel: "On-chain beforeSwap guard halts all three pools at the cutoff, before the offering is priced.",
+    marketBlurb: "Pick a side. If you are right, each share pays $1.00 once the SEC publishes the final price. If not, it pays $0.",
+    metaLabel: "Anthropic IPO · Form 424B4",
+    condYes: `Final price ≥ ${dollars(ipoThreshold * 100)}`,
+    condNo: `Final price < ${dollars(ipoThreshold * 100)}`,
+    swapText: "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to trade your view on the IPO price together with ETH.",
+    traders: "IPO Traders",
+    kicker: "First Filing",
+    audience: "Conditional markets for IPO traders",
+    launchLabel: "Anthropic IPO market",
+    footerBlurb: "Conditional markets on Uniswap v4. Trade the Anthropic IPO price, settled from the SEC filing.",
+    filingUnit: "FILING",
+    filingCaption: "Only the first Form 424B4 on SEC EDGAR settles the market",
+    waitDone: "Waiting for the Form 424B4",
   },
   formatThreshold: dollars,
   formatValue: dollars,
+  event: "ipo",
+  metaTitle: "QTimeline: Anthropic IPO price market",
+  metaDescription: `${thresholdDollars ? `Will Anthropic's final IPO price be at or above $${Number(thresholdDollars).toFixed(2)} per share?` : "Will Anthropic's final IPO price be at or above the market threshold?"} Buy YES or NO on Robinhood Chain. Each winning share pays $1.00, settled from the SEC's Form 424B4.`,
+  ruler: { min: 50, max: 110, threshold: ipoThreshold, format: (n) => `$${n.toFixed(2)}` },
 };
 
-export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "pce" ? pce : ipo;
+// Macro event (US Core PCE) on the shared engine. Everything event-specific comes from build variables, so the next release only
+// needs new values for NEXT_PUBLIC_EVENT_THRESHOLD_BPS, NEXT_PUBLIC_EVENT_PERIOD_LABEL and NEXT_PUBLIC_EVENT_CUTOFF_AT, not a new contract deployment.
+const eventBps = Number(process.env.NEXT_PUBLIC_EVENT_THRESHOLD_BPS ?? "30");
+const periodLabel = process.env.NEXT_PUBLIC_EVENT_PERIOD_LABEL ?? "October 2026";
+const eventCutoffAt = Number(process.env.NEXT_PUBLIC_EVENT_CUTOFF_AT) || undefined;
+const pctText = percent(eventBps);
+const pceQuestion = `Will US Core PCE rise at least ${pctText} month over month in ${periodLabel}?`;
+
+const pceEngine: EventProfile = {
+  id: "ipo",
+  event: "pce",
+  tag: `Core PCE · ${periodLabel}`,
+  question: pceQuestion,
+  yesLabel: `YES · ≥ ${pctText}`,
+  noLabel: `NO · < ${pctText}`,
+  source: `First BEA Personal Income and Outlays release for ${periodLabel}, Core PCE price index, percent change from the preceding month`,
+  thresholdLabel: "Threshold",
+  reportedLabel: "Reported Core PCE",
+  oracleRule: "A project bot reads the first official BEA release and reports the printed month-over-month Core PCE in basis points. The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the BEA number. The release and its hash are public.",
+  cutoffNumber: ["5 min", "Cutoff before release", "Swaps close on-chain"],
+  cutoffAt: eventCutoffAt,
+  copy: {
+    heroEyebrow: `Core PCE ${periodLabel}`,
+    heroA: "One inflation print",
+    heroB: "two timelines",
+    heroLead: `${pceQuestion} Buy YES or NO shares. Each winning share pays $1.00 once BEA publishes the number, settled on Uniswap v4 under ECDSA + ML-⁠DSA-⁠44.`,
+    manifesto: "We split one macroeconomic print into two live Uniswap v4 timelines on Robinhood Chain. Trade conditional ETH exposure and settle from the first BEA release under hybrid ECDSA plus NIST FIPS 204 post-quantum signatures.",
+    lockCaption: "Swap lock before the BEA release",
+    lockKicker: "Cutoff",
+    lockText: "IpoTimelineHook enforces beforeSwap on every pool, locking swaps at the on-chain cutoff before the BEA release.",
+    lockLead: "IpoTimelineHook enforces the cutoff directly inside beforeSwap across ETH-YES, ETH-NO, and YES/NO, so nobody trades after the number is known.",
+    oracleCard: "Dual ECDSA + NIST FIPS 204 module-lattice attestation settles the BEA-reported Core PCE on-chain.",
+    ethYes: `Conditional ETH price discovery if Core PCE prints at or above ${pctText} month over month.`,
+    ethNo: `Parallel ETH price discovery if Core PCE prints below ${pctText} month over month.`,
+    traderCard: "Express joint views on US inflation and ETH price without liquidation risk.",
+    sourceKey: "BEA",
+    sourceTitle: "First release only",
+    sourceText: "Resolves strictly from the first BEA Personal Income and Outlays release, and later revisions never change it.",
+    expiryText: "If no BEA figure is reported before the on-chain deadline, any address can call cancelExpired(marketId) for 50/50 redemption.",
+    benchmark: `US Core PCE ${periodLabel}, month over month, read from the first BEA release.`,
+    lockQuote: "ETH-YES, ETH-NO, and YES/NO pools locked at the cutoff by IpoTimelineHook.",
+    attestQuote: "Dual ECDSA + NIST FIPS 204 ML-DSA-44 attestation, or 50/50 expiry after the deadline.",
+    enforced: "Fees, beta caps, the resolution source, and the expiry fallback are encoded in the contracts. The deployer can upgrade contract logic.",
+    footer: `Core PCE ${periodLabel}`,
+    menuLock: "Cutoff before release",
+    genesis: `US Core PCE ${periodLabel} (at or above ${pctText} month over month), taken from the first BEA release. Trading halts on-chain at the cutoff, before the release.`,
+    releaseHeadline: "BEA release in",
+    voteNext: "Pick one of two fixed thresholds for the next event. Each wallet votes a single time.",
+    oracleTitle: "BEA release, hybrid authorization",
+    guardLabel: "On-chain beforeSwap guard halts all three pools at the cutoff, before the number is released.",
+    marketBlurb: "Pick a side. If you are right, each share pays $1.00 once BEA publishes the Core PCE figure. If not, it pays $0.",
+    metaLabel: "US Core PCE · BEA first release",
+    condYes: `Core PCE ≥ ${pctText}`,
+    condNo: `Core PCE < ${pctText}`,
+    swapText: "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to trade your view on US inflation together with ETH.",
+    traders: "Macro Traders",
+    kicker: "First Release",
+    audience: "Conditional markets for macro traders",
+    launchLabel: `Core PCE ${periodLabel}`,
+    footerBlurb: "Conditional markets on Uniswap v4. Trade US Core PCE, settled from the BEA release.",
+    filingUnit: "RELEASE",
+    filingCaption: "Only the first BEA release settles the market",
+    waitDone: "Waiting for the BEA release",
+  },
+  formatThreshold: percent,
+  formatValue: percent,
+  metaTitle: "QTimeline: US Core PCE market",
+  metaDescription: `${pceQuestion} Buy YES or NO on Robinhood Chain. Each winning share pays $1.00, settled from the first BEA release.`,
+  ruler: { min: 0, max: Math.max(60, Math.abs(eventBps) * 2), threshold: eventBps, format: percent },
+};
+
+export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "pce" ? pce : process.env.NEXT_PUBLIC_EVENT_KIND === "pce" ? pceEngine : ipo;

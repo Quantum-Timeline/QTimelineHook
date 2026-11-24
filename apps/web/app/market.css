@@ -186,3 +186,18 @@
   .qb__tmark { font-size: 0.6rem; }
 }
 @media (prefers-reduced-motion: reduce) { .qb__card, .qb__seam, .qb__half, .qb__cta, .qb__cta b { transition: none; } }
+
+/* ── Past markets: ended events, kept visible and verifiable ── */
+.past { margin-top: clamp(28px, 3.4vw, 48px); }
+.past__title { margin: 0 0 16px; font-family: Archivo, sans-serif; font-variation-settings: "wdth" 108; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+.past__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.past__item { padding: clamp(18px, 2.2vw, 28px); border: 1px solid var(--glass-line, rgba(243, 242, 236, 0.14)); border-radius: var(--r-lg, 18px); background: rgba(243, 242, 236, 0.04); display: grid; gap: 10px; }
+.past__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.past__status { padding: 4px 10px; border-radius: 999px; font-family: "JetBrains Mono", monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(243, 242, 236, 0.09); color: var(--paper, #f3f2ec); }
+.past__status--yes { background: rgba(207, 239, 140, 0.18); color: var(--lime, #cfef8c); }
+.past__window { color: var(--muted, #a3ad9f); font-size: 0.72rem; letter-spacing: 0.04em; }
+.past__q { margin: 0; font-family: Archivo, sans-serif; font-weight: 600; font-size: clamp(1.1rem, 1.8vw, 1.5rem); letter-spacing: -0.02em; line-height: 1.2; }
+.past__out { margin: 0; max-width: 70ch; color: var(--muted, #a3ad9f); font-size: 0.95rem; line-height: 1.55; }
+.past__link { justify-self: start; color: var(--lime, #cfef8c); font-size: 0.74rem; letter-spacing: 0.06em; text-decoration: none; }
+.past__link:hover { text-decoration: underline; }
+.landing-past { padding: clamp(40px, 6vw, 96px) 0; }

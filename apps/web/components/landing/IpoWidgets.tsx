@@ -24,7 +24,7 @@ export function IpoCountdown({ cutoffAt }: { cutoffAt: number }) {
     <div className="ipo-count" role="timer" aria-label="Time until trading closes">
       <span className="ipo-count__label mono">Trading closes</span>
       {left === 0 ? (
-        <strong className="ipo-count__done">Waiting for the Form 424B4</strong>
+        <strong className="ipo-count__done">{eventProfile.copy.waitDone}</strong>
       ) : (
         <div className="ipo-count__digits" aria-hidden="true">
           {(parts ?? [["--", "days"], ["--", "hrs"], ["--", "min"], ["--", "sec"]]).map(([value, unit]) => (

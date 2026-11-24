@@ -264,7 +264,7 @@
     "proxies": {
       "IpoMarketRegistry": {
         "proxy": "0x5444CF6E91462938C975668266c9E24b6233BD37",
-        "implementation": "0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE",
+        "implementation": "0x7055Eb3b51589c6715ca6AD119fa8547cE14D202",
         "proxyAdmin": "0x7fBED094F93a3271BBe9C2690d6aEC08c0222884",
         "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
       },
@@ -276,13 +276,13 @@
       },
       "IpoMarketFactory": {
         "proxy": "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
-        "implementation": "0x68E6e6689502c7ff4D05F0569c6c72066AdFD164",
+        "implementation": "0x20499D3fB06Fd0830553eBf8Aac0BF52A6ea852a",
         "proxyAdmin": "0x9Dd2B081D1ace94Dc7941ACaaE2aF165F080e425",
         "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
       },
       "IpoResolutionAdapter": {
         "proxy": "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
-        "implementation": "0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A",
+        "implementation": "0x0087A0a7544322c0361616Ca1C7f5cf8Fd95d529",
         "proxyAdmin": "0x69e5862108969673dc040b9A0978DD466b8A52AF",
         "owner": "0x3B06A7c6839dF369d62961DcA54ea56185332828"
       },
@@ -420,6 +420,169 @@
       }
     ],
     "activated": true,
-    "status": "Scheduled"
+    "status": "Scheduled",
+    "liquidityWithdrawal": {
+      "status": "Cancelled",
+      "transactions": {
+        "withdraw": "0x47954e12fd11d083cc846df8410eed42cc9d4d5a3b8db1411efeede9f887a3b2",
+        "redeem_eth_yes": "0x158be025b2850ba68fc8c7d261abcfd34b5cc604501ef2b5409477c8c8bff130",
+        "redeem_eth_no": "0xf99b1369fddca241e51e93f1e0be962ed0bf6861573e20e438f4b23bc6d19eb2",
+        "redeem_usdg_yes": "0x87943250569e2a190564bdf130ac03716e00f9839b9a15bc83636658fd53ab35",
+        "redeem_usdg_no": "0x0ea389d17a9cddecaedbbe71431e9bcffbcd54fe13066e92720748cc58da9d01"
+      },
+      "completedAt": "2026-11-24T08:55:52.119Z",
+      "remainingClaims": [
+        "0",
+        "0",
+        "0",
+        "0"
+      ]
+    }
+  },
+  "upgradeHistory": [
+    {
+      "target": "IpoResolutionAdapter",
+      "from": "0xE8120d3e02c48eA95066b4d6dbE89427Ab80196A",
+      "to": "0x0087A0a7544322c0361616Ca1C7f5cf8Fd95d529",
+      "logic": "IpoResolutionAdapter",
+      "transactionHash": "0xd45f18da317de6402d3289c95d89b54b9a66cc58013ea8ffdb74189f9b13d5d5",
+      "runtimeCodeHash": "0x6b9ef22d217ffb37bbbd170decbb185fc9a7ed110be3f972001b56b0e20c4f3c",
+      "at": "2026-11-24T08:56:05.653Z"
+    },
+    {
+      "target": "IpoMarketRegistry",
+      "from": "0x430fa4A5C4b013aD16974e4846b55aD3dfA02EeE",
+      "to": "0x7055Eb3b51589c6715ca6AD119fa8547cE14D202",
+      "logic": "IpoMarketRegistry",
+      "transactionHash": "0x078eace72a6d9ad6491dc0cd609275e35bc02d4ce0a0048bb77f4b859bcd4aea",
+      "runtimeCodeHash": "0x7f4ab480fce0bf09bc743efe6f65d27352cb44da0c4093bdd3e24492e83ab2f9",
+      "at": "2026-11-24T08:56:08.285Z"
+    },
+    {
+      "target": "IpoMarketFactory",
+      "from": "0x68E6e6689502c7ff4D05F0569c6c72066AdFD164",
+      "to": "0x20499D3fB06Fd0830553eBf8Aac0BF52A6ea852a",
+      "logic": "IpoMarketFactory",
+      "transactionHash": "0xa38e4a2b0bc4be934420172ce2f651cda962d1b2ddeebceca37fb3804fa9c59a",
+      "runtimeCodeHash": "0xb83c64b48a8096669c4b7dea1c88c5ab663fcd2fdbeacdbf7849782773ea601a",
+      "at": "2026-11-24T08:56:11.031Z"
+    }
+  ],
+  "events": {
+    "core-pce-2026-10": {
+      "marketId": "0xc8fdedaeb42752167dd111603983166c4529ae4da59820328fa75385cac4fcee",
+      "configHash": "0x6b7acc1db0b76c6ef382a7c52cace86b8ce6dc2306e302ef929f70307d3a7fd9",
+      "period": "CORE-PCE-2026-10",
+      "periodId": "0x3707bed0dc2f4df1fabaa0af06ef7138bf3cb4e754240deb8923fe4a1f85a65a",
+      "thresholdCents": 30,
+      "thresholdBps": 30,
+      "opensAt": "1795514177",
+      "cutoffAt": "1795613100",
+      "releaseAt": "1795613400",
+      "deadline": "1795786200",
+      "hook": "0x824Bc382bEfbF478BA24309C0CF68C04a2F76880",
+      "referenceEthUsd": "1778.03",
+      "transactions": {
+        "create": {
+          "hash": "0x82822c94374eb066a29ddf8810c7e81f913a1bbee3ac128bfc04d5140bc48644",
+          "gasUsed": "3635795",
+          "blockNumber": "122102641"
+        },
+        "setSource": {
+          "hash": "0x9c1d93dda63a1b32c01bb7925fea09fe16c21c45fc16413dd2dbc45a52eb577f",
+          "gasUsed": "79254"
+        },
+        "initializePools": {
+          "hash": "0x24ed567415e32fcba8341c99cdc571f1faada62aed531eb18772b67489fd6a3a",
+          "gasUsed": "237040"
+        },
+        "splitEth": {
+          "hash": "0xb43dc898aa5b8ad86711121c5639bf4c1b0209e918f4c896f968c3520081cf93",
+          "gasUsed": "206650"
+        },
+        "splitUsdg": {
+          "hash": "0x371c6fd7cdbd81c65ab33c7e036c31c3f20ecb8057bbfb5514c781e202aba19d",
+          "gasUsed": "260004"
+        },
+        "positions": [
+          {
+            "hash": "0x9b3c8764fd8ab83e89c0d8a5a37dd4232f4aa3a3862cebe55a513667b02ebd29",
+            "gasUsed": "489340"
+          },
+          {
+            "hash": "0x3d92d338cb6ca85783d4968c3694e946bf5e9aca4645e2b7e7a13593073e4a21",
+            "gasUsed": "489340"
+          },
+          {
+            "hash": "0x45cf3bf4d8d8e5a45d0e68912259fa26634e72e30b0f5bb4a7cead8ea8360f5a",
+            "gasUsed": "455184"
+          }
+        ],
+        "activate": {
+          "hash": "0xcf277d13786969ad3fb1771ffe7c664b3685f7457a51d21abbb77c87fdab6b59",
+          "gasUsed": "93913"
+        }
+      },
+      "source": "bea:core-pce:mom:first-release",
+      "eventKey": "core-pce-2026-10",
+      "vault": "0xA127EeB1084623E8C6d141501410Fde98164C3Ab",
+      "tokens": [
+        "0xCcC3bd893c5aa1A4eE109Be4FAc2655E615d446B",
+        "0xF036A7677904a2fe7807b792f092633243Ba0119",
+        "0x928FaB302AFe89a571E99eBaFcaA6E0818d3ba76",
+        "0x58564d1C266139e28fb46387fFfb1c9AbBf383c6"
+      ],
+      "poolIds": [
+        "0x3da93da0f29807edb3756e1bf746b0d47345b66f9d75360a7c9d4e6e1069498c",
+        "0xfed9c5ae9a148546894e03baec6ddad63cfe7ac331cc6eea64a7cba1cf501e76",
+        "0xbe0b43d6165f239aa339f7f4060f6fbb459bb0e484af6fb80d09d7ab9032737f"
+      ],
+      "positionIds": [
+        "4355306",
+        "4355307",
+        "4355308"
+      ],
+      "seeded": true,
+      "positions": [
+        {
+          "currency0": "0x928FaB302AFe89a571E99eBaFcaA6E0818d3ba76",
+          "currency1": "0xCcC3bd893c5aa1A4eE109Be4FAc2655E615d446B",
+          "tickLower": 199200,
+          "tickUpper": 203760,
+          "liquidity": "1755234328141",
+          "sqrtPriceX96": "1878927581114741726242897422806282",
+          "amount0Max": "8000000",
+          "amount1Max": "4499361653065472",
+          "amount0Needed": "7948538",
+          "amount1Needed": "4498911716898466"
+        },
+        {
+          "currency0": "0x58564d1C266139e28fb46387fFfb1c9AbBf383c6",
+          "currency1": "0xF036A7677904a2fe7807b792f092633243Ba0119",
+          "tickLower": 199200,
+          "tickUpper": 203760,
+          "liquidity": "1755234328141",
+          "sqrtPriceX96": "1878927581114741726242897422806282",
+          "amount0Max": "8000000",
+          "amount1Max": "4499361653065472",
+          "amount0Needed": "7948538",
+          "amount1Needed": "4498911716898466"
+        },
+        {
+          "currency0": "0x58564d1C266139e28fb46387fFfb1c9AbBf383c6",
+          "currency1": "0x928FaB302AFe89a571E99eBaFcaA6E0818d3ba76",
+          "tickLower": -6240,
+          "tickUpper": 6240,
+          "liquidity": "74617438",
+          "sqrtPriceX96": "79228162514264337593543950336",
+          "amount0Max": "20000000",
+          "amount1Max": "20000000",
+          "amount0Needed": "19998000",
+          "amount1Needed": "19998000"
+        }
+      ],
+      "activated": true,
+      "status": "Scheduled"
+    }
   }
 }

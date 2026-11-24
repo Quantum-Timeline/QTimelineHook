@@ -34,7 +34,7 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
   {
     name: "IpoResolutionAdapter",
     kind: "ORACLE",
-    role: "SEC Form 424B4 hybrid oracle adapter",
+    role: "Hybrid oracle adapter, one bound source per market",
     address: "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
   },
   {
@@ -135,7 +135,7 @@ export default function ContractsSection() {
             </h2>
           </div>
           <div className="contracts__meta mono">
-            <span>SYSTEM / anthropic-ipo-pricing</span>
+            <span>SYSTEM / shared event engine</span>
             <span className="rh-inline">CHAIN / <RobinhoodMark h={13} /> <i>Mainnet (4663)</i></span>
             <span className="contracts__status">STATUS / Deployed &amp; Sealed</span>
           </div>

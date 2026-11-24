@@ -4,22 +4,18 @@ import { AnimatedNumber } from "@/lib/motion";
 import { useOdds } from "@/lib/odds";
 import { eventProfile } from "@/lib/event-profile";
 
-const MIN = 50;
-const MAX = 110;
-
 /**
  * One card, two sides. The seam sits at the market's price: the side the crowd favours is the wider one.
  * Each half is a button that sets the ticket below. The ruler underneath places the threshold on the price line.
  */
 export function QuickBet() {
   const { yes: pYes } = useOdds();
-  const threshold = Number(process.env.NEXT_PUBLIC_IPO_THRESHOLD) || 74;
+  const ruler = eventProfile.ruler ?? { min: 50, max: 110, threshold: 74, format: (n: number) => `$${n.toFixed(2)}` };
   const closes = eventProfile.cutoffAt
     ? new Date(eventProfile.cutoffAt * 1000).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "America/New_York" }) + " ET"
     : undefined;
   const seam = Math.min(70, Math.max(30, (pYes ?? 0.5) * 100));
-  const tPct = ((threshold - MIN) / (MAX - MIN)) * 100;
-  const money = (n: number) => `$${n.toFixed(2)}`;
+  const tPct = Math.min(100, Math.max(0, ((ruler.threshold - ruler.min) / (ruler.max - ruler.min)) * 100));
 
   function pick(side: "yes" | "no") {
     window.dispatchEvent(new CustomEvent("qt:bet", { detail: side }));
@@ -28,14 +24,14 @@ export function QuickBet() {
 
   const cents = (yes: boolean) => (pYes === undefined ? undefined : Math.round((yes ? pYes : 1 - pYes) * 100));
   const sides = [
-    { side: "yes" as const, label: "YES", cond: `Final price ≥ ${money(threshold)}` },
-    { side: "no" as const, label: "NO", cond: `Final price < ${money(threshold)}` },
+    { side: "yes" as const, label: "YES", cond: eventProfile.copy.condYes },
+    { side: "no" as const, label: "NO", cond: eventProfile.copy.condNo },
   ];
 
   return (
     <section className="qb" aria-label="Pick a side" style={{ ["--seam" as string]: `${seam}%`, ["--t" as string]: `${tPct}%` }}>
       <div className="qb__meta mono">
-        <span>Anthropic IPO · Form 424B4</span>
+        <span>{eventProfile.copy.metaLabel}</span>
         {closes && <span>Trading closes {closes}</span>}
       </div>
 
@@ -61,9 +57,9 @@ export function QuickBet() {
       <div className="qb__ruler" aria-hidden="true">
         <div className="qb__track"><i className="qb__no" /><i className="qb__yes" /><span className="qb__notch" /></div>
         <div className="qb__ticks mono">
-          <span>{money(MIN)}</span>
-          <span className="qb__tmark">{money(threshold)} threshold</span>
-          <span>{money(MAX)}</span>
+          <span>{ruler.format(ruler.min)}</span>
+          <span className="qb__tmark">{ruler.format(ruler.threshold)} threshold</span>
+          <span>{ruler.format(ruler.max)}</span>
         </div>
       </div>
 

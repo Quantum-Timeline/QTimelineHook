@@ -102,8 +102,11 @@ contract IpoMarketFactory is Initializable, EIP712 {
         external returns (bytes32 marketId)
     {
         if (msg.sender != deployer || address(hookDeployer) == address(0)) revert Unauthorized();
-        if (!(c.opensAt < c.cutoffAt && c.cutoffAt + releaseDelay == c.releaseAt && c.deadline == c.releaseAt + resolutionWindow)
-            || c.periodId == bytes32(0) || c.thresholdBps <= 0 || c.nonce != nonces[deployer]
+        // Schedule bounds mirror the registry (5 minutes to 7 days from cutoff to earliest report, 1 to 14 days report window), and the
+        // threshold is any signed value so a month-over-month print can sit at or below zero.
+        if (!(c.opensAt < c.cutoffAt && c.releaseAt >= c.cutoffAt + 300 && c.releaseAt <= c.cutoffAt + 7 days
+                && c.deadline >= c.releaseAt + 1 days && c.deadline <= c.releaseAt + 14 days)
+            || c.periodId == bytes32(0) || c.nonce != nonces[deployer]
             || block.timestamp > c.signatureExpiry || c.signatureExpiry > c.opensAt
             || c.ethCollateralCap == 0 || c.ethCollateralCap > 0.1 ether
             || c.usdgCollateralCap == 0 || c.usdgCollateralCap > 500 * 10 ** usdgDecimals) revert InvalidConfig();
@@ -115,10 +118,10 @@ contract IpoMarketFactory is Initializable, EIP712 {
         marketId = keccak256(abi.encode(configHash, c.nonce));
         if (created[marketId]) revert AlreadyCreated();
 
-        address yesEth = _newToken("QTimeline ANT ETH YES", "qtETH-YES", 18);
-        address noEth = _newToken("QTimeline ANT ETH NO", "qtETH-NO", 18);
-        address yesUsd = _newToken("QTimeline ANT USDG YES", "qtUSDG-YES", usdgDecimals);
-        address noUsd = _newToken("QTimeline ANT USDG NO", "qtUSDG-NO", usdgDecimals);
+        address yesEth = _newToken("QTimeline ETH YES", "qtETH-YES", 18);
+        address noEth = _newToken("QTimeline ETH NO", "qtETH-NO", 18);
+        address yesUsd = _newToken("QTimeline USDG YES", "qtUSDG-YES", usdgDecimals);
+        address noUsd = _newToken("QTimeline USDG NO", "qtUSDG-NO", usdgDecimals);
         address vault = address(new BeaconProxy(vaultBeacon, abi.encodeCall(IpoConditionalVault.initialize, (
             address(this), deployer, marketId, registry, address(0), yesEth, noEth, c.ethCollateralCap, usdg, yesUsd, noUsd, c.usdgCollateralCap
         ))));
