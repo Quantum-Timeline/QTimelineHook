@@ -66,7 +66,7 @@ const ARCHITECTURE_ITEMS = [
     index: "HOOK",
     kindLabel: "Cutoff",
     icon: "qt-hook",
-    name: eventProfile.id === "ipo" ? "IpoTimelineHook" : "TimelineHook",
+    name: eventProfile.event === "ipo" ? "IpoTimelineHook" : "TimelineHook",
     label: eventProfile.id === "ipo" ? eventProfile.copy.guardLabel : "On-chain beforeSwap guard halts all three pools at 13:25 UTC, five minutes before release.",
     href: "/rules/",
   },
@@ -157,7 +157,7 @@ const LIFECYCLE_ROWS = [
     n: "SIGN",
     kicker: "Attestation",
     title: "Dual ECDSA + ML-DSA-44",
-    text: `${eventProfile.id === "ipo" ? "IpoResolutionAdapter" : "PostQuantumResolver"} requires both a classical ECDSA signature and a FIPS 204 ML-DSA-44 lattice signature.`,
+    text: `${eventProfile.event === "ipo" ? "IpoResolutionAdapter" : eventProfile.event === "pce" && eventProfile.id === "ipo" ? "ResolutionAdapter" : "PostQuantumResolver"} requires both a classical ECDSA signature and a FIPS 204 ML-DSA-44 lattice signature.`,
   },
   {
     n: "CLAIM",

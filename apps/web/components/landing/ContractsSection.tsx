@@ -14,13 +14,13 @@ const EXPLORER_BASE = "https://robinhoodchain.blockscout.com/address";
 
 const MAINNET_CONTRACTS: ContractEntry[] = [
   {
-    name: "IpoMarketRegistry",
+    name: "MarketRegistry",
     kind: "CORE",
     role: "Market state, cutoff & pool registry",
     address: "0x5444CF6E91462938C975668266c9E24b6233BD37",
   },
   {
-    name: "IpoMarketFactory",
+    name: "MarketFactory",
     kind: "CORE",
     role: "Deploys vault, outcome tokens, hook & 3 pools",
     address: "0xDb882dBD0da7ed65d4C360b5B18B9bd93ceAFde6",
@@ -32,31 +32,31 @@ const MAINNET_CONTRACTS: ContractEntry[] = [
     address: "0x401a0A3A8e32ABaA7f66EE7247D592f47784DF45",
   },
   {
-    name: "IpoResolutionAdapter",
+    name: "ResolutionAdapter",
     kind: "ORACLE",
     role: "Hybrid oracle adapter, one bound source per market",
     address: "0x741C847f54CeebD6A4D1A32341f73fb62eb80fbA",
   },
   {
-    name: "IpoHookDeployer",
+    name: "HookDeployer",
     kind: "HOOK",
     role: "CREATE2 deployer for each market's beforeSwap cutoff hook",
     address: "0xaAa28FA6a7DB709129879c1daF13Bc90B843064f",
   },
   {
-    name: "IpoTimelineHook beacon",
+    name: "TimelineHook beacon",
     kind: "BEACON",
     role: "Upgrade point for every market's cutoff hook",
     address: "0xa9928908754d2876613787E362bc35DA559C97FE",
   },
   {
-    name: "IpoConditionalVault beacon",
+    name: "ConditionalVault beacon",
     kind: "BEACON",
     role: "Upgrade point for every market's 1:1 USDG-backed YES/NO vault",
     address: "0x326be2C0e8883dd7b24d3afD17d9f37B3D512329",
   },
   {
-    name: "IpoOutcomeToken beacon",
+    name: "OutcomeToken beacon",
     kind: "BEACON",
     role: "Upgrade point for the four YES/NO claim tokens of each market",
     address: "0xCD8B0EB1025215A7C64af28D1Aa45b9f12a44214",
