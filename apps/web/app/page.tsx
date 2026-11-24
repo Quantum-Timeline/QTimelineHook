@@ -282,7 +282,7 @@ export default function HomePage() {
           </p>
           {eventProfile.id === "ipo" ? (
             <div className="hero__foot" data-reveal data-delay="0.95">
-              {eventProfile.event === "ipo" ? <IpoStack /> : null}
+              <IpoStack />
               {eventProfile.cutoffAt ? <IpoCountdown cutoffAt={eventProfile.cutoffAt} /> : null}
             </div>
           ) : null}

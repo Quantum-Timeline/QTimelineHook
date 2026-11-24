@@ -47,11 +47,13 @@ const STACK = [
 
 /** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */
 export function IpoStack() {
+  // The SEC mark belongs to the IPO event only; other events show the shared stack until their own source mark is added.
+  const items = STACK.filter((item) => item.name !== "SEC" || eventProfile.event === "ipo");
   return (
     <div className="ipo-stack">
       <span className="ipo-stack__cap mono">Built with</span>
       <ul aria-label="Built with">
-        {STACK.map((item) => (
+        {items.map((item) => (
           <li key={item.name} data-mark={"mark" in item ? "true" : undefined}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.icon} alt={item.name} style={{ height: `calc(${item.m} * clamp(20px, 2vw, 30px))` }} />
