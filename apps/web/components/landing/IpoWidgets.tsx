@@ -42,13 +42,14 @@ const STACK = [
   { name: "Uniswap", icon: "/partners/uniswap-wordmark.svg", m: 1.3 },
   { name: "Ethereum", icon: "/partners/ethereum.svg", m: 1.45 },
   { name: "USDG", icon: "/partners/usdg.png", m: 1.25, mark: true },
-  { name: "SEC", icon: "/partners/sec-logo-white-1x.png", m: 1.25, mark: true },
+  { name: "SEC", icon: "/partners/sec-logo-white-1x.png", m: 1.25, mark: true, only: "ipo" },
+  { name: "BEA", icon: "/partners/bea-logo.png", m: 1.15, only: "pce" },
 ] as const;
 
 /** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */
 export function IpoStack() {
-  // The SEC mark belongs to the IPO event only; other events show the shared stack until their own source mark is added.
-  const items = STACK.filter((item) => item.name !== "SEC" || eventProfile.event === "ipo");
+  // The last mark is the event's data source: SEC for the IPO market, BEA for Core PCE.
+  const items = STACK.filter((item) => !("only" in item) || item.only === eventProfile.event);
   return (
     <div className="ipo-stack">
       <span className="ipo-stack__cap mono">Built with</span>
