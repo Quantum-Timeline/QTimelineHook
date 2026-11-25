@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { eventProfile } from "@/lib/event-profile";
 import { PAST_MARKETS, explorerAddress } from "@/lib/past-markets";
 
-/** Ended markets, newest first. The market this build is showing is never listed here. */
+/** Ended markets, newest first. */
 export function PastMarkets({ heading = true }: { heading?: boolean }) {
-  const items = PAST_MARKETS.filter((m) => m.event !== eventProfile.event);
+  const items = PAST_MARKETS;
   if (items.length === 0) return null;
   return (
     <section className="past" id="past" aria-label="Past markets">
@@ -13,7 +12,7 @@ export function PastMarkets({ heading = true }: { heading?: boolean }) {
         {items.map((m) => (
           <li key={m.marketId} className="past__item">
             <div className="past__head">
-              <span className={`past__status past__status--${m.status === "Cancelled" ? "cancelled" : m.status === "Settled YES" ? "yes" : "no"}`}>{m.status}</span>
+              <span className={`past__status past__status--${m.status === "Settled YES" ? "yes" : "no"}`}>{m.status}</span>
               <span className="past__window mono">{m.window}</span>
             </div>
             <p className="past__q">{m.question}</p>
