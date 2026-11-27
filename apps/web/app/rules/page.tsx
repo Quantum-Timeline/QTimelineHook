@@ -8,7 +8,7 @@ import { eventProfile } from "@/lib/event-profile";
 const rules = [
   ["Vault · split", "One deposit, two claims", "Deposit ETH or USDG into a market vault to mint equal YES and NO outcome tokens for that collateral.", "ETH", true],
   ["Pool · trade", "Three independent pools", "ETH-YES and ETH-NO expose conditional asset prices. YES-NO provides an implied outcome price. LP fee is 0.30%; QTimeline adds no protocol fee.", "USDG", false],
-  ["Oracle · resolve", eventProfile.id === "ipo" ? eventProfile.copy.oracleTitle : "BEA data, hybrid authorization", eventProfile.oracleRule, "ETH", false],
+  ["Oracle · resolve", eventProfile.id === "ipo" ? eventProfile.copy.oracleTitle : `${eventProfile.copy.sourceKey ?? "BEA"} data, hybrid authorization`, eventProfile.oracleRule, "ETH", false],
   ["Claim · redeem", "Winning side pays 1:1", "After a valid result, winning claims redeem for their collateral. If unresolved 48 hours after the scheduled report time, anyone can trigger cancellation; each individual claim redeems for half, while a matched YES/NO pair merges for full collateral.", "USDG", true],
 ] as const;
 

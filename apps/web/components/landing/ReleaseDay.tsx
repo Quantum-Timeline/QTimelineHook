@@ -39,7 +39,7 @@ export function ReleaseDay({ cutoffAt }: { cutoffAt: number }) {
     { at: releaseAt, when: "Then", title: c.relStep4, text: c.relStep4Text },
   ];
   // Which moment is next, so the page can say what the visitor is waiting for.
-  const next = now === undefined ? undefined : now < cutoffAt ? { label: "Trading closes in", to: cutoffAt } : now < releaseAt ? { label: "The BEA publishes in", to: releaseAt } : now < deadline ? { label: "Reporting window closes in", to: deadline } : undefined;
+  const next = now === undefined ? undefined : now < cutoffAt ? { label: "Trading closes in", to: cutoffAt } : now < releaseAt ? { label: `The ${eventProfile.copy.sourceKey ?? "BEA"} publishes in`, to: releaseAt } : now < deadline ? { label: "Reporting window closes in", to: deadline } : undefined;
   const state = (idx: number) => {
     if (now === undefined) return "idle";
     if (idx === 0) return now >= cutoffAt ? "done" : "next";

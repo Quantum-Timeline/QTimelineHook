@@ -26,14 +26,14 @@ Everything below uses the contracts that are already deployed on Robinhood Chain
 4. **Point the site at it.**
 
    ```sh
-   QT_EVENT_KIND=pce QT_EVENT_PERIOD_LABEL="November 2026" pnpm web:ipo:configure
+   QT_EVENT_KIND=pce QT_EVENT_PERIOD_LABEL="November 2026" pnpm web:ipo:configure   # QT_EVENT_KIND=unemployment for the jobs report
    ```
 
    Set the matching GitHub repository variables used by `deploy-web.yml`: `NEXT_PUBLIC_MARKET_ID`, `NEXT_PUBLIC_EVENT_KIND`, `NEXT_PUBLIC_EVENT_THRESHOLD_BPS`, `NEXT_PUBLIC_EVENT_PERIOD_LABEL`, `NEXT_PUBLIC_EVENT_CUTOFF_AT`. A push to `main` rebuilds and deploys the site to Cloudflare Pages. Add the ended market to `apps/web/lib/past-markets.ts` so holders can reach their claims.
 
-5. **Point the resolver at it.** Update the variables read by `.github/workflows/resolve-mainnet-event.yml`: `QTIMELINE_EVENT_ENABLED=true`, `QTIMELINE_EVENT_MARKET_ID`, `QT_EVENT_PERIOD`, `QT_EVENT_SOURCE` (`bea` or `sec`) and, for BEA, `QT_BEA_DATA_PERIOD` (`YYYY-MM`). Change the `cron` line to the new release window. Run the workflow once by hand as a dry run first: it must report that the release is not published yet, which proves the RPC, the market, the bound source and the keys all line up.
+5. **Point the resolver at it.** Update the variables read by `.github/workflows/resolve-mainnet-event.yml`: `QTIMELINE_EVENT_ENABLED=true`, `QTIMELINE_EVENT_MARKET_ID`, `QT_EVENT_PERIOD`, `QT_EVENT_SOURCE` (`bea`, `bls` or `sec`) and, for BEA, `QT_BEA_DATA_PERIOD` (`YYYY-MM`); for BLS, `QT_BLS_DATA_PERIOD` (`YYYY-MM`) and `QT_BLS_USER_AGENT`, which must include a contact email because BLS blocks bots that do not identify themselves. Change the `cron` line to the new release window. Run the workflow once by hand as a dry run first: it must report that the release is not published yet, which proves the RPC, the market, the bound source and the keys all line up.
 
-6. **After the result.** Check the market status on chain. To take the treasury liquidity back, run `pnpm withdraw:ipo` (read-only plan) and `pnpm withdraw:ipo -- --broadcast`. Holders redeem on the Positions page.
+6. **After the result.** Check the market status on chain. To take the treasury liquidity back, run `QT_EVENT_KEY=<key> pnpm withdraw:ipo` (read-only plan) and `QT_EVENT_KEY=<key> pnpm withdraw:ipo -- --broadcast`; without the key it targets the original IPO market. Check the deployer holds enough ETH and USDG for the next market (`pnpm market:ipo:plan` lists shortfalls). Holders redeem on the Positions page.
 
 **Changing contract logic.** The proxies are upgradeable by the deployer: `QT_IPO_UPGRADE_TARGET=<key> QT_IPO_UPGRADE_CONTRACT=<artifact> pnpm upgrade:ipo [-- --broadcast]`. Rehearse on a fork first, keep the storage layout, and note that the deployer key has no timelock. The manifest records every upgrade under `upgradeHistory`.
 

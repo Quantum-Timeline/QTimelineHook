@@ -49,7 +49,8 @@ const STACK = [
 /** The real wordmarks of what the market is built on: bare logos under a small caption, no containers. */
 export function IpoStack() {
   // The last mark is the event's data source: SEC for the IPO market, BEA for Core PCE.
-  const items = STACK.filter((item) => !("only" in item) || item.only === eventProfile.event);
+  const items = STACK.filter((item) => !("only" in item) || item.only === eventProfile.event)
+    .filter((item) => item.name !== "BEA" || eventProfile.copy.sourceKey === "BEA");
   return (
     <div className="ipo-stack">
       <span className="ipo-stack__cap mono">Built with</span>

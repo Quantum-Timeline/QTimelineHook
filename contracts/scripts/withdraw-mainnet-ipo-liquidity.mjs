@@ -31,8 +31,9 @@ const positionManagerAbi = [
 async function main() {
   const manifest = await readJson(manifestPath);
   if (manifest.system !== "anthropic-ipo-pricing" || manifest.chainId !== MAINNET_CHAIN_ID) throw new Error("The manifest is not the Mainnet IPO deployment");
-  const market = manifest.ipoMarket;
-  if (!market?.marketId || !market.positionIds?.length) throw new Error("The manifest has no seeded IPO market");
+  // QT_EVENT_KEY selects a market created later on the shared engine (manifest.events[key]); without it the original IPO market is used.
+  const market = process.env.QT_EVENT_KEY ? manifest.events?.[process.env.QT_EVENT_KEY] : manifest.ipoMarket;
+  if (!market?.marketId || !market.positionIds?.length) throw new Error("The manifest has no seeded market for that key");
   const env = parseEnv(await readFile(resolve(root, "contracts/.env"), "utf8"));
   const account = privateKeyToAccount(env.RH_MAINNET_DEPLOYER_PRIVATE_KEY);
   if (getAddress(account.address) !== getAddress(manifest.deployer)) throw new Error("The configured key is not the manifest deployer");

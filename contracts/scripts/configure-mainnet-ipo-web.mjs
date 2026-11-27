@@ -28,7 +28,7 @@ try {
   const market = eventKey ? manifest.events?.[eventKey] : manifest.ipoMarket;
   if (eventKey && !market?.marketId) throw new Error(`No market under manifest.events.${eventKey}; create it first`);
   const eventKind = eventKey ? (process.env.QT_EVENT_KIND || "") : "";
-  if (eventKey && eventKind !== "pce") throw new Error("Set QT_EVENT_KIND=pce (the only event kind besides the original IPO market)");
+  if (eventKey && eventKind !== "pce" && eventKind !== "unemployment") throw new Error("Set QT_EVENT_KIND=pce or QT_EVENT_KIND=unemployment");
   const marketId = market?.marketId && /^0x[0-9a-fA-F]{64}$/.test(market.marketId) ? market.marketId : `0x${"0".repeat(64)}`;
   const threshold = !eventKey && market?.thresholdCents ? (market.thresholdCents / 100).toFixed(2) : "";
   const eventLines = eventKey ? [

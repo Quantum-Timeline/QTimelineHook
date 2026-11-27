@@ -301,7 +301,7 @@ The site is a static export, and one build shows one event. The event comes from
 | Variable | Example | Meaning |
 |---|---|---|
 | `NEXT_PUBLIC_EVENT_PROFILE` | `ipo` | Selects the shared-engine UI |
-| `NEXT_PUBLIC_EVENT_KIND` | `pce` | Switches the copy to the Core PCE market |
+| `NEXT_PUBLIC_EVENT_KIND` | `pce` or `unemployment` | Switches the copy to the Core PCE or the US unemployment rate market |
 | `NEXT_PUBLIC_MARKET_ID` | `0xc8fd…fcee` | The market the page trades |
 | `NEXT_PUBLIC_EVENT_THRESHOLD_BPS` | `30` | The threshold in basis points |
 | `NEXT_PUBLIC_EVENT_PERIOD_LABEL` | `October 2026` | The period shown in copy |
@@ -324,7 +324,7 @@ pnpm market:ipo:plan
 pnpm market:ipo:create
 
 # 2. Point the web build at it
-QT_EVENT_KIND=pce QT_EVENT_PERIOD_LABEL="November 2026" pnpm web:ipo:configure
+QT_EVENT_KIND=pce QT_EVENT_PERIOD_LABEL="November 2026" pnpm web:ipo:configure   # or QT_EVENT_KIND=unemployment
 ```
 
 Then update the repository variables used by the resolver workflow and the web build. The full runbook is in [`docs/OPERATIONS.md`](docs/OPERATIONS.md).

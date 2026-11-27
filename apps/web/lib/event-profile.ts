@@ -21,6 +21,8 @@ export type EventProfile = {
   event: "ipo" | "pce";
   metaTitle: string;
   metaDescription: string;
+  /** Link-preview artwork for events that do not use the default banners. */
+  banner?: { url: string; width: number; height: number; alt: string };
   /** Line drawn under the quick-bet card, in display units formatted by `format`. */
   ruler?: { min: number; max: number; threshold: number; format(n: number): string };
 };
@@ -236,4 +238,66 @@ const pceEngine: EventProfile = {
   ruler: { min: 0, max: Math.max(60, Math.abs(eventBps) * 2), threshold: eventBps, format: percent },
 };
 
-export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "pce" ? pce : process.env.NEXT_PUBLIC_EVENT_KIND === "pce" ? pceEngine : ipo;
+// US unemployment rate (BLS Employment Situation) on the same shared engine. It reuses the macro profile and only changes what is
+// specific to the data: the one-decimal rate, the BLS source, and the wording. Threshold 420 means 4.2%.
+const rate = (bps: number) => `${(bps / 100).toFixed(1)}%`;
+const rateText = rate(eventBps);
+const jobsQuestion = `Will the US unemployment rate be ${rateText} or higher in ${periodLabel}?`;
+
+const jobsEngine: EventProfile = {
+  ...pceEngine,
+  tag: `Unemployment rate · ${periodLabel}`,
+  question: jobsQuestion,
+  yesLabel: `YES · ≥ ${rateText}`,
+  noLabel: `NO · < ${rateText}`,
+  source: `First BLS Employment Situation release for ${periodLabel}, unemployment rate, total, seasonally adjusted (Table A-1)`,
+  reportedLabel: "Reported unemployment rate",
+  oracleRule: "A project bot reads the first official BLS Employment Situation release and reports the printed unemployment rate in basis points (4.2% is 420). The report digest requires both ECDSA and ML-DSA-44 signatures. These keys share project control; the signature does not independently prove the BLS number. The release and its hash are public.",
+  copy: {
+    ...pceEngine.copy,
+    heroA: "Bet on jobs,",
+    heroB: "before the report.",
+    heroLead: `The unemployment rate is the headline number in the monthly US jobs report, and the BLS publishes the ${periodLabel} figure${releaseDate ? ` on ${releaseDate}` : ""}. Buy YES if it prints ${rateText} or higher, NO if lower. A winning share pays $1.00 in USDG, all on-chain with no account needed.`,
+    heroStep2: "BLS publishes the number",
+    relLead: "No judges and no appeals. The BLS publishes the unemployment rate once, a signed report puts it on-chain, and the market pays out from it.",
+    relStep2: "The BLS publishes the number",
+    relStep2Text: `The first release for ${periodLabel} is the only one that counts. Later revisions are ignored.`,
+    relYes: `Prints ${rateText} or higher`,
+    relNo: `Prints below ${rateText}`,
+    manifesto: "We split one labor-market print into two live Uniswap v4 timelines on Robinhood Chain. Trade conditional ETH exposure and settle from the first BLS release under hybrid ECDSA plus NIST FIPS 204 post-quantum signatures.",
+    lockCaption: "Swap lock before the BLS release",
+    lockText: "TimelineHook enforces beforeSwap on every pool, locking swaps at the on-chain cutoff before the BLS release.",
+    lockLead: "TimelineHook enforces the cutoff directly inside beforeSwap across ETH-YES, ETH-NO, and YES/NO, so nobody trades after the number is known.",
+    oracleCard: "Dual ECDSA + NIST FIPS 204 module-lattice attestation settles the BLS-reported unemployment rate on-chain.",
+    ethYes: `Conditional ETH price discovery if unemployment prints at or above ${rateText}.`,
+    ethNo: `Parallel ETH price discovery if unemployment prints below ${rateText}.`,
+    traderCard: "Express joint views on the US labor market and ETH price without liquidation risk.",
+    sourceKey: "BLS",
+    sourceTitle: "First release only",
+    sourceText: "Resolves strictly from the first BLS Employment Situation release, and later revisions never change it.",
+    expiryText: "If no BLS figure is reported before the on-chain deadline, any address can call cancelExpired(marketId) for 50/50 redemption.",
+    benchmark: `US unemployment rate ${periodLabel}, seasonally adjusted, read from the first BLS release.`,
+    footer: `Unemployment ${periodLabel}`,
+    genesis: `US unemployment rate ${periodLabel} (at or above ${rateText}), taken from the first BLS release. Trading halts on-chain at the cutoff, before the release.`,
+    releaseHeadline: "BLS release in",
+    oracleTitle: "BLS release, hybrid authorization",
+    guardLabel: "On-chain beforeSwap guard halts all three pools at the cutoff, before the number is released.",
+    marketBlurb: "Pick a side. If you are right, each share pays $1.00 once BLS publishes the unemployment rate. If not, it pays $0.",
+    metaLabel: "US unemployment rate · BLS first release",
+    condYes: `Unemployment ≥ ${rateText}`,
+    condNo: `Unemployment < ${rateText}`,
+    swapText: "Swap across ETH-YES, ETH-NO, and YES/NO on Uniswap v4 to trade your view on US jobs together with ETH.",
+    launchLabel: `Unemployment ${periodLabel}`,
+    footerBlurb: "Conditional markets on Uniswap v4. Trade the US unemployment rate, settled from the BLS release.",
+    filingCaption: "Only the first BLS release settles the market",
+    waitDone: "Waiting for the BLS release",
+  },
+  formatThreshold: rate,
+  formatValue: rate,
+  metaTitle: "QTimeline: US unemployment rate market",
+  metaDescription: `${jobsQuestion} Buy YES or NO on Robinhood Chain. Each winning share pays $1.00, settled from the first BLS release.`,
+  banner: { url: "/brand/og-jobs.png", width: 1200, height: 630, alt: "QTimeline: Bet on jobs, before the report" },
+  ruler: { min: Math.max(0, eventBps - 100), max: eventBps + 100, threshold: eventBps, format: rate },
+};
+
+export const eventProfile: EventProfile = process.env.NEXT_PUBLIC_EVENT_PROFILE === "pce" ? pce : process.env.NEXT_PUBLIC_EVENT_KIND === "pce" ? pceEngine : process.env.NEXT_PUBLIC_EVENT_KIND === "unemployment" ? jobsEngine : ipo;
