@@ -84,7 +84,7 @@ jobs:
             test -n "$QT_BEA_DATA_PERIOD" || { echo "QT_BEA_DATA_PERIOD is not configured for the bea source." >&2; exit 1; }
           elif [[ "$QT_EVENT_SOURCE" == "bls" ]]; then
             test -n "$QT_BLS_DATA_PERIOD" || { echo "QT_BLS_DATA_PERIOD is not configured for the bls source." >&2; exit 1; }
-            [[ "$QT_BLS_USER_AGENT" == *@* ]] || { echo "QT_BLS_USER_AGENT must include a contact email; BLS blocks bots that do not identify themselves." >&2; exit 1; }
+            if [[ -n "$QT_BLS_USER_AGENT" && "$QT_BLS_USER_AGENT" != *@* ]]; then echo "QT_BLS_USER_AGENT, when set, must include a contact email; leave it empty to use the BLS API." >&2; exit 1; fi
           elif [[ "$QT_EVENT_SOURCE" == "sec" ]]; then
             test -n "$QT_SEC_USER_AGENT" || { echo "QT_SEC_USER_AGENT is not configured; the SEC requires a declared contact." >&2; exit 1; }
           else

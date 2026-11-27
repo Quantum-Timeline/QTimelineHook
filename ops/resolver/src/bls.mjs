@@ -4,6 +4,8 @@ import { keccak256, stringToHex } from 'viem';
 
 export const SOURCE_ID = 'bls:unemployment-rate:sa:first-release';
 export const RELEASE_URL = 'https://www.bls.gov/news.release/empsit.t01.htm';
+export const API_URL = 'https://api.bls.gov/publicAPI/v2/timeseries/data/';
+const API_SERIES = 'LNS14000000'; // unemployment rate, 16 years and over, seasonally adjusted: the headline figure
 const TABLE_ROW = 'Unemployment rate (total, seasonally adjusted)';
 
 // BLS labels the columns of Table A-1 with abbreviated months, for example "Oct.2026" or "Sept.2026".
@@ -81,12 +83,12 @@ export function parseUnemploymentRate(html, expectedPeriod) {
   return { pending: false, printed: `${printed}%`, valueBps: Number(whole) * 100 + Number(fraction) * 10 };
 }
 
-export function makeEvidence({ url, periodId, printedValue, html, fetchedAt, fixtureMode = false }) {
+export function makeEvidence({ url, periodId, printedValue, html, fetchedAt, fixtureMode = false, table = 'Table A-1. Employment status of the civilian population by sex and age (seasonally adjusted)' }) {
   const evidence = {
     source: SOURCE_ID,
     url,
     period: periodId,
-    table: 'Table A-1. Employment status of the civilian population by sex and age (seasonally adjusted)',
+    table,
     row: TABLE_ROW,
     printedValue,
     responseSha256: createHash('sha256').update(html).digest('hex'),
@@ -99,4 +101,46 @@ export function makeEvidence({ url, periodId, printedValue, html, fetchedAt, fix
       .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0),
   ));
   return { evidence, canonicalJson, evidenceHash: keccak256(stringToHex(canonicalJson)) };
+}
+
+/**
+ * Reads the same headline figure from the official BLS Public Data API (series LNS14000000), which needs no contact email.
+ * Returns { published: false } when the API has no value for the month yet, so the poll stays a quiet no-op.
+ */
+export async function fetchApiRelease(periodId, fetchImpl = fetch, url = API_URL) {
+  const { year } = splitPeriod(periodId);
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== 'https:' || parsedUrl.hostname !== 'api.bls.gov') throw new Error('Only the official api.bls.gov HTTPS API is accepted');
+  const response = await fetchImpl(parsedUrl, {
+    method: 'POST',
+    redirect: 'error',
+    headers: { 'content-type': 'application/json', 'user-agent': 'QTimeline-BLS-resolver/0.1' },
+    body: JSON.stringify({ seriesid: [API_SERIES], startyear: String(year), endyear: String(year) }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) throw new Error(`BLS API returned HTTP ${response.status}`);
+  const text = await response.text();
+  const json = JSON.parse(text);
+  if (json.status !== 'REQUEST_SUCCEEDED') throw new Error(`BLS API request failed: ${json.status}`);
+  const series = json.Results?.series?.find((item) => item.seriesID === API_SERIES);
+  if (!series || !Array.isArray(series.data)) throw new Error('BLS API response has no unemployment series');
+  return { published: true, url: API_URL, html: text, series: series.data };
+}
+
+/** Reads the expected month from a BLS API series; returns { pending: true } until that month exists. */
+export function parseApiUnemployment(data, expectedPeriod) {
+  const { year, month } = splitPeriod(expectedPeriod);
+  const code = `M${String(month).padStart(2, '0')}`;
+  const matches = data.filter((item) => item.year === String(year) && item.period === code);
+  if (matches.length === 0) return { pending: true };
+  if (matches.length !== 1) throw new Error('BLS API returned the month more than once');
+  const printed = String(matches[0].value);
+  if (!/^\d{1,2}\.\d$/.test(printed)) throw new Error(`Unemployment rate is not a one-decimal percentage: ${printed}`);
+  const [whole, fraction] = printed.split('.');
+  return { pending: false, printed: `${printed}%`, valueBps: Number(whole) * 100 + Number(fraction) * 10 };
+}
+
+/** Evidence for a reading taken from the API (the full response body is hashed). */
+export function makeApiEvidence({ periodId, printedValue, body, fetchedAt }) {
+  return makeEvidence({ url: API_URL, periodId, printedValue, html: body, fetchedAt, table: `BLS Public Data API series ${API_SERIES} (seasonally adjusted)` });
 }

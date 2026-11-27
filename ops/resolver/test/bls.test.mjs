@@ -71,3 +71,40 @@ test('fetch needs a contact email, stays on www.bls.gov and treats a missing pag
   assert.deepEqual(pending, { published: false, status: 404 });
   await assert.rejects(() => fetchOfficialRelease('bot/0.1 (a@b.co)', async () => new Response('denied', { status: 403 })), /HTTP 403/);
 });
+
+import { parseApiUnemployment, fetchApiRelease, makeApiEvidence, API_URL } from '../src/bls.mjs';
+
+const apiData = [
+  { year: '2026', period: 'M10', periodName: 'October', latest: 'true', value: '4.1' },
+  { year: '2026', period: 'M09', periodName: 'September', value: '4.2' },
+];
+
+test('API reader converts the month to basis points and stays pending until it exists', () => {
+  assert.deepEqual(parseApiUnemployment(apiData, '2026-10'), { pending: false, printed: '4.1%', valueBps: 410 });
+  assert.deepEqual(parseApiUnemployment(apiData, '2026-09'), { pending: false, printed: '4.2%', valueBps: 420 });
+  assert.deepEqual(parseApiUnemployment(apiData, '2026-11'), { pending: true });
+});
+
+test('API reader refuses duplicate months and values that are not one-decimal percentages', () => {
+  assert.throws(() => parseApiUnemployment([...apiData, apiData[0]], '2026-10'), /more than once/);
+  assert.throws(() => parseApiUnemployment([{ year: '2026', period: 'M11', value: '-' }], '2026-11'), /one-decimal percentage/);
+});
+
+test('API fetch posts the headline series, stays on api.bls.gov and surfaces failures', async () => {
+  let seen;
+  const ok = async (url, init) => { seen = { url: String(url), body: JSON.parse(init.body) }; return new Response(JSON.stringify({ status: 'REQUEST_SUCCEEDED', Results: { series: [{ seriesID: 'LNS14000000', data: apiData }] } })); };
+  const result = await fetchApiRelease('2026-10', ok);
+  assert.equal(result.published, true);
+  assert.deepEqual(seen.body, { seriesid: ['LNS14000000'], startyear: '2026', endyear: '2026' });
+  await assert.rejects(() => fetchApiRelease('2026-10', ok, 'https://example.com/x'), /Only the official api\.bls\.gov/);
+  await assert.rejects(() => fetchApiRelease('2026-10', async () => new Response('no', { status: 500 })), /HTTP 500/);
+  await assert.rejects(() => fetchApiRelease('2026-10', async () => new Response(JSON.stringify({ status: 'REQUEST_NOT_PROCESSED' }))), /request failed/);
+});
+
+test('API evidence names the same source and its own table', () => {
+  const item = makeApiEvidence({ periodId: '2026-11', printedValue: '4.2%', body: '{}', fetchedAt: '2026-12-04T13:31:00.000Z' });
+  const parsed = JSON.parse(item.canonicalJson);
+  assert.equal(parsed.source, SOURCE_ID);
+  assert.equal(parsed.url, API_URL);
+  assert.match(parsed.table, /LNS14000000/);
+});

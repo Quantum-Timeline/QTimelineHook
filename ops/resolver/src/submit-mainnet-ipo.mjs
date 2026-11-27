@@ -8,7 +8,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { ANTHROPIC_CIK, documentUrl, fetchProspectus, fetchSubmissions, findFirstFinalProspectus, makeIpoEvidence, parseOfferPrice } from './sec.mjs';
 import { assertIpoManifest, buildIpoReport } from './ipo-report.mjs';
 import { SOURCE_ID as BEA_SOURCE_ID, fetchOfficialRelease, makeEvidence as makeBeaEvidence, officialReleaseUrl, parseCorePce } from './bea.mjs';
-import { RELEASE_URL as BLS_RELEASE_URL, SOURCE_ID as BLS_SOURCE_ID, fetchOfficialRelease as fetchBlsRelease, makeEvidence as makeBlsEvidence, parseUnemploymentRate } from './bls.mjs';
+import { RELEASE_URL as BLS_RELEASE_URL, SOURCE_ID as BLS_SOURCE_ID, fetchApiRelease as fetchBlsApi, fetchOfficialRelease as fetchBlsRelease, makeApiEvidence as makeBlsApiEvidence, makeEvidence as makeBlsEvidence, parseApiUnemployment, parseUnemploymentRate } from './bls.mjs';
 import { terminalOutcome } from './mainnet-report.mjs';
 import { normalizeMainnetSeedHex } from './mainnet-seed.mjs';
 
@@ -38,20 +38,28 @@ if (eventSource === 'bls') {
   const dataPeriod = process.env.QT_BLS_DATA_PERIOD;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dataPeriod ?? '')) throw new Error('Set QT_BLS_DATA_PERIOD to the data month, for example 2026-11.');
   let release;
+  let useApi = false;
   if (process.env.QT_EVENT_REHEARSAL_HTML) {
     const host = new URL(process.env.QT_MAINNET_RPC || 'http://invalid.invalid').hostname;
     if (host !== '127.0.0.1' && host !== 'localhost') throw new Error('Rehearsal fixtures are only allowed against a local fork RPC.');
     release = { published: true, url: BLS_RELEASE_URL, html: await readFile(process.env.QT_EVENT_REHEARSAL_HTML, 'utf8') };
-  } else {
+  } else if (process.env.QT_BLS_USER_AGENT) {
+    // Optional: read the release table itself. BLS only serves that page to clients that identify themselves with a contact email.
     release = await fetchBlsRelease(process.env.QT_BLS_USER_AGENT);
+  } else {
+    // Default: the official BLS Public Data API, same headline series, no contact email needed.
+    release = await fetchBlsApi(dataPeriod);
+    useApi = true;
   }
-  const bls = release.published ? parseUnemploymentRate(release.html, dataPeriod) : { pending: true };
+  const bls = !release.published ? { pending: true } : useApi ? parseApiUnemployment(release.series, dataPeriod) : parseUnemploymentRate(release.html, dataPeriod);
   if (bls.pending) {
     console.log(JSON.stringify({ chainId: 4663, period, published: false, reason: `BLS release for ${dataPeriod} is not published yet`, transactionSent: false }));
     process.exit(0);
   }
   parsed = { printed: bls.printed, priceCents: bls.valueBps };
-  beaEvidence = makeBlsEvidence({ url: release.url, periodId: dataPeriod, printedValue: bls.printed, html: release.html, fetchedAt: new Date().toISOString() });
+  beaEvidence = useApi
+    ? makeBlsApiEvidence({ periodId: dataPeriod, printedValue: bls.printed, body: release.html, fetchedAt: new Date().toISOString() })
+    : makeBlsEvidence({ url: release.url, periodId: dataPeriod, printedValue: bls.printed, html: release.html, fetchedAt: new Date().toISOString() });
 } else if (eventSource === 'bea') {
   const dataPeriod = process.env.QT_BEA_DATA_PERIOD;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dataPeriod ?? '')) throw new Error('Set QT_BEA_DATA_PERIOD to the data month, for example 2026-10.');

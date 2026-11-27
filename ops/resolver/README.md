@@ -7,7 +7,7 @@ One resolver serves every market on the shared event engine. It lives in `src/su
 | `QT_EVENT_SOURCE` | Reads | Bound source id on chain |
 |---|---|---|
 | `bea` | The BEA Personal Income and Outlays release for `QT_BEA_DATA_PERIOD` (`YYYY-MM`), Core PCE month over month, reported in basis points | `bea:core-pce:mom:first-release` |
-| `bls` | The BLS Employment Situation Table A-1 for `QT_BLS_DATA_PERIOD` (`YYYY-MM`), unemployment rate (total, seasonally adjusted), reported in basis points (4.2% is 420). Needs `QT_BLS_USER_AGENT` with a contact email | `bls:unemployment-rate:sa:first-release` |
+| `bls` | The BLS Employment Situation Table A-1 for `QT_BLS_DATA_PERIOD` (`YYYY-MM`), unemployment rate (total, seasonally adjusted), reported in basis points (4.2% is 420). Read from the official BLS Public Data API (series `LNS14000000`), no setup needed. Optionally set `QT_BLS_USER_AGENT` (with a contact email) to read the release table instead | `bls:unemployment-rate:sa:first-release` |
 | `sec` (default) | The first Form 424B4 on SEC EDGAR, offering price in US cents | the original IPO source |
 
 Before it signs, the runner reads `expectedSource(marketId)` from the adapter and **refuses to sign when the market is not bound to the source it is about to report**. It also checks the chain id, the resolver and relayer, the market period and the deadline. It simulates, sends once, then reads the final status, value and evidence hash back from chain. A run against a market that is already final submits nothing. An unpublished release (404) is a quiet no-op.
