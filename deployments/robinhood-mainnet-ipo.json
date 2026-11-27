@@ -582,7 +582,24 @@
         }
       ],
       "activated": true,
-      "status": "Scheduled"
+      "status": "Scheduled",
+      "liquidityWithdrawal": {
+        "status": "FinalYes",
+        "transactions": {
+          "withdraw": "0x41baf81d6e0ae2a8f0dc0ba74b6a9228b724a712779db8a50fd64b5d9f116f61",
+          "redeem_eth_yes": "0x48d4f9f2c4268f278352acf5266693855c4ea1100f2bc7961d77df6dac0deacc",
+          "redeem_eth_no": "0xe42280572efbb360894240a39deae04f5a280a176ba1191d5cbec5d2a78bf0ac",
+          "redeem_usdg_yes": "0x2daa89972bf9a989ad5558ac1286cd9c7f82fcf77c8b4918d2564d9132932ef5",
+          "redeem_usdg_no": "0x1a358ddd6f03a7f9ef6715d560ff131c0589246d33dc9eddb040d6eb92cd7b11"
+        },
+        "completedAt": "2026-11-27T07:22:28.626Z",
+        "remainingClaims": [
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      }
     }
   }
 }
