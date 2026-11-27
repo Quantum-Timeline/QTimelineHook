@@ -1,13 +1,15 @@
 name: Resolve a shared-engine event on Robinhood Mainnet
 
 # One workflow for every event that runs on the shared IPO-engine contracts (no contract redeploy per event).
-# The data source is chosen per run: 'bea' (US Core PCE) or 'sec' (an SEC 424B4 offering price). The market must already be
+# The data source is chosen per run: 'bea' (US Core PCE), 'bls' (US unemployment rate) or 'sec' (an SEC 424B4 offering price). The market must already be
 # bound to the same source on chain (setMarketSource), and the resolver refuses to sign otherwise.
 
 on:
   schedule:
     # Core PCE for October 2026: BEA releases on 25 Nov at 13:30 UTC; poll every 15 minutes through 27 Nov.
     - cron: '*/15 13-18 25-27 11 *'
+    # US unemployment rate for November 2026: BLS releases on 4 Dec at 13:30 UTC; poll every 15 minutes through 6 Dec.
+    - cron: '*/15 13-18 4-6 12 *'
   workflow_dispatch:
     inputs:
       manifest_path:
@@ -24,7 +26,7 @@ on:
         required: true
         type: string
       event_source:
-        description: Data source, 'bea' or 'sec'.
+        description: Data source, 'bea', 'bls' or 'sec'.
         required: true
         type: string
         default: bea
@@ -33,6 +35,11 @@ on:
         required: false
         type: string
         default: 2026-10
+      bls_data_period:
+        description: For the bls source, the data month (YYYY-MM), for example 2026-11.
+        required: false
+        type: string
+        default: 2026-11
       broadcast:
         description: Submit the simulated report transaction (leave false for dry run).
         required: true
@@ -58,6 +65,8 @@ jobs:
       QT_IPO_PERIOD: ${{ inputs.period || vars.QT_EVENT_PERIOD }}
       QT_EVENT_SOURCE: ${{ inputs.event_source || vars.QT_EVENT_SOURCE || 'bea' }}
       QT_BEA_DATA_PERIOD: ${{ inputs.bea_data_period || vars.QT_BEA_DATA_PERIOD }}
+      QT_BLS_DATA_PERIOD: ${{ inputs.bls_data_period || vars.QT_BLS_DATA_PERIOD }}
+      QT_BLS_USER_AGENT: ${{ vars.QT_BLS_USER_AGENT }}
       QT_SEC_USER_AGENT: ${{ vars.QT_SEC_USER_AGENT }}
       QT_BROADCAST: ${{ github.event_name == 'schedule' && '1' || (inputs.broadcast && '1' || '0') }}
     steps:
@@ -73,10 +82,13 @@ jobs:
           test -n "$QT_IPO_PERIOD" || { echo "Period is not configured." >&2; exit 1; }
           if [[ "$QT_EVENT_SOURCE" == "bea" ]]; then
             test -n "$QT_BEA_DATA_PERIOD" || { echo "QT_BEA_DATA_PERIOD is not configured for the bea source." >&2; exit 1; }
+          elif [[ "$QT_EVENT_SOURCE" == "bls" ]]; then
+            test -n "$QT_BLS_DATA_PERIOD" || { echo "QT_BLS_DATA_PERIOD is not configured for the bls source." >&2; exit 1; }
+            [[ "$QT_BLS_USER_AGENT" == *@* ]] || { echo "QT_BLS_USER_AGENT must include a contact email; BLS blocks bots that do not identify themselves." >&2; exit 1; }
           elif [[ "$QT_EVENT_SOURCE" == "sec" ]]; then
             test -n "$QT_SEC_USER_AGENT" || { echo "QT_SEC_USER_AGENT is not configured; the SEC requires a declared contact." >&2; exit 1; }
           else
-            echo "QT_EVENT_SOURCE must be bea or sec." >&2; exit 1
+            echo "QT_EVENT_SOURCE must be bea, bls or sec." >&2; exit 1
           fi
           if [[ "$QT_BROADCAST" == "1" && "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.broadcast }}" != "true" ]]; then
             echo "Manual runs default to simulation; broadcast requires the explicit input." >&2

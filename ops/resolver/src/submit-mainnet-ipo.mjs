@@ -8,6 +8,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { ANTHROPIC_CIK, documentUrl, fetchProspectus, fetchSubmissions, findFirstFinalProspectus, makeIpoEvidence, parseOfferPrice } from './sec.mjs';
 import { assertIpoManifest, buildIpoReport } from './ipo-report.mjs';
 import { SOURCE_ID as BEA_SOURCE_ID, fetchOfficialRelease, makeEvidence as makeBeaEvidence, officialReleaseUrl, parseCorePce } from './bea.mjs';
+import { RELEASE_URL as BLS_RELEASE_URL, SOURCE_ID as BLS_SOURCE_ID, fetchOfficialRelease as fetchBlsRelease, makeEvidence as makeBlsEvidence, parseUnemploymentRate } from './bls.mjs';
 import { terminalOutcome } from './mainnet-report.mjs';
 import { normalizeMainnetSeedHex } from './mainnet-seed.mjs';
 
@@ -25,13 +26,33 @@ if (!marketId || !/^0x[0-9a-fA-F]{64}$/.test(marketId)) throw new Error('Set QT_
 // or 'bea' (US Core PCE month over month from the BEA release for QT_BEA_DATA_PERIOD, for example 2026-10). The market must be
 // bound to the same source on chain (IpoResolutionAdapter.setMarketSource); the check below refuses to sign otherwise.
 const eventSource = process.env.QT_EVENT_SOURCE || 'sec';
-if (eventSource !== 'sec' && eventSource !== 'bea') throw new Error("QT_EVENT_SOURCE must be 'sec' or 'bea'.");
+if (eventSource !== 'sec' && eventSource !== 'bea' && eventSource !== 'bls') throw new Error("QT_EVENT_SOURCE must be 'sec', 'bea' or 'bls'.");
 
 let first;
 let fetched;
 let parsed;
 let beaEvidence;
-if (eventSource === 'bea') {
+if (eventSource === 'bls') {
+  // US unemployment rate (total, seasonally adjusted) from BLS Employment Situation Table A-1 for QT_BLS_DATA_PERIOD (for example
+  // 2026-11), in basis points: 4.2% is 420. Same rehearsal seam as BEA, honoured only against a local fork RPC.
+  const dataPeriod = process.env.QT_BLS_DATA_PERIOD;
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dataPeriod ?? '')) throw new Error('Set QT_BLS_DATA_PERIOD to the data month, for example 2026-11.');
+  let release;
+  if (process.env.QT_EVENT_REHEARSAL_HTML) {
+    const host = new URL(process.env.QT_MAINNET_RPC || 'http://invalid.invalid').hostname;
+    if (host !== '127.0.0.1' && host !== 'localhost') throw new Error('Rehearsal fixtures are only allowed against a local fork RPC.');
+    release = { published: true, url: BLS_RELEASE_URL, html: await readFile(process.env.QT_EVENT_REHEARSAL_HTML, 'utf8') };
+  } else {
+    release = await fetchBlsRelease(process.env.QT_BLS_USER_AGENT);
+  }
+  const bls = release.published ? parseUnemploymentRate(release.html, dataPeriod) : { pending: true };
+  if (bls.pending) {
+    console.log(JSON.stringify({ chainId: 4663, period, published: false, reason: `BLS release for ${dataPeriod} is not published yet`, transactionSent: false }));
+    process.exit(0);
+  }
+  parsed = { printed: bls.printed, priceCents: bls.valueBps };
+  beaEvidence = makeBlsEvidence({ url: release.url, periodId: dataPeriod, printedValue: bls.printed, html: release.html, fetchedAt: new Date().toISOString() });
+} else if (eventSource === 'bea') {
   const dataPeriod = process.env.QT_BEA_DATA_PERIOD;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(dataPeriod ?? '')) throw new Error('Set QT_BEA_DATA_PERIOD to the data month, for example 2026-10.');
   let release;
@@ -120,12 +141,12 @@ if (onchainSigner.toLowerCase() !== signer.address.toLowerCase()) throw new Erro
 
 const market = await publicClient.readContract({ address: registry, abi: registryArtifact.abi, functionName: 'market', args: [marketId] });
 if (market.periodId.toLowerCase() !== keccak256(stringToHex(period)).toLowerCase()) throw new Error('On-chain IPO market period does not match the configured period.');
-const sourceIdText = eventSource === 'bea' ? BEA_SOURCE_ID : undefined;
+const sourceIdText = eventSource === 'bea' ? BEA_SOURCE_ID : eventSource === 'bls' ? BLS_SOURCE_ID : undefined;
 const expectedSourceAbi = [{ type: 'function', name: 'expectedSource', stateMutability: 'view', inputs: [{ type: 'bytes32' }], outputs: [{ type: 'bytes32' }] }];
-if (eventSource === 'bea') {
+if (sourceIdText) {
   // The adapter only settles a market from the source it was bound to; refuse early (and clearly) if the binding is missing.
   const bound = await publicClient.readContract({ address: adapter, abi: expectedSourceAbi, functionName: 'expectedSource', args: [marketId] });
-  if (bound.toLowerCase() !== keccak256(stringToHex(BEA_SOURCE_ID)).toLowerCase()) throw new Error('Market is not bound to the BEA source on chain; run setMarketSource first. No transaction sent.');
+  if (bound.toLowerCase() !== keccak256(stringToHex(sourceIdText)).toLowerCase()) throw new Error(`Market is not bound to the ${eventSource.toUpperCase()} source on chain; run setMarketSource first. No transaction sent.`);
 }
 const priorOutcome = terminalOutcome(market.status);
 if (priorOutcome) {
