@@ -14,7 +14,7 @@ const factoryAbi = parseAbi([
 const quoterAbi = parseAbi(["function quoteExactInputSingle(((address currency0,address currency1,uint24 fee,int24 tickSpacing,address hooks) poolKey,bool zeroForOne,uint128 exactAmount,bytes hookData) params) returns (uint256 amountOut,uint256 gasEstimate)"]);
 const PROBE = 10_000n; // 0.01 USDG claim: small enough to read the spot ratio, large enough to survive rounding
 
-export type Odds = { yes?: number; note: string };
+export type Odds = { yes?: number; note: string; /** On-chain status once trading is closed (4 = final YES, 5 = final NO). */ status?: number };
 
 /** Implied YES probability from the YES/NO pool spot ratio. A market estimate, never a contract input. */
 export function useOdds(): Odds {
@@ -39,7 +39,7 @@ export function useOdds(): Odds {
           client.getBlock(),
         ]);
         if (!canTradeAt({ status: market.status, activated: market.activated, opensAt: market.opensAt, cutoffAt: market.cutoffAt, chainTimestamp: block.timestamp })) {
-          if (active) setOdds({ note: market.status >= 3 ? "Trading is closed; odds are frozen." : "Odds open with trading." });
+          if (active) setOdds({ note: market.status >= 3 ? "Trading is closed; odds are frozen." : "Odds open with trading.", status: market.status });
           return;
         }
         const pool = keys[2];
