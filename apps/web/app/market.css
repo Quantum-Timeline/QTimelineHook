@@ -202,7 +202,7 @@
 .past__link:hover { text-decoration: underline; }
 .landing-past { padding: clamp(40px, 6vw, 96px) 0; }
 .past__links { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; }
-.past__link--primary { color: #0b0b0b; background: var(--lime, #cfef8c); padding: 8px 14px; border-radius: 999px; font-weight: 600; }
+a.past__link.past__link--primary, a.past__link.past__link--primary:visited, a.past__link.past__link--primary:hover, a.past__link.past__link--primary:focus-visible { color: #0b0b0b; background: var(--lime, #cfef8c); padding: 8px 14px; border-radius: 999px; font-weight: 600; opacity: 1; text-shadow: none; }
 .past__link--primary:hover { text-decoration: none; filter: brightness(1.08); }
 
 /* Settled market: the two sides show who won instead of a price and a buy button. */
