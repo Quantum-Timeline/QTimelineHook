@@ -600,6 +600,121 @@
           "0"
         ]
       }
+    },
+    "unemployment-2026-11": {
+      "marketId": "0xa611206aacb8fe61d50838256d2b84d024dd27262f863d662d62bf40324a567d",
+      "configHash": "0xfe251adf7f3195915c5f7bbcf2eda10a8e2883494a11d453212ef68775cf10ad",
+      "period": "UNEMPLOYMENT-2026-11",
+      "periodId": "0x403ce6dbedb451401ca2ee6a751cd9e20f5eb64d0eefc9fa7c889b550ecaa0db",
+      "thresholdCents": 420,
+      "thresholdBps": 420,
+      "opensAt": "1795767773",
+      "cutoffAt": "1796390700",
+      "releaseAt": "1796391000",
+      "deadline": "1796563800",
+      "hook": "0xBb3F445db21355cddaFf914824EFd32C0805e880",
+      "referenceEthUsd": "1702",
+      "transactions": {
+        "create": {
+          "hash": "0x7b3051924f0cc6ab0e44e4dffc0e5f4bc83ddb4184896e875e459091579af77a",
+          "gasUsed": "3643006",
+          "blockNumber": "124081099"
+        },
+        "setSource": {
+          "hash": "0x6482a76fdb36554084d2c3eeb2ae20948e1c51bf39eebfcd884020be609666dc",
+          "gasUsed": "79754"
+        },
+        "initializePools": {
+          "hash": "0xda6289911ec874aeabc174b0dee46f398c63271e88f4f63249ecff5fb83b7a42",
+          "gasUsed": "237737"
+        },
+        "splitEth": {
+          "hash": "0x3eaec7c774d44dc0fbd4676699b0fb17ec1c9d5eff04a549d336452a2d2e6d84",
+          "gasUsed": "207269"
+        },
+        "splitUsdg": {
+          "hash": "0x3cada92837ee70993b7d0eeb39646e962a0a4783e05e7ba739b852b2c6397435",
+          "gasUsed": "260595"
+        },
+        "positions": [
+          {
+            "hash": "0x5b2c4878e627aaf5a330037cfd4f9d0f43806b33f6b53e1508cee767c441f6c2",
+            "gasUsed": "491102"
+          },
+          {
+            "hash": "0xfb497c4f685af9144b72e56faaf991b2ada8973fdebec12653c1640c70e94cb3",
+            "gasUsed": "468557"
+          },
+          {
+            "hash": "0xf673c0f1fc8a1a33650c747401ebe3b024406e4d9e32849881a586160e0cb7fd",
+            "gasUsed": "456320"
+          }
+        ],
+        "activate": {
+          "hash": "0xb03aa8d2053b82508081340bab09df71292a5785274a80fe3b193e4824ed4679",
+          "gasUsed": "94322"
+        }
+      },
+      "source": "bls:unemployment-rate:sa:first-release",
+      "eventKey": "unemployment-2026-11",
+      "vault": "0x8E55837B9fd57737E65e241cf782aE3BBef8dda6",
+      "tokens": [
+        "0x039B2EF3a0552B7f1F9163dD706F693D088d646B",
+        "0xba10c96559838Ac6b93e08f5c5B3065b42641960",
+        "0x7002861aC79b254772d535470eEcE63D496cC1C2",
+        "0xaEE66c3758cD4482C6f35ab4a7b371eDf1D7484E"
+      ],
+      "poolIds": [
+        "0x8f7a8b23aad378e1c410f93071a2d020166a4cac23831ffd026e959e5228a054",
+        "0xcc6c2e6b8e1d78a0b62b555564bcd0138e42dddba0713f068cd5097c2ebfddcd",
+        "0x63538f72e70de717af3a320f8b9b0ea7b36ca2a49edabe43d5fa52bc9f6940cb"
+      ],
+      "positionIds": [
+        "4374850",
+        "4374851",
+        "4374852"
+      ],
+      "seeded": true,
+      "positions": [
+        {
+          "currency0": "0x039B2EF3a0552B7f1F9163dD706F693D088d646B",
+          "currency1": "0x7002861aC79b254772d535470eEcE63D496cC1C2",
+          "tickLower": -204180,
+          "tickUpper": -199680,
+          "liquidity": "909163475278",
+          "sqrtPriceX96": "3268581826056696818953263",
+          "amount0Max": "2350176263219742",
+          "amount1Max": "4000000",
+          "amount0Needed": "2339531447302898",
+          "amount1Needed": "3999600"
+        },
+        {
+          "currency0": "0xaEE66c3758cD4482C6f35ab4a7b371eDf1D7484E",
+          "currency1": "0xba10c96559838Ac6b93e08f5c5B3065b42641960",
+          "tickLower": 199680,
+          "tickUpper": 204180,
+          "liquidity": "909163475278",
+          "sqrtPriceX96": "1920435855497471691511905719853018",
+          "amount0Max": "4000000",
+          "amount1Max": "2350176263219742",
+          "amount0Needed": "3999600",
+          "amount1Needed": "2339531447302898"
+        },
+        {
+          "currency0": "0x7002861aC79b254772d535470eEcE63D496cC1C2",
+          "currency1": "0xaEE66c3758cD4482C6f35ab4a7b371eDf1D7484E",
+          "tickLower": -6240,
+          "tickUpper": 6240,
+          "liquidity": "74617438",
+          "sqrtPriceX96": "79228162514264337593543950336",
+          "amount0Max": "20000000",
+          "amount1Max": "20000000",
+          "amount0Needed": "19998000",
+          "amount1Needed": "19998000"
+        }
+      ],
+      "activated": true,
+      "status": "Scheduled"
     }
   }
 }
