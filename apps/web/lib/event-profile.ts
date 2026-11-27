@@ -256,7 +256,7 @@ const jobsEngine: EventProfile = {
   copy: {
     ...pceEngine.copy,
     heroA: "Bet on jobs,",
-    heroB: "before the report.",
+    heroB: "before the print.",
     heroLead: `The unemployment rate is the headline number in the monthly US jobs report, and the BLS publishes the ${periodLabel} figure${releaseDate ? ` on ${releaseDate}` : ""}. Buy YES if it prints ${rateText} or higher, NO if lower. A winning share pays $1.00 in USDG, all on-chain with no account needed.`,
     heroStep2: "BLS publishes the number",
     relLead: "No judges and no appeals. The BLS publishes the unemployment rate once, a signed report puts it on-chain, and the market pays out from it.",
@@ -296,7 +296,7 @@ const jobsEngine: EventProfile = {
   formatValue: rate,
   metaTitle: "QTimeline: US unemployment rate market",
   metaDescription: `${jobsQuestion} Buy YES or NO on Robinhood Chain. Each winning share pays $1.00, settled from the first BLS release.`,
-  banner: { url: "/brand/og-jobs.png", width: 1200, height: 630, alt: "QTimeline: Bet on jobs, before the report" },
+  banner: { url: "/brand/og-jobs.png", width: 1200, height: 630, alt: "QTimeline: Bet on jobs, before the print" },
   ruler: { min: Math.max(0, eventBps - 100), max: eventBps + 100, threshold: eventBps, format: rate },
 };
 
